@@ -10,7 +10,7 @@ import axios from "axios";
 
 
 Vue.use(ElementUI);
-
+axios.defaults.timeout = 6000;
 axios.defaults.baseURL = process.env.BASE_API;
 Vue.prototype.$axios = axios;
 

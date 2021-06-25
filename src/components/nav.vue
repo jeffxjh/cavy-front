@@ -42,7 +42,7 @@
             <el-submenu
               :key="key"
               v-if="item.children && item.children.length !== 0"
-              :index="item.id+''"
+              :index="item.id + ''"
             >
               <template slot="title">
                 <i :class="item.icon"></i>
@@ -50,7 +50,7 @@
               </template>
               <el-menu-item
                 v-for="(val, index) in item.children"
-                :index="val.id"
+                :index="val.id+''"
                 :key="index"
               >
                 <template slot="title">
@@ -59,7 +59,7 @@
                 </template>
               </el-menu-item>
             </el-submenu>
-            <el-submenu v-else :key="item.parentID" :index="item.id+''">
+            <el-submenu v-else :key="item.parentID" :index="item.id + ''">
               <template slot="title">
                 <i :class="item.icon"></i>
                 <span>{{ item.menuName }}</span>
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { MenuService } from "../common/api/api";
+import { treeMenu } from "../common/api/api";
 var $this = {};
 export default {
   name: "sideMeuns",
@@ -93,9 +93,17 @@ export default {
     this.getMenu();
   },
   methods: {
-   async getMenu() {
-      let res =await MenuService.tree();
-      console.info(res, 123);
+    async getMenu() {
+      let result = await treeMenu();
+
+       console.info(result, 1);
+     this.menuList = result.data.data;
+      // let aa = treeMenu().then(res => {
+      //   console.info(result, 2);
+      // });
+
+      // console.info(aa, 3);
+
       // this.menuList = res.data;
       // this.$axios
       //   .get("/menu/list", {})
@@ -107,7 +115,6 @@ export default {
       //   .catch(err => {
       //     console.log(err);
       //   });
-
     },
 
     handleOpen(key, keyPath) {
