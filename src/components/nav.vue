@@ -1,5 +1,5 @@
 <template>
-  <el-aside width="200px">
+  <el-aside :width="isCollapse ? '64px' : '200px'">
     <el-row class="tac">
       <el-col>
         <!--
@@ -31,41 +31,52 @@
         </el-menu> -->
 
         <!-- 这里的 routerList  为 从 router.js动态获取到了路由信息 -->
+        <div class="toggle-button" @click="toggleCollapse">
+          <div v-if="isCollapse">
+            <i class="el-icon-s-unfold"></i>
+          </div>
+          <div v-else>
+            <i class="el-icon-s-fold"></i>
+          </div>
+        </div>
 
         <el-menu
           default-active="1"
-          class="el-menu-vertical-demo"
           @open="handleOpen"
           @close="handleClose"
+          unique-opened
+          background-color="#333744"
+          text-color="#fff"
+          active-text-color="#409EFF"
+          :collapse="isCollapse"
+          :collapse-transition="false"
         >
-          <template v-for="(item, key) in menuList">
-            <el-submenu
-              :key="key"
-              v-if="item.children && item.children.length !== 0"
-              :index="item.id + ''"
-            >
-              <template slot="title">
-                <i :class="item.icon"></i>
-                <span>{{ item.menuName }}</span>
-              </template>
-              <el-menu-item
-                v-for="(val, index) in item.children"
-                :index="val.id+''"
-                :key="index"
-              >
+          <div :key="key" :index="item.id + ''" v-for="(item, key) in menuList">
+            <!-- 有二级菜单 -->
+            <div v-if="item.children && item.children.length !== 0">
+              <el-submenu :key="item.id" :index="item.id + ''">
                 <template slot="title">
-                  <i :class="val.icon"></i>
-                  <span>{{ val.menuName }}</span>
+                  <i :class="item.icon"></i>
+                  <span slot="title">{{ item.menuName }}</span>
                 </template>
-              </el-menu-item>
-            </el-submenu>
-            <el-submenu v-else :key="item.parentID" :index="item.id + ''">
-              <template slot="title">
+                <el-menu-item
+                  :key="subKey"
+                  :index="subItem.id + ''"
+                  v-for="(subItem, subKey) in item.children"
+                >
+                  <i :class="subItem.icon"></i>
+                  <span slot="title">{{ subItem.menuName }}</span>
+                </el-menu-item>
+              </el-submenu>
+            </div>
+            <!-- 没有二级菜单 -->
+            <div v-else>
+              <el-menu-item :index="item.id">
                 <i :class="item.icon"></i>
-                <span>{{ item.menuName }}</span>
-              </template>
-            </el-submenu>
-          </template>
+                <span slot="title">{{ item.menuName }}</span>
+              </el-menu-item>
+            </div>
+          </div>
         </el-menu>
       </el-col>
     </el-row>
@@ -79,11 +90,9 @@ export default {
   name: "sideMeuns",
   data() {
     return {
-      menuList: [
-        { id: 1, parentId: 3, weight: 0, menuName: "后台中心", code: "main" },
-        { id: 2, parentId: 2, weight: 0, menuName: "后台中心", code: "main" },
-        { id: 3, parentId: 1, weight: 0, menuName: "后台中心", code: "main" }
-      ]
+      menuList: [],
+      //是否折叠菜单
+      isCollapse: false
     };
   },
   beforeCreate() {
@@ -96,8 +105,8 @@ export default {
     async getMenu() {
       let result = await treeMenu();
 
-       console.info(result, 1);
-     this.menuList = result.data.data;
+      console.info(result, 1);
+      this.menuList = result.data.data;
       // let aa = treeMenu().then(res => {
       //   console.info(result, 2);
       // });
@@ -130,6 +139,10 @@ export default {
       } else if ((link = "order")) {
         $this.$router.push("/order").catch(error => error);
       }
+    },
+    //左侧菜单折叠展开
+    toggleCollapse() {
+      this.isCollapse = !this.isCollapse;
     }
   }
 };
@@ -141,8 +154,30 @@ export default {
 }
 .el-menu {
   border-right: none;
+  font-size: 14px;
+  font-weight: bold;
 }
 .el-aside {
   border-right: 1px solid #f5f1f1;
+  background-color: #333744;
 }
+.toggle-button {
+  padding-left: 10px;
+  background-color: #4a5064;
+  font-size: 20px;
+  color: #fff;
+  line-height: 24px;
+  text-align: center;
+  letter-spacing: 0.5em;
+  cursor: pointer;
+}
+
+/*隐藏文字*/
+  .el-menu--collapse  .el-submenu__title span{
+    display: none;
+  }
+  /*隐藏 > */
+  .el-menu--collapse  .el-submenu__title .el-submenu__icon-arrow{
+    display: none;
+  }
 </style>
