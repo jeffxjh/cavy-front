@@ -51,27 +51,37 @@
           :collapse="isCollapse"
           :collapse-transition="false"
         >
-          <div :key="key" :index="item.id + ''" v-for="(item, key) in menuList">
+          <div
+            :key="key"
+            :index="item.code + item.id + ''"
+            v-for="(item, key) in menuList"
+          >
             <!-- 有二级菜单 -->
             <div v-if="item.children && item.children.length !== 0">
-              <el-submenu :key="item.id" :index="item.id + ''">
+              <el-submenu
+                :key="item.id"
+                :index="item.id + ' '+item.code"
+                @click="goPage(item.url)"
+              >
                 <template slot="title">
                   <i :class="item.icon"></i>
                   <span slot="title">{{ item.menuName }}</span>
                 </template>
                 <el-menu-item
                   :key="subKey"
-                  :index="subItem.id + ''"
+                  :index="subItem.id + ' ' + subKey"
                   v-for="(subItem, subKey) in item.children"
                 >
-                  <i :class="subItem.icon"></i>
-                  <span slot="title">{{ subItem.menuName }}</span>
+                  <div @click="goPage(subItem.url)">
+                    <i :class="subItem.icon"></i>
+                    <span slot="title">{{ subItem.menuName }}</span>
+                  </div>
                 </el-menu-item>
               </el-submenu>
             </div>
             <!-- 没有二级菜单 -->
             <div v-else>
-              <el-menu-item :index="item.id">
+              <el-menu-item :index="item.id + ''" @click="goPage(item.url)">
                 <i :class="item.icon"></i>
                 <span slot="title">{{ item.menuName }}</span>
               </el-menu-item>
@@ -134,11 +144,11 @@ export default {
     },
     //跳转到某个导航页
     goPage(link) {
-      if (link === "home") {
-        $this.$router.push("/").catch(error => error);
-      } else if ((link = "order")) {
-        $this.$router.push("/order").catch(error => error);
+      console.info("左侧菜单栏跳转地址", link);
+      if (link == undefined || link == null || link == "") {
+        $this.$router.push(`/`).catch(error => error);
       }
+      $this.$router.push(`/${link}`).catch(error => error);
     },
     //左侧菜单折叠展开
     toggleCollapse() {
@@ -173,11 +183,11 @@ export default {
 }
 
 /*隐藏文字*/
-  .el-menu--collapse  .el-submenu__title span{
-    display: none;
-  }
-  /*隐藏 > */
-  .el-menu--collapse  .el-submenu__title .el-submenu__icon-arrow{
-    display: none;
-  }
+.el-menu--collapse .el-submenu__title span {
+  display: none;
+}
+/*隐藏 > */
+.el-menu--collapse .el-submenu__title .el-submenu__icon-arrow {
+  display: none;
+}
 </style>

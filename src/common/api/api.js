@@ -49,3 +49,7 @@ export const deleteClient = params => {
 export const treeMenu = params => {
   return getRequest("/menu/tree", params);
 };
+// 长业务
+export const business = params => {
+  return getRequest("/business", params);
+};
