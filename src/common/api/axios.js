@@ -1,10 +1,45 @@
 import axios from 'axios';
 import { getStore, setStore } from './storage';
-
+import router from '@/router'
 let base = '';
 
 // 超时设定
 axios.defaults.timeout = 15000;
+
+
+// http request 拦截器
+axios.interceptors.request.use(
+  config => {
+    console.info('进入拦截器',config)
+    if (localStorage.token) { //判断token是否存在
+      config.headers.Authorization = localStorage.token;  //将token设置成请求头
+    }
+    return config;
+  },
+  err => {
+    return Promise.reject(err);
+  }
+);
+
+// http response 拦截器
+axios.interceptors.response.use(
+  response => {
+    if (response.data.errno === 999) {
+      router.replace('/');
+      console.log("token过期");
+    }
+    return response;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+
+
+
+
+
 
 export const getRequest = (url, params) => {
     let accessToken = getStore('accessToken');

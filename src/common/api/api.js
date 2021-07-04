@@ -3,6 +3,7 @@ import {
   getRequest,
   getNoAuthRequest,
   postNoAuthRequest,
+  postBodyRequest,
   postRequest,
   putRequest
 } from "./axios";
@@ -56,4 +57,8 @@ export const business = params => {
 // 获取菜单树
 export const userList = params => {
   return getRequest("/user", params);
+};
+// 获取菜单树
+export const login = params => {
+  return postBodyRequest("/user/login", params);
 };
