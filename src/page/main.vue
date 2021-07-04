@@ -66,23 +66,16 @@ export default {
     },
     business() {
       let that = this;
-      axios({
-        method: "get",
-        url: "http://localhost:8011/cavy/business/",
-        params: { uuid: "asdasd" }
-      })
-        .then(function(response) {
-          if (response.status === 200 && response.data.msg === "success") {
+      let r = business({ uuid: "" })
+        .then(function(res) {
+          // console.info(res, 1);
+          if (res.status === 200 && res.data.msg === "success") {
             let interval = setInterval(() => {
-              axios({
-                method: "get",
-                url: "http://localhost:8011/cavy/business/",
-                params: { uuid: "asdasd" }
-              })
+              business({uuid: res.data.data.uuid})
                 .then(function(response) {
-                  console.log(response.data.data, 2);
-                  that.progressValue = parseInt(response.data.data);
-                  if (parseInt(response.data.data) >= 100) {
+                  // console.log(response.data.data, 2);
+                  that.progressValue = parseInt(response.data.data.count);
+                  if (parseInt(response.data.data.count) >= 100) {
                     clearInterval(interval);
                     that.$message({
                       message: "操作成功",
@@ -91,7 +84,7 @@ export default {
                   }
                 })
                 .catch(function(error) {
-                  console.log(error);
+                  // console.log(error);
                   clearInterval(interval);
                   that.$message.error("操作失败");
                 });

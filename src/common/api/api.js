@@ -51,5 +51,9 @@ export const treeMenu = params => {
 };
 // 长业务
 export const business = params => {
-  return getRequest("/business", params);
+  return getRequest("/business/", params);
+};
+// 获取菜单树
+export const userList = params => {
+  return getRequest("/user", params);
 };
