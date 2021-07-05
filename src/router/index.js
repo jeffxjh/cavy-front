@@ -6,6 +6,7 @@ import Main from "@/page/main";
 import System from "@/page/system";
 import File from "@/page/file";
 import Login from "@/page/login";
+import Websocket from "@/page/websocket";
 import Layout from "@/components/layout";
 import Centre from "@/components/centre";
 
@@ -47,6 +48,12 @@ const routes = [
         path: "/system/file",
         name: "File",
         component: File
+      }
+      ,
+      {
+        path: "/message/websocket",
+        name: "Websocket",
+        component: Websocket
       }
     ]
   },

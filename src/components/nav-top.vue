@@ -4,16 +4,14 @@
       <img class="logo" src="@/assets/imgs/logo.png" alt="Logo" />
     </el-aside>
     <el-aside width="auto" class="header-logo tap">
-      <!-- <el-badge is-dot class="item">
-        <el-button class="share-button" icon="el-icon-share" type="primary"
-          >通知</el-button
-        >
-      </el-badge> -->
+      <el-badge is-dot class="item">
+        <el-button class="share-button" icon="el-icon-share" type="primary">通知</el-button>
+      </el-badge>
 
       <el-dropdown @command="handleCommand">
-        <el-avatar icon="el-icon-user-solid" class="headerLogo"
-          ><i class="el-icon-arrow-down el-icon--right"></i
-        ></el-avatar>
+      <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"  @error="errorHandler">
+       <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"/>
+      </el-avatar>
         <el-dropdown-menu slot="dropdown" >
           <el-dropdown-item>个人信息</el-dropdown-item>
           <el-dropdown-item>通知</el-dropdown-item>
@@ -37,6 +35,9 @@ export default {
     $this = this;
   },
   methods: {
+     errorHandler() {
+        return true
+      },
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
