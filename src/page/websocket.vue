@@ -22,6 +22,7 @@ export default {
     initWebSocket() {
       //初始化weosocket
       const wsuri = "ws://localhost:8011/cavy/websocket/DPS007";
+      //const wsuri = "ws://localhost:8011/cavy/ws/serverTwo";
       this.websock = new WebSocket(wsuri);
       this.websock.onmessage = this.websocketonmessage;
       this.websock.onopen = this.websocketonopen;
