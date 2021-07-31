@@ -16,7 +16,9 @@
     "element-ui": "^2.15.2",
     "vue": "^2.5.2",
     "vue-axios": "^3.2.4",
-    "vue-router": "^3.0.1"
+    "vue-fragment": "^1.5.2",
+    "vue-router": "^3.0.1",
+    "wangeditor": "^4.7.6"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

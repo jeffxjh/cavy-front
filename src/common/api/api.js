@@ -54,11 +54,23 @@ export const treeMenu = params => {
 export const business = params => {
   return getRequest("/business/", params);
 };
-// 获取菜单树
+// 获取用户列表
 export const userList = params => {
   return getRequest("/user", params);
 };
 // 获取菜单树
 export const login = params => {
   return postBodyRequest("/user/login", params);
+};
+// 获取问题列表
+export const questionList = params => {
+  return getRequest("/question", params);
+};
+// 新建问题列表
+export const addQuestion = params => {
+  return postBodyRequest("/question", params);
+};
+// 获取回答列表
+export const findAnswerByQuestionId = params => {
+  return getRequest("/answer", params);
 };

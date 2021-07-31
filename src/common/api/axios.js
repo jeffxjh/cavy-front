@@ -12,7 +12,7 @@ axios.interceptors.request.use(
   config => {
     console.info('进入拦截器',config)
     if (localStorage.token) { //判断token是否存在
-      config.headers.Authorization = localStorage.token;  //将token设置成请求头
+      config.headers.Authorization = "Bearer "+localStorage.token;  //将token设置成请求头
     }
     return config;
   },

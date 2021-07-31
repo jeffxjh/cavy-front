@@ -3,7 +3,7 @@
 > A Vue.js project
 
 ## Build Setup
-
+npm i wangeditor --save
 ``` bash
 # install dependencies
 npm install

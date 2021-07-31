@@ -6,6 +6,8 @@ import Main from "@/page/main";
 import System from "@/page/system";
 import File from "@/page/file";
 import Login from "@/page/login";
+import Questionanswer from "@/page/questionanswer";
+import Questionform from "@/page/form/questionform";
 import Websocket from "@/page/websocket";
 import Layout from "@/components/layout";
 import Centre from "@/components/centre";
@@ -54,6 +56,16 @@ const routes = [
         path: "/message/websocket",
         name: "Websocket",
         component: Websocket
+      },
+      {
+        path: "/questionanswer",
+        name: "Questionanswer",
+        component: Questionanswer
+      },
+      {
+        path: "/form/questionform",
+        name: "Questionform",
+        component: Questionform
       }
     ]
   },
