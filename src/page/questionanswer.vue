@@ -159,6 +159,7 @@ export default {
       that.listLoading = true;
       questionList(that.params)
         .then(response => {
+          console.info(123123,response)
           that.tableData = response.data.data.data.map((item, index) => {
             item.keyId = index;
             item.childrenData = []; // 添加子表格数据
@@ -169,6 +170,7 @@ export default {
           that.listLoading = false;
         })
         .catch(function (error) {
+          console.info(321321,error)
           that.listLoading = false;
           that.$message.error("加载失败");
         });

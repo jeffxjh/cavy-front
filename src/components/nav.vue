@@ -41,7 +41,7 @@
         </div>
 
         <el-menu
-          default-active="1"
+          :default-active="actionIndex"
           @open="handleOpen"
           @close="handleClose"
           unique-opened
@@ -53,15 +53,15 @@
         >
           <div
             :key="key"
-            :index="item.code + item.id + ''"
+            :index="item.url"
             v-for="(item, key) in menuList"
           >
             <!-- 有二级菜单 -->
             <div v-if="item.children && item.children.length !== 0">
               <el-submenu
                 :key="item.id"
-                :index="item.id + ' '+item.code"
-                @click="goPage(item.url)"
+                :index="item.url"
+                @click="goPage(item)"
               >
                 <template slot="title">
                   <i :class="item.icon"></i>
@@ -69,10 +69,10 @@
                 </template>
                 <el-menu-item
                   :key="subKey"
-                  :index="subItem.id + ' ' + subKey"
+                  :index="subItem.url"
                   v-for="(subItem, subKey) in item.children"
                 >
-                  <div @click="goPage(subItem.url)">
+                  <div @click="goPage(subItem)">
                     <i :class="subItem.icon"></i>
                     <span slot="title">{{ subItem.menuName }}</span>
                   </div>
@@ -81,7 +81,7 @@
             </div>
             <!-- 没有二级菜单 -->
             <div v-else>
-              <el-menu-item :index="item.id + ''" @click="goPage(item.url)">
+              <el-menu-item :index="item.url" @click="goPage(item)">
                 <i :class="item.icon"></i>
                 <span slot="title">{{ item.menuName }}</span>
               </el-menu-item>
@@ -101,6 +101,7 @@ export default {
   data() {
     return {
       menuList: [],
+      actionIndex: "main",
       //是否折叠菜单
       isCollapse: false
     };
@@ -111,11 +112,16 @@ export default {
   mounted() {
     this.getMenu();
   },
+  created() {
+    let activePath=window.sessionStorage.getItem('activePath')
+    if (activePath!=null){
+      this.actionIndex=activePath
+    }
+  },
   methods: {
     async getMenu() {
       let result = await treeMenu();
-
-      console.info(result, 1);
+      // console.info(result, 1);
       this.menuList = result.data.data;
       // let aa = treeMenu().then(res => {
       //   console.info(result, 2);
@@ -143,12 +149,18 @@ export default {
       console.log(key, keyPath);
     },
     //跳转到某个导航页
-    goPage(link) {
-      console.info("左侧菜单栏跳转地址", link);
+    goPage(item) {
+      let link =item.url
+      // console.info("左侧菜单栏跳转地址", link);
       if (link == undefined || link == null || link == "") {
         $this.$router.push(`/`).catch(error => error);
       }
       $this.$router.push(`/${link}`).catch(error => error);
+      this.saveNavState(item.url)
+      this.actionIndex=item.url
+    },
+    saveNavState(activePath) {
+      window.sessionStorage.setItem('activePath',activePath)
     },
     //左侧菜单折叠展开
     toggleCollapse() {

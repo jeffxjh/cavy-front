@@ -89,7 +89,7 @@ router.beforeEach((to, from, next) => {
     }
     return next();
   }
-  console.info(localStorage.token, 3333);
+  console.info("localStorage.token", localStorage.token);
   // 获取token
   // const tokenStr = window.sessionStorage.getItem("token");
   const tokenStr = window.localStorage.getItem("token");
