@@ -74,6 +74,13 @@ const routes = [
     name: "Login",
     component: Login
   }
+  ,
+  {
+    path: "/",
+    redirect:'/index',
+    name: "Layout",
+    component: Layout
+  }
 ];
 
 const router = new Router({
@@ -89,7 +96,7 @@ router.beforeEach((to, from, next) => {
     }
     return next();
   }
-  console.info("localStorage.token", localStorage.token);
+  // console.info("localStorage.token", localStorage.token);
   // 获取token
   // const tokenStr = window.sessionStorage.getItem("token");
   const tokenStr = window.localStorage.getItem("token");

@@ -1,47 +1,52 @@
 <template>
   <div id="user">
     <body id="poster">
-      <el-form
-        ref="loginForm"
-        class="login-container"
-        label-position="left"
-        label-width="0px"
-        :rules="rules"
-      >
-        <h3 class="login_title">登录</h3>
-        <el-form-item prop="loginForm.username">
-          <el-input
-            type="text"
-            v-model="loginForm.username"
-            auto-complete="off"
-            placeholder="账号"
-          ></el-input>
-        </el-form-item>
+    <el-form
+      :model="loginForm"
+      ref="loginForm"
+      class="login-container"
+      label-position="left"
+      label-width="0px"
+      :rules="rules"
+    >
+      <h3 class="login_title">Cavy</h3>
+      <el-form-item prop="username">
+        <el-input
+          class="el-input"
+          type="text"
+          v-model="loginForm.username"
+          auto-complete="off"
+          placeholder="账号"
+        ></el-input>
+      </el-form-item>
 
-        <el-form-item prop="loginForm.password">
-          <el-input
-            type="password"
-            v-model="loginForm.password"
-            auto-complete="off"
-            placeholder="密码"
-          ></el-input>
-        </el-form-item>
+      <el-form-item prop="password">
+        <el-input
+          class="el-input"
+          type="password"
+          v-model="loginForm.password"
+          auto-complete="off"
+          placeholder="密码"
+        ></el-input>
+      </el-form-item>
 
-        <el-form-item style="width: 100%">
-          <el-button
-            type="primary"
-            style="width: 100%;background: #505458;border: none"
-            v-on:click="login"
-            >登录</el-button
-          >
-        </el-form-item>
-      </el-form>
+      <el-form-item style="width: 100%;">
+        <el-button
+          class="loginbutton"
+          type="primary"
+          @click="login"
+        >登录
+        </el-button
+        >
+      </el-form-item>
+    </el-form>
     </body>
   </div>
 </template>
 
 <script>
-import { login } from "../common/api/api";
+import {login} from "../common/api/api";
+
 export default {
   name: "Login",
   data() {
@@ -53,20 +58,25 @@ export default {
       responseResult: [],
       rules: {
         username: [
-          { required: true, message: "请输入账号", trigger: "blur" },
-          { min: 3, max: 50, message: "长度在 3 到 50 个字符", trigger: "blur" }
+          {required: true, message: "请输入账号", trigger: "blur"},
+          {min: 3, max: 50, message: "长度在 3 到 50 个字符", trigger: "blur"}
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "blur" }
+          {required: true, message: "请输入密码", trigger: "blur"},
+          {min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "blur"}
         ]
       }
     };
   },
 
   methods: {
-    login() {
+    async login() {
       let that = this;
+      let valid = await this.$refs.loginForm.validate();
+      if (!valid) {
+        that.$message.error("表单验证不通过！");
+        return;
+      }
       login({
         username: this.loginForm.username,
         password: this.loginForm.password
@@ -79,47 +89,85 @@ export default {
             res.data.msg === "登录成功"
           ) {
             window.localStorage["token"] = res.data.data.token;
-            that.$router.replace({ path: "/index" });
+            that.$router.replace({path: "/index"});
             console.info(JSON.stringify(res.data.data), '用户信息');
             JSON.parse('jsonString');
             window.localStorage["userinfo"] = JSON.stringify(res.data.data);
           } else {
-          that.$message.error(res.data.msg);
+            that.$message.error(res.data.msg);
           }
         })
-        .catch(failResponse => {});
+        .catch(failResponse => {
+        });
     }
   }
 };
 </script>
 <style>
 #poster {
-  background: url("../assets/imgs/backgroud.jpg") no-repeat;
+  background-image: linear-gradient(to left, #fd79a8, #a29bfe);
+  /*background: url("../assets/imgs/backgroud.jpg") no-repeat;*/
   background-position: center;
   height: 100%;
   width: 100%;
   background-size: cover;
   position: fixed;
 }
+
 body {
   margin: 0px;
   padding: 0;
 }
 
+.loginbutton {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  /*height: 24px;*/
+  padding: 12px;
+  font: 900 20px '';
+  color: #333744;
+  width: 50%;
+  border: none;
+  justify-content: center;
+  border-radius: 10px;
+  background-image: linear-gradient(to left, #fd79a8, #a29bfe);
+}
+
 .login-container {
-  border-radius: 15px;
+  border-radius: 10px;
   background-clip: padding-box;
   margin: 90px auto;
   width: 350px;
   padding: 35px 35px 15px 35px;
   background: #fff;
-  border: 1px solid #eaeaea;
-  box-shadow: 0 0 25px #cac6c6;
+  /*border: 1px solid #eaeaea;*/
+  /*box-shadow: 0 0 25px #cac6c6;*/
+}
+
+.el-input {
+  border: 0;
+  border-bottom: 2px solid rgb(60, 60, 70);
 }
 
 .login_title {
   margin: 0px auto 40px auto;
   text-align: center;
   color: #505458;
+  font: 900 40px '';
+  letter-spacing: 2px;
+}
+.el-input__inner{
+  border: 0;
+}
+.el-input__inner::placeholder {
+  color: #000;
+  text-align:left;
+}
+/* 谷歌 */
+.el-input__inner::-webkit-input-placeholder {
+  color: #000;
+  text-align:left;
+  font-weight: bold;
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <el-container>
     <el-aside width="auto" class="header-logo tap">
-      <img class="logo" src="@/assets/imgs/logo.png" alt="Logo" />
+      <img class="logo" src="@/assets/icons/logo.png" alt="Logo" />
     </el-aside>
     <el-aside width="auto" class="header-logo tap">
-      <el-badge is-dot class="item">
-        <el-button class="share-button" icon="el-icon-share" type="primary">通知</el-button>
-      </el-badge>
+<!--      <el-badge is-dot class="item">-->
+<!--        <el-button class="share-button" icon="el-icon-share" type="primary">通知</el-button>-->
+<!--      </el-badge>-->
 
       <el-dropdown @command="handleCommand">
       <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"  @error="errorHandler">
@@ -61,19 +61,20 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
 section {
   height: 100%;
   display: flex;
+  /*background-color: #4a5064;*/
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 0px;
 }
 .logo {
-  width: 200px;
-}
-.headerLogo,
-.logo {
+  /*width: 200px;*/
   cursor: pointer;
+  height: 60px;
+  margin-left: 0;
 }
 
 .item {

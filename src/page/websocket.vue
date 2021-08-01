@@ -21,9 +21,11 @@ export default {
   methods: {
     initWebSocket() {
       //初始化weosocket
-      const wsuri = "ws://localhost:8011/cavy/websocket/DPS007";
-      //const wsuri = "ws://localhost:8011/cavy/ws/serverTwo";
-      this.websock = new WebSocket(wsuri);
+      //const wsuri = "ws://localhost:8011/cavy/websocket/DPS007";
+      const wsuri = "ws://localhost:8011/cavy/ws/serverTwo";
+      let token = localStorage.getItem("token")
+      this.websock = new WebSocket(wsuri, [token]);
+      // this.websock = new WebSocket(wsuri);
       this.websock.onmessage = this.websocketonmessage;
       this.websock.onopen = this.websocketonopen;
       this.websock.onerror = this.websocketonerror;
@@ -31,7 +33,7 @@ export default {
     },
     websocketonopen() {
       //连接建立之后执行send方法发送数据
-      let actions = { test: "12345" };
+      let actions = {test: "12345"};
       this.websocketsend(JSON.stringify(actions));
     },
     websocketonerror() {
@@ -55,7 +57,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       })
-        .then(({ value }) => {
+        .then(({value}) => {
           // this.$message({
           //   type: "success",
           //   message: "你的邮箱是: " + value

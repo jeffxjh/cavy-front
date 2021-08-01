@@ -30,11 +30,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .el-main {
   background-color: #f5f7f9;
 }
-.el-header,
+.el-header {
+  background-color: #ECECEC;
+}
+
 .el-footer {
   background-color: white;
   box-sizing: border-box;
