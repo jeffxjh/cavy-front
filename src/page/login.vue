@@ -12,7 +12,7 @@
       <h3 class="login_title">Cavy</h3>
       <el-form-item prop="username">
         <el-input
-          class="el-input"
+          class="login-el-input"
           type="text"
           v-model="loginForm.username"
           auto-complete="off"
@@ -22,7 +22,7 @@
 
       <el-form-item prop="password">
         <el-input
-          class="el-input"
+          class="login-el-input"
           type="password"
           v-model="loginForm.password"
           auto-complete="off"
@@ -103,7 +103,7 @@ export default {
   }
 };
 </script>
-<style>
+<style >
 #poster {
   background-image: linear-gradient(to left, #fd79a8, #a29bfe);
   /*background: url("../assets/imgs/backgroud.jpg") no-repeat;*/
@@ -145,7 +145,7 @@ body {
   /*box-shadow: 0 0 25px #cac6c6;*/
 }
 
-.el-input {
+.login-el-input {
   border: 0;
   border-bottom: 2px solid rgb(60, 60, 70);
 }
@@ -157,6 +157,9 @@ body {
   font: 900 40px '';
   letter-spacing: 2px;
 }
+
+</style>
+<style scoped>
 .el-input__inner{
   border: 0;
 }
