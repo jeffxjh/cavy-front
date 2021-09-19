@@ -5,12 +5,20 @@ import Order from "@/page/order";
 import Main from "@/page/main";
 import System from "@/page/system";
 import File from "@/page/file";
+import Knowledge from "@/page/knowledge";
+import Article from "@/page/article";
+import Category from "@/page/category";
+import Label from "@/page/label";
+import Power from "@/page/power";
+import Role from "@/page/role";
+import Menu from "@/page/menu";
 import Login from "@/page/login";
 import Questionanswer from "@/page/questionanswer";
 import Questionform from "@/page/form/questionform";
 import Websocket from "@/page/websocket";
 import Layout from "@/components/layout";
 import Centre from "@/components/centre";
+import Home from "@/view/home/home";
 
 Vue.use(Router);
 
@@ -36,9 +44,45 @@ const routes = [
         component: Main
       },
       {
-        path: "/user",
+        path: "/power",
+        name: "Power",
+        component: Power,
+        children: []
+      },
+      {
+        path: "/power/role",
+        name: "Role",
+        component: Role
+      },
+      {
+        path: "/power/menu",
+        name: "Menu",
+        component: Menu
+      },
+      {
+        path: "/power/user",
         name: "User",
         component: User
+      },
+      {
+        path: "/knowledge",
+        name: "Knowledge",
+        component: Knowledge,
+        children: []
+      },
+      {
+        path: "/knowledge/category",
+        name: "Category",
+        component: Category
+      },
+      {
+        path: "/knowledge/article",
+        name: "Article",
+        component: Article
+      },  {
+        path: "/knowledge/label",
+        name: "LabelLabel",
+        component: Label
       },
       {
         path: "/system",
@@ -80,6 +124,12 @@ const routes = [
     redirect:'/index',
     name: "Layout",
     component: Layout
+  }
+  ,
+  {
+    path: "/home",
+    name: "Home",
+    component: Home
   }
 ];
 
