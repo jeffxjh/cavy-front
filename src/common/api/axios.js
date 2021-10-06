@@ -50,6 +50,18 @@ export const getRequest = (url, params) => {
     }
   });
 };
+export const getBlobRequest = (url, params) => {
+  let accessToken = getStore('accessToken');
+  return axios({
+    method: 'get',
+    url: `${base}${url}`,
+    params: params,
+    responseType: 'blob', // 声明返回blob格式
+    headers: {
+      'accessToken': accessToken
+    }
+  });
+};
 
 export const postRequest = (url, params) => {
   let accessToken = getStore("accessToken");

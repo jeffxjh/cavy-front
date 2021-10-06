@@ -27,11 +27,15 @@
         type="primary"
         icon="el-icon-search"
         @click="getList"
+        round
       >
         Search
       </el-button>
-       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate" round>
         Add
+      </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-download" @click="downTemplate" round>
+        Export
       </el-button>
     </div>
     <el-table
@@ -85,7 +89,7 @@
 </template>
 
 <script>
-import { userList } from "@/common/api/api";
+import { userList,exportUser } from "@/common/api/api";
 export default {
   name: "User",
   data() {
@@ -139,6 +143,28 @@ export default {
     handleCurrentChange(val) {
       this.params.pageIndex = val;
       this.getList();
+    },
+    downTemplate() {
+      let that = this;
+      exportUser(that.params).then(res => {
+        if (!res) return;
+        let blob = new Blob([res.data], {
+          type: "application/vnd.ms-excel;charset=utf-8"
+        });
+        let url = window.URL.createObjectURL(blob);
+        let aLink = document.createElement("a");
+        aLink.style.display = "none";
+        aLink.href = url;
+        aLink.setAttribute("download", "xxx.xls"); // 下载的文件
+        document.body.appendChild(aLink);
+        aLink.click();
+        document.body.removeChild(aLink);
+        window.URL.revokeObjectURL(url);
+      })
+        .catch(function(error) {
+          that.listLoading = false;
+          that.$message.error("加载失败");
+        });
     }
   }
 };

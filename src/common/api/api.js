@@ -5,7 +5,7 @@ import {
   postNoAuthRequest,
   postBodyRequest,
   postRequest,
-  putRequest
+  putRequest, getBlobRequest, postBlobRequest
 } from "./axios";
 import axios from "axios";
 // 认证
@@ -73,4 +73,8 @@ export const addQuestion = params => {
 // 获取回答列表
 export const findAnswerByQuestionId = params => {
   return getRequest("/answer", params);
+};
+// 获取回答列表
+export const exportUser = params => {
+  return getBlobRequest("/user/export", params);
 };
