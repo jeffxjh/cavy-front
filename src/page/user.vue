@@ -31,12 +31,19 @@
       >
         Search
       </el-button>
-       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate" round>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate"
+                 round>
         Add
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-download" @click="downTemplate" round>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-download"
+                 @click="downTemplate" round>
         Export
       </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-download"
+                 @click="show" round>
+        import
+      </el-button>
+      <uploadFile :addOrUpdateVisible="addOrUpdateVisible" :excelUrl="excelUrl" :width="width" @changeShow="showAddOrUpdate" @close="close" ref="addOrUpdateRef"></uploadFile>
     </div>
     <el-table
       v-loading="listLoading"
@@ -56,7 +63,7 @@
       </el-table-column>
       <el-table-column prop="phone" label="手机号" width="180">
       </el-table-column>
-      <el-table-column prop="email" label="邮件" width="180"> </el-table-column>
+      <el-table-column prop="email" label="邮件" width="180"></el-table-column>
       <el-table-column prop="adduser" label="添加人" width="180">
       </el-table-column>
       <el-table-column prop="addtime" label="添加日期" width="180">
@@ -64,13 +71,13 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)"
-            >修改
+          >修改
           </el-button>
           <el-button
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
-            >删除
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -86,11 +93,16 @@
     >
     </el-pagination>
   </div>
+
 </template>
 
 <script>
-import { userList,exportUser } from "@/common/api/api";
+import {userList, exportUser} from "@/common/api/api";
+import uploadFile from "../view/home/uploadExcelFile"
 export default {
+  components: {
+    uploadFile
+  },
   name: "User",
   data() {
     return {
@@ -101,7 +113,11 @@ export default {
         userName: "",
         pageIndex: 1,
         pageSize: 10
-      }
+      },
+      // 控制新增编辑弹窗的显示与隐藏
+      addOrUpdateVisible: false,
+      excelUrl: '/user/import',
+      width: '30%'
     };
   },
   watch: {},
@@ -124,14 +140,15 @@ export default {
           that.params.pageIndex = response.data.data.pageIndex;
           that.listLoading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           that.listLoading = false;
           that.$message.error("加载失败");
         });
     },
-    handleCreate() {},
+    handleCreate() {
+    },
     sortChange(data) {
-      const { prop, order } = data;
+      const {prop, order} = data;
       if (prop === "id") {
         that.sortByID(order);
       }
@@ -155,16 +172,30 @@ export default {
         let aLink = document.createElement("a");
         aLink.style.display = "none";
         aLink.href = url;
-        aLink.setAttribute("download", "xxx.xls"); // 下载的文件
+        aLink.setAttribute("download", "用户信息.xlsx"); // 下载的文件
         document.body.appendChild(aLink);
         aLink.click();
         document.body.removeChild(aLink);
         window.URL.revokeObjectURL(url);
       })
-        .catch(function(error) {
+        .catch(function (error) {
           that.listLoading = false;
           that.$message.error("加载失败");
         });
+    },
+    // 按钮点击事件 显示新增编辑弹窗组件
+    show(){
+      this.addOrUpdateVisible = true
+    },close(){
+      this.addOrUpdateVisible = false
+    },
+    // 监听 子组件弹窗关闭后触发，有子组件调用
+    showAddOrUpdate(data){
+      if(data === 'false'){
+        this.addOrUpdateVisible = false
+      }else{
+        this.addOrUpdateVisible = true
+      }
     }
   }
 };
@@ -173,4 +204,6 @@ export default {
 .el-table th > .cell {
   padding-left: 14px;
 }
+
+
 </style>

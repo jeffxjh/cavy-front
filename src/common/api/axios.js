@@ -117,6 +117,19 @@ export const postBodyRequest = (url, params) => {
   });
 };
 
+export const postExcelRequest = (url, params) => {
+  let accessToken = getStore('accessToken');
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'accessToken': accessToken
+    }
+  });
+};
+
 /**
  * 无需token验证的GET请求 避免旧token过期导致请求失败
  * @param {*} url
