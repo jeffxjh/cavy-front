@@ -12,9 +12,11 @@ import Label from "@/page/label";
 import Power from "@/page/power";
 import Role from "@/page/role";
 import Menu from "@/page/menu";
+import Task from "@/page/task";
 import Login from "@/page/login";
 import Questionanswer from "@/page/questionanswer";
 import Questionform from "@/page/form/questionform";
+import Taskform from "@/page/form/taskform";
 import Websocket from "@/page/websocket";
 import Layout from "@/components/layout";
 import Centre from "@/components/centre";
@@ -42,6 +44,17 @@ const routes = [
         path: "/main",
         name: "Main",
         component: Main
+      },
+      {
+        path: "/task",
+        name: "Task",
+        component: Task
+      },
+      ,
+      {
+        path: "/form/taskform",
+        name: "Taskform",
+        component: Taskform
       },
       {
         path: "/power",

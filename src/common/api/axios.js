@@ -84,6 +84,19 @@ export const postRequest = (url, params) => {
   });
 };
 
+export const postJsonRequest = (url, params) => {
+  let accessToken = getStore("accessToken");
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      'Content-Type': 'application/json',
+      'accessToken': accessToken
+    }
+  });
+};
+
 export const putRequest = (url, params) => {
   let accessToken = getStore("accessToken");
   return axios({

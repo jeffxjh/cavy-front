@@ -5,7 +5,7 @@ import {
   postNoAuthRequest,
   postBodyRequest,
   postRequest,
-  putRequest, getBlobRequest, postBlobRequest
+  putRequest, getBlobRequest, postBlobRequest, postJsonRequest
 } from "./axios";
 import axios from "axios";
 // 认证
@@ -77,4 +77,12 @@ export const findAnswerByQuestionId = params => {
 // 获取回答列表
 export const exportUser = params => {
   return getBlobRequest("/user/export", params);
+};
+// 获取回答列表
+export const taskPage = params => {
+  return postJsonRequest("/task/page", params);
+};
+// 新建问题列表
+export const addTask = params => {
+  return postBodyRequest("/task", params);
 };
