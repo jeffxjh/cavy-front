@@ -8,7 +8,7 @@ module.exports = {
   dev: {
     proxyTable: {
       "/cavy": {
-        target: "http://127.0.0.1:8011",
+        target: "http://192.168.6.206:8011/",
         changeOrigin: true,
         pathRewrite: {
           "^/cavy": "/cavy"

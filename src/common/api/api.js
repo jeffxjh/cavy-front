@@ -58,7 +58,7 @@ export const business = params => {
 export const userList = params => {
   return getRequest("/user", params);
 };
-// 获取菜单树
+// 用户登录
 export const login = params => {
   return postBodyRequest("/user/login", params);
 };

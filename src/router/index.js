@@ -154,6 +154,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // 访问登录页，放行
   if (to.path === "/login") {
+    
     if (window.localStorage.getItem("token")) {
       next("/index");
     }
