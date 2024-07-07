@@ -5,7 +5,10 @@ import {
   postNoAuthRequest,
   postBodyRequest,
   postRequest,
-  putRequest, getBlobRequest, postBlobRequest, postJsonRequest
+  putRequest,
+  getBlobRequest,
+  postBlobRequest,
+  postJsonRequest
 } from "./axios";
 import axios from "axios";
 // 认证
@@ -60,7 +63,7 @@ export const userList = params => {
 };
 // 用户登录
 export const login = params => {
-  return postBodyRequest("/user/login", params);
+  return postBodyRequest("/user/login", params, true);
 };
 // 获取问题列表
 export const questionList = params => {
@@ -85,4 +88,8 @@ export const taskPage = params => {
 // 新建问题列表
 export const addTask = params => {
   return postBodyRequest("/task", params);
+};
+// 新建用户
+export const addUser = params => {
+  return postBodyRequest("/user", params);
 };
