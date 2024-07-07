@@ -16,6 +16,7 @@ import Task from "@/page/task";
 import Login from "@/page/login";
 import Questionanswer from "@/page/questionanswer";
 import Questionform from "@/page/form/questionform";
+import Userform from "@/page/form/userform";
 import Taskform from "@/page/form/taskform";
 import Websocket from "@/page/websocket";
 import Layout from "@/components/layout";
@@ -60,7 +61,18 @@ const routes = [
         path: "/power",
         name: "Power",
         component: Power,
-        children: []
+        children: [
+          {
+            path: "/power/menu",
+            name: "Menu",
+            component: Menu
+          },
+          {
+            path: "/power/user",
+            name: "User",
+            component: User
+          },
+        ]
       },
       {
         path: "/power/role",
@@ -92,7 +104,8 @@ const routes = [
         path: "/knowledge/article",
         name: "Article",
         component: Article
-      },  {
+      },  
+      {
         path: "/knowledge/label",
         name: "LabelLabel",
         component: Label
@@ -123,6 +136,11 @@ const routes = [
         path: "/form/questionform",
         name: "Questionform",
         component: Questionform
+      },
+      {
+        path: "/form/userform",
+        name: "Userform",
+        component: Userform
       }
     ]
   },
