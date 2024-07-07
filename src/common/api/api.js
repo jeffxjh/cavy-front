@@ -59,7 +59,7 @@ export const business = params => {
 };
 // 获取用户列表
 export const userList = params => {
-  return getRequest("/user", params);
+  return getRequest("/user", params, true, "#user");
 };
 // 用户登录
 export const login = params => {

@@ -62,7 +62,7 @@ axios.interceptors.response.use(
   }
 );
 
-export const getRequest = (url, params, showLoading) => {
+export const getRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({
     method: "get",
@@ -75,7 +75,7 @@ export const getRequest = (url, params, showLoading) => {
     }
   });
 };
-export const getBlobRequest = (url, params, showLoading) => {
+export const getBlobRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({
     method: "get",
@@ -90,7 +90,7 @@ export const getBlobRequest = (url, params, showLoading) => {
   });
 };
 
-export const postRequest = (url, params, showLoading) => {
+export const postRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({
     method: "post",
@@ -116,7 +116,7 @@ export const postRequest = (url, params, showLoading) => {
   });
 };
 
-export const postJsonRequest = (url, params, showLoading) => {
+export const postJsonRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({
     method: "post",
@@ -131,7 +131,7 @@ export const postJsonRequest = (url, params, showLoading) => {
   });
 };
 
-export const putRequest = (url, params, showLoading) => {
+export const putRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({
     method: "put",
@@ -157,7 +157,7 @@ export const putRequest = (url, params, showLoading) => {
   });
 };
 
-export const postBodyRequest = (url, params, showLoading,loadingTarget) => {
+export const postBodyRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({
     method: "post",
@@ -171,7 +171,7 @@ export const postBodyRequest = (url, params, showLoading,loadingTarget) => {
   });
 };
 
-export const postExcelRequest = (url, params, showLoading) => {
+export const postExcelRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({
     method: "post",
@@ -186,20 +186,7 @@ export const postExcelRequest = (url, params, showLoading) => {
   });
 };
 
-/**
- * 无需token验证的GET请求 避免旧token过期导致请求失败
- * @param {*} url
- * @param {*} params
- */
-export const getNoAuthRequest = (url, params) => {
-  return axios({
-    method: "get",
-    url: `${base}${url}`,
-    params: params
-  });
-};
-
-export const postNoAuthRequest = (url, params, showLoading) => {
+export const postNoAuthRequest = (url, params, showLoading, loadingTarget) => {
   return axios({
     method: "post",
     url: `${base}${url}`,
@@ -220,5 +207,17 @@ export const postNoAuthRequest = (url, params, showLoading) => {
       showLoading: showLoading != undefined,
       loadingTarget: loadingTarget
     }
+  });
+};
+/**
+ * 无需token验证的GET请求 避免旧token过期导致请求失败
+ * @param {*} url
+ * @param {*} params
+ */
+export const getNoAuthRequest = (url, params) => {
+  return axios({
+    method: "get",
+    url: `${base}${url}`,
+    params: params
   });
 };
