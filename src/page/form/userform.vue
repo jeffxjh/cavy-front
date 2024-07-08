@@ -13,36 +13,73 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户账号" style="width: 80%" prop="userName">
-              <el-input v-model="form.userName"></el-input>
+              <el-input
+                v-model="form.userName"
+                placeholder="请输入用户账号"
+                clearable
+              ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="登录密码" style="width: 80%" prop="password">
-              <el-input v-model="form.password"></el-input>
+              <el-input
+                v-model="form.password"
+                placeholder="请输入登录密码"
+                show-password
+                clearable
+              ></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="真实姓名" style="width: 80%" prop="realName">
-              <el-input v-model="form.realName"></el-input>
+              <el-input
+                v-model="form.realName"
+                placeholder="请输入真实姓名"
+                clearable
+              ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="性别" style="width: 80%" prop="gender">
-              <el-input v-model="form.gender"></el-input>
+              <el-radio v-model="form.gender" label="1">男</el-radio>
+              <el-radio v-model="form.gender" label="2">女</el-radio>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="手机号" style="width: 80%" prop="phone">
-              <el-input v-model="form.phone"></el-input>
+              <el-input
+                v-model="form.phone"
+                placeholder="请输入手机号"
+                clearable
+              ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="邮箱" style="width: 80%" prop="email">
-              <el-input v-model="form.email"></el-input>
+              <el-input
+                v-model="form.email"
+                placeholder="请输入邮箱"
+                clearable
+              ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="用户状态" style="width: 30%" prop="email">
+              <el-select v-model="form.status" placeholder="请选择用户状态">
+                <el-option
+                  v-for="item in statusOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -104,6 +141,24 @@ export default {
       }
     };
     return {
+      statusOptions: [
+        {
+          value: "0",
+          label: "已新建",
+        },
+        {
+          value: "1",
+          label: "已使用",
+        },
+        {
+          value: "2",
+          label: "已禁用",
+        },
+        {
+          value: "3",
+          label: "已冻结",
+        },
+      ],
       editor: {
         info: "",
       },
@@ -115,7 +170,7 @@ export default {
       rules: {
         userName: [
           { required: true, message: "请输入账号", trigger: "blur" },
-          { min: 1, max: 10, message: "长度不超过10个字符", trigger: "blur" },
+          { min: 1, max: 20, message: "长度不超过20个字符", trigger: "blur" },
         ],
         password: [
           {
@@ -158,9 +213,8 @@ export default {
     // },
     //添加增加题目
     async onSubmit(type) {
-      const valid = await this.$refs.form.validate().catch((err) =>
-      {
-        console.info(err)
+      const valid = await this.$refs.form.validate().catch((err) => {
+        console.info(err);
       });
       if (valid === true) {
         let form = null;
