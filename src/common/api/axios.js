@@ -157,6 +157,32 @@ export const putRequest = (url, params, showLoading, loadingTarget) => {
   });
 };
 
+export const deleteRequest = (url, params, showLoading, loadingTarget) => {
+  let accessToken = getStore("accessToken");
+  return axios({
+    method: "delete",
+    url: `${base}${url}`,
+    data: params,
+    transformRequest: [
+      function(data) {
+        let ret = "";
+        for (let it in data) {
+          ret +=
+            encodeURIComponent(it) + "=" + encodeURIComponent(data[it]) + "&";
+        }
+        ret = ret.substring(0, ret.length - 1);
+        return ret;
+      }
+    ],
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      accessToken: accessToken,
+      showLoading: showLoading != undefined,
+      loadingTarget: loadingTarget
+    }
+  });
+};
+
 export const postBodyRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({

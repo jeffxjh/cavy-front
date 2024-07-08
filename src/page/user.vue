@@ -49,7 +49,7 @@
         style="margin-left: 10px"
         type="danger"
         icon="el-icon-edit"
-        @click="handleCreate"
+        @click="handleBatchDelete"
       >
         删除
       </el-button>
@@ -86,6 +86,7 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         type="selection"
@@ -97,16 +98,32 @@
       <el-table-column prop="phone" label="手机号" width="180">
       </el-table-column>
       <el-table-column prop="email" label="邮件" width="180"></el-table-column>
+      <el-table-column
+        prop="status"
+        label="状态"
+        :formatter="formatStatus"
+        width="180"
+      ></el-table-column>
+      <el-table-column
+        prop="defaultUser"
+        label="是否默认用户"
+        :formatter="formatDefaultUser"
+        width="180"
+      ></el-table-column>
       <el-table-column prop="adduser" label="添加人" width="180">
       </el-table-column>
       <el-table-column prop="addtime" label="添加日期" width="180">
       </el-table-column>
       <el-table-column label="操作" width="180">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)"
+          <el-button
+            :disabled="scope.row.defaultUser == '1'"
+            size="mini"
+            @click="handleEdit(scope.$index, scope.row)"
             >修改
           </el-button>
           <el-button
+            :disabled="scope.row.defaultUser == '1'"
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
@@ -129,7 +146,7 @@
 </template>
 
 <script>
-import { userList, exportUser } from "@/common/api/api";
+import { userList, exportUser, deleteUser } from "@/common/api/api";
 import uploadFile from "../view/home/uploadExcelFile";
 export default {
   components: {
@@ -139,6 +156,7 @@ export default {
   data() {
     return {
       listLoading: true,
+      multipleSelection: [],
       total: 0,
       tableData: [],
       params: {
@@ -158,7 +176,10 @@ export default {
   },
   methods: {
     selectable(row, index) {
-      return true;
+      return row.defaultUser != "1";
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
     },
     getList() {
       console.info("查询中。。。");
@@ -179,6 +200,60 @@ export default {
     },
     handleCreate() {
       this.$router.push(`/form/userform`).catch((error) => error);
+    },
+    handleDelete(index, row) {
+      this.$confirm("此操作将永久删除用户, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          deleteUser({ ids: [row.id] })
+            .then((response) => {
+              if (response.status == 200 && response.data.code == 1000) {
+                this.$message.success("删除成功");
+                this.getList();
+              }
+            })
+            .catch(function (error) {});
+        })
+        .catch(() => {
+          // this.$message({
+          //   type: "info",
+          //   message: "已取消删除",
+          // });
+        });
+    },
+    handleBatchDelete() {
+      let that = this;
+      if (this.multipleSelection.length == 0) {
+        that.$message.error("请勾选需要删除的数据");
+      }
+      let ids = this.multipleSelection.map(function (item) {
+        return item["id"];
+      });
+
+      this.$confirm("此操作将永久删除用户, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          deleteUser({ ids: ids })
+            .then((response) => {
+              if (response.status == 200 && response.data.code == 1000) {
+                that.$message.success("删除成功");
+                this.getList();
+              }
+            })
+            .catch(function (error) {});
+        })
+        .catch(() => {
+          // this.$message({
+          //   type: "info",
+          //   message: "已取消删除",
+          // });
+        });
     },
     sortChange(data) {
       const { prop, order } = data;
@@ -230,6 +305,36 @@ export default {
         this.addOrUpdateVisible = false;
       } else {
         this.addOrUpdateVisible = true;
+      }
+    },
+    formatStatus(row, column) {
+      switch (row.status) {
+        case "3":
+          return "已冻结";
+          break;
+        case "2":
+          return "已禁用";
+          break;
+        case "1":
+          return "已使用";
+          break;
+        case "0":
+          return "已新建";
+          break;
+        default:
+          return row.status;
+      }
+    },
+    formatDefaultUser(row, column) {
+      switch (row.defaultUser) {
+        case "1":
+          return "是";
+          break;
+        case "0":
+          return "否";
+          break;
+        default:
+          return row.defaultUser;
       }
     },
   },

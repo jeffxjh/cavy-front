@@ -70,6 +70,22 @@
         </el-row>
         <el-row>
           <el-col :span="12">
+            <el-form-item
+              label="默认用户"
+              style="width: 80%"
+              prop="defaultUser"
+            >
+              <el-switch
+                v-model="form.defaultUser"
+                active-text="是"
+                inactive-text="否"
+              >
+                <!-- active-color="#13ce66" -->
+                <!-- inactive-color="#ff4949" -->
+              </el-switch>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="用户状态" style="width: 30%" prop="email">
               <el-select v-model="form.status" placeholder="请选择用户状态">
                 <el-option

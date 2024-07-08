@@ -6,6 +6,7 @@ import {
   postBodyRequest,
   postRequest,
   putRequest,
+  deleteRequest,
   getBlobRequest,
   postBlobRequest,
   postJsonRequest
@@ -57,10 +58,7 @@ export const treeMenu = params => {
 export const business = params => {
   return getRequest("/business/", params);
 };
-// 获取用户列表
-export const userList = params => {
-  return getRequest("/user", params, true, "#user");
-};
+
 // 用户登录
 export const login = params => {
   return postBodyRequest("/user/login", params, true);
@@ -89,7 +87,15 @@ export const taskPage = params => {
 export const addTask = params => {
   return postBodyRequest("/task", params);
 };
+// 获取用户列表
+export const userList = params => {
+  return getRequest("/user", params, true, "#user");
+};
 // 新建用户
 export const addUser = params => {
   return postBodyRequest("/user", params);
+};
+// 删除用户
+export const deleteUser = params => {
+  return deleteRequest("/user", params);
 };
