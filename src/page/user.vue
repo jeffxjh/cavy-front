@@ -96,6 +96,7 @@
       style="width: 100%"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
+      @row-dblclick="dbSelected"
     >
       <el-table-column
         type="selection"
@@ -244,6 +245,12 @@ export default {
           name: "Userform",
           params: { id: this.multipleSelection[0].id },
         })
+        .catch((error) => error);
+    },
+    dbSelected(row) {
+      let that = this;
+      let id = this.$router
+        .push({ name: "Userform", params: { id: row.id, view: "view" } })
         .catch((error) => error);
     },
     handleDetail() {

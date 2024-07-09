@@ -14,7 +14,13 @@
       >
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
-      <el-form ref="form" :model="form" label-width="80px" :rules="rules" :disabled="disabled">
+      <el-form
+        ref="form"
+        :model="form"
+        label-width="80px"
+        :rules="rules"
+        :disabled="disabled"
+      >
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户账号" style="width: 80%" prop="userName">
@@ -48,8 +54,10 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="性别" style="width: 80%" prop="gender">
-              <el-radio v-model="form.gender" label="1">男</el-radio>
-              <el-radio v-model="form.gender" label="2">女</el-radio>
+              <!-- :label=“1”，表示label的值应为数字1-->
+              <!-- label=“1”，表示label的值应为字符串1 -->
+              <el-radio v-model="form.gender" :label="1">男</el-radio>
+              <el-radio v-model="form.gender" :label="2">女</el-radio>
             </el-form-item>
           </el-col>
         </el-row>
@@ -106,12 +114,24 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item>
+        <!-- <el-form-item>
           <el-button type="primary" @click="onSubmit(1)">保存</el-button>
           <el-button type="success" @click="onSubmit(0)">保存并返回</el-button>
-          <el-button @click="cancel()">取消</el-button>
-        </el-form-item>
+          <el-button @click="cancel()">返回</el-button>
+        </el-form-item> -->
       </el-form>
+    </el-card>
+    <el-card
+      class="form-button-group"
+      body-style="padding:10px;text-align:right"
+    >
+      <el-button v-if="!this.disabled" type="primary" @click="onSubmit(1)"
+        >保存</el-button
+      >
+      <el-button v-if="!this.disabled" type="success" @click="onSubmit(0)"
+        >保存并返回</el-button
+      >
+      <el-button @click="cancel()">返回</el-button>
     </el-card>
   </div>
 </template>
@@ -289,5 +309,10 @@ export default {
 <style scoped>
 .form-container {
   width: 80%;
+}
+.form-button-group {
+  width: 80%;
+  margin-top: 5px;
+  border: none;
 }
 </style>
