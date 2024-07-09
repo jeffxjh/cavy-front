@@ -26,29 +26,38 @@
       <el-button class="filter-item" icon="el-icon-search" @click="getList">
         搜索
       </el-button>
+      <!-- <el-button
+        class="filter-item"
+        style="margin-left: 10px"
+        type="success"
+        icon="el-icon-search"
+        @click="handleDetail"
+      >
+        明细
+      </el-button>     -->
       <el-button
         class="filter-item"
         style="margin-left: 10px"
         type="primary"
-        icon="el-icon-edit"
+        icon="el-icon-document"
         @click="handleCreate"
       >
         添加
       </el-button>
-      <el-button
+      <!-- <el-button
         class="filter-item"
         style="margin-left: 10px"
         type="warning"
         icon="el-icon-edit"
-        @click="handleCreate"
+        @click="handleEdit"
       >
-        修改
-      </el-button>
+        编辑
+      </el-button> -->
       <el-button
         class="filter-item"
         style="margin-left: 10px"
         type="danger"
-        icon="el-icon-edit"
+        icon="el-icon-delete"
         @click="handleBatchDelete"
       >
         删除
@@ -114,13 +123,21 @@
       </el-table-column>
       <el-table-column prop="addtime" label="添加日期" width="180">
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="操作" width="255">
         <template slot-scope="scope">
+          <!-- :disabled="scope.row.defaultUser == '1'" -->
           <el-button
-            :disabled="scope.row.defaultUser == '1'"
             size="mini"
-            @click="handleEdit(scope.$index, scope.row)"
-            >修改
+            type="success"
+            @click="handleRowDetail(scope.$index, scope.row)"
+            >明细
+          </el-button>
+          <el-button
+            size="mini"
+            type="warning"
+            :disabled="scope.row.defaultUser == '1'"
+            @click="handleRowEdit(scope.$index, scope.row)"
+            >编辑
           </el-button>
           <el-button
             :disabled="scope.row.defaultUser == '1'"
@@ -176,7 +193,8 @@ export default {
   },
   methods: {
     selectable(row, index) {
-      return row.defaultUser != "1";
+      // return row.defaultUser != "1";
+      return true;
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -200,6 +218,48 @@ export default {
     },
     handleCreate() {
       this.$router.push(`/form/userform`).catch((error) => error);
+    },
+    handleRowEdit(index, row) {
+      let that = this;
+      let id = this.$router
+        .push({ name: "Userform", params: { id: row.id } })
+        .catch((error) => error);
+    },
+    handleRowDetail(index, row) {
+      let that = this;
+      let id = this.$router
+        .push({ name: "Userform", params: { id: row.id, view: "view" } })
+        .catch((error) => error);
+    },
+    handleEdit() {
+      let that = this;
+      if (this.multipleSelection.length == 0) {
+        that.$message.error("请勾选一条需要修改的数据");
+      }
+      if (this.multipleSelection.length > 1) {
+        that.$message.error("请只选择一条数据");
+      }
+      let id = this.$router
+        .push({
+          name: "Userform",
+          params: { id: this.multipleSelection[0].id },
+        })
+        .catch((error) => error);
+    },
+    handleDetail() {
+      let that = this;
+      if (this.multipleSelection.length == 0) {
+        that.$message.error("请勾选一条需要查看的数据");
+      }
+      if (this.multipleSelection.length > 1) {
+        that.$message.error("请只选择一条数据");
+      }
+      let id = this.$router
+        .push({
+          name: "Userform",
+          params: { id: this.multipleSelection[0].id, view: "view" },
+        })
+        .catch((error) => error);
     },
     handleDelete(index, row) {
       this.$confirm("此操作将永久删除用户, 是否继续?", "提示", {
@@ -229,10 +289,17 @@ export default {
       if (this.multipleSelection.length == 0) {
         that.$message.error("请勾选需要删除的数据");
       }
+      let defaultUsers=[]
       let ids = this.multipleSelection.map(function (item) {
+        if(item['defaultUser']=='1'){
+          defaultUsers.push(item)
+        }
         return item["id"];
       });
-
+      if (defaultUsers.length != 0) {
+        that.$message.error("请不要选择默认用户");
+        return
+      }
       this.$confirm("此操作将永久删除用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",

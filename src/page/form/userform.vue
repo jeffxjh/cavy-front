@@ -6,10 +6,15 @@
       <el-breadcrumb-item :to="{ path: '/power/user' }"
         >用户管理</el-breadcrumb-item
       >
-      <el-breadcrumb-item>新增用户</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="this.$route.params.id == undefined"
+        >新增用户</el-breadcrumb-item
+      >
+      <el-breadcrumb-item v-if="this.$route.params.id != undefined"
+        >编辑用户</el-breadcrumb-item
+      >
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
-      <el-form ref="form" :model="form" label-width="80px" :rules="rules">
+      <el-form ref="form" :model="form" label-width="80px" :rules="rules" :disabled="disabled">
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户账号" style="width: 80%" prop="userName">
@@ -79,6 +84,8 @@
                 v-model="form.defaultUser"
                 active-text="是"
                 inactive-text="否"
+                active-value="1"
+                inactive-value="0"
               >
                 <!-- active-color="#13ce66" -->
                 <!-- inactive-color="#ff4949" -->
@@ -100,8 +107,8 @@
           </el-col>
         </el-row>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit(1)">创建</el-button>
-          <el-button type="info" @click="onSubmit(0)">创建并返回</el-button>
+          <el-button type="primary" @click="onSubmit(1)">保存</el-button>
+          <el-button type="success" @click="onSubmit(0)">保存并返回</el-button>
           <el-button @click="cancel()">取消</el-button>
         </el-form-item>
       </el-form>
@@ -111,7 +118,7 @@
 
 <script>
 import Editor from "@/components/editor";
-import { addUser } from "@/common/api/api";
+import { addUser, getUser, updateUser } from "@/common/api/api";
 
 export default {
   components: {
@@ -157,6 +164,7 @@ export default {
       }
     };
     return {
+      disabled: false,
       statusOptions: [
         {
           value: "0",
@@ -215,7 +223,20 @@ export default {
       },
     };
   },
-  mounted() {},
+  mounted() {
+    if (this.$route.params.id) {
+      if (this.$route.params.view != undefined) {
+        this.disabled = true;
+      }
+      getUser({ id: this.$route.params.id })
+        .then((response) => {
+          if (response.status == 200 && response.data.code == 1000) {
+            this.form = response.data.data;
+          }
+        })
+        .catch(function (error) {});
+    }
+  },
   methods: {
     // onSubmit() {
     //   console.log(this.form);
@@ -236,7 +257,12 @@ export default {
         let form = null;
         form = this.form;
         const params = form;
-        const res = await addUser(params);
+        let res = {};
+        if (this.form.id == undefined) {
+          res = await addUser(params);
+        } else {
+          res = await updateUser(params);
+        }
         if (res.status == "200" && res.data.code == "1000") {
           this.$message({
             type: "success",

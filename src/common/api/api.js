@@ -99,3 +99,11 @@ export const addUser = params => {
 export const deleteUser = params => {
   return deleteRequest("/user", params);
 };
+// 获取用户详情
+export const getUser = params => {
+  return getRequest("/user/getById", params);
+};
+// 修改用户
+export const updateUser = params => {
+  return putRequest("/user", params);
+};
