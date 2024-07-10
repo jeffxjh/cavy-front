@@ -107,3 +107,7 @@ export const getUser = params => {
 export const updateUser = params => {
   return putRequest("/user", params);
 };
+// 获取角色列表
+export const roleList = params => {
+  return postRequest("/role", params, true, "#role");
+};

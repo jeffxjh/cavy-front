@@ -136,11 +136,27 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <!-- <el-form-item>
-          <el-button type="primary" @click="onSubmit(1)">保存</el-button>
-          <el-button type="success" @click="onSubmit(0)">保存并返回</el-button>
-          <el-button @click="cancel()">返回</el-button>
-        </el-form-item> -->
+        <el-form-item label="用户角色">
+          <div v-if="disabled">
+            <el-tag
+              :key="role.id"
+              v-for="role in form.roleList"
+              :disable-transitions="true"
+            >
+              {{ role.roleName }}
+            </el-tag>
+          </div>
+
+          <el-transfer
+            v-else
+            filterable
+            filter-placeholder="请输入角色名称"
+            :titles="['可选', '已选']"
+            v-model="form.roleList"
+            :data="roleOptions"
+          >
+          </el-transfer>
+        </el-form-item>
       </el-form>
     </el-card>
     <el-card
@@ -160,7 +176,7 @@
 
 <script>
 import Editor from "@/components/editor";
-import { addUser, getUser, updateUser } from "@/common/api/api";
+import { addUser, getUser, updateUser, roleList } from "@/common/api/api";
 
 export default {
   components: {
@@ -205,8 +221,25 @@ export default {
         }
       }
     };
-
+    const generateData = (_) => {
+      const data = [];
+      roleList({})
+        .then((response) => {
+          if (response.status == 200 && response.data.code == 1000) {
+            response.data.data.forEach((role, index) => {
+              data.push({
+                label: role.roleName,
+                key: role.menuId,
+              });
+            });
+          }
+        })
+        .catch(function (error) {});
+      return data;
+    };
     return {
+      roleOptions: generateData(),
+      value: [],
       disabled: false,
       statusOptions: [
         {
@@ -230,10 +263,7 @@ export default {
         info: "",
       },
       isClear: false,
-      form: {
-        title: "",
-        content: "",
-      },
+      form: {},
       rules: {
         userName: [
           { required: true, message: "请输入账号", trigger: "blur" },
@@ -275,6 +305,14 @@ export default {
         .then((response) => {
           if (response.status == 200 && response.data.code == 1000) {
             this.form = response.data.data;
+            if (!this.disabled) {
+              // 穿梭框在右侧只需要赋值id就可以显示
+              const initSelectRoleList = [];
+              this.form.roleList.map((item) => {
+                initSelectRoleList.push(item.id);
+              });
+              this.form.roleList = initSelectRoleList;
+            }
           }
         })
         .catch(function (error) {});
@@ -374,6 +412,9 @@ export default {
 </script>
 
 <style scoped>
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
 .form-container {
   width: 80%;
 }
