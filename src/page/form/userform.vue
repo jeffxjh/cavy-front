@@ -24,7 +24,9 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户账号" style="width: 80%" prop="userName">
+              <span v-if="disabled">{{ form.userName }}</span>
               <el-input
+                v-else
                 v-model="form.userName"
                 placeholder="请输入用户账号"
                 clearable
@@ -33,7 +35,9 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="登录密码" style="width: 80%" prop="password">
+              <span v-if="disabled">{{ form.password }}</span>
               <el-input
+                v-else
                 v-model="form.password"
                 placeholder="请输入登录密码"
                 show-password
@@ -45,7 +49,9 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="真实姓名" style="width: 80%" prop="realName">
+              <span v-if="disabled">{{ form.realName }}</span>
               <el-input
+                v-else
                 v-model="form.realName"
                 placeholder="请输入真实姓名"
                 clearable
@@ -54,17 +60,22 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="性别" style="width: 80%" prop="gender">
+              <span v-if="disabled">{{ genderName }}</span>
               <!-- :label=“1”，表示label的值应为数字1-->
               <!-- label=“1”，表示label的值应为字符串1 -->
-              <el-radio v-model="form.gender" :label="1">男</el-radio>
-              <el-radio v-model="form.gender" :label="2">女</el-radio>
+              <div v-else>
+                <el-radio v-model="form.gender" :label="1">男</el-radio>
+                <el-radio v-model="form.gender" :label="2">女</el-radio>
+              </div>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="手机号" style="width: 80%" prop="phone">
+              <span v-if="disabled">{{ form.phone }}</span>
               <el-input
+                v-else
                 v-model="form.phone"
                 placeholder="请输入手机号"
                 clearable
@@ -73,7 +84,9 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="邮箱" style="width: 80%" prop="email">
+              <span v-if="disabled">{{ form.email }}</span>
               <el-input
+                v-else
                 v-model="form.email"
                 placeholder="请输入邮箱"
                 clearable
@@ -88,7 +101,9 @@
               style="width: 80%"
               prop="defaultUser"
             >
+              <span v-if="disabled">{{ defaultUserName }}</span>
               <el-switch
+                v-else
                 v-model="form.defaultUser"
                 active-text="是"
                 inactive-text="否"
@@ -101,8 +116,15 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="用户状态" style="width: 30%" prop="email">
-              <el-select v-model="form.status" placeholder="请选择用户状态">
+            <el-form-item label="用户状态" style="width: 30%" prop="status">
+              <span v-if="disabled">
+                {{ statusName }}
+              </span>
+              <el-select
+                v-else
+                v-model="form.status"
+                placeholder="请选择用户状态"
+              >
                 <el-option
                   v-for="item in statusOptions"
                   :key="item.value"
@@ -183,6 +205,7 @@ export default {
         }
       }
     };
+
     return {
       disabled: false,
       statusOptions: [
@@ -256,6 +279,50 @@ export default {
         })
         .catch(function (error) {});
     }
+  },
+  computed: {
+    statusName() {
+      switch (this.form.status) {
+        case "3":
+          return "已冻结";
+          break;
+        case "2":
+          return "已禁用";
+          break;
+        case "1":
+          return "已使用";
+          break;
+        case "0":
+          return "已新建";
+          break;
+        default:
+          return this.form.status;
+      }
+    },
+    defaultUserName() {
+      switch (this.form.defaultUser) {
+        case "0":
+          return "否";
+          break;
+        case "1":
+          return "是";
+          break;
+        default:
+          return this.form.defaultUser;
+      }
+    },
+    genderName() {
+      switch (this.form.gender) {
+        case 2:
+          return "女";
+          break;
+        case 1:
+          return "男";
+          break;
+        default:
+          return this.form.gender;
+      }
+    },
   },
   methods: {
     // onSubmit() {
