@@ -65,7 +65,7 @@
       <el-button
         class="filter-item"
         style="margin-left: 10px"
-        type="info"
+        type="success"
         icon="el-icon-download"
         @click="downTemplate"
       >
@@ -74,7 +74,7 @@
       <el-button
         class="filter-item"
         style="margin-left: 10px"
-        type="info"
+        type="success"
         icon="el-icon-upload"
         @click="show"
       >
