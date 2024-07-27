@@ -86,14 +86,25 @@
           </template>
         </el-table-column>
         <el-table-column property="title" label="标题"></el-table-column>
-        <el-table-column fixed="right" label="操作" width="120">
-          <template slot-scope="scope">
+        <el-table-column align="right">
+          <template slot="header">
             <el-button
-              @click.native.prevent="deleteMessageRow(scope.$index, messageData)"
+              @click.native.prevent="deleteAllMessage"
               type="text"
               size="small"
             >
-              清除
+              全部已读
+            </el-button>
+          </template>
+          <template slot-scope="scope">
+            <el-button
+              @click.native.prevent="
+                deleteMessageRow(scope.$index, messageData)
+              "
+              type="text"
+              size="small"
+            >
+              已读
             </el-button>
           </template>
         </el-table-column>
@@ -122,7 +133,11 @@
 </template>
 
 <script>
-import { messageList, readedMessage } from "../common/api/api";
+import {
+  messageList,
+  readedMessage,
+  readedAllMessage,
+} from "../common/api/api";
 import ws from "@/components/ws.vue";
 var $this = {};
 export default {
@@ -203,7 +218,10 @@ export default {
     },
     deleteMessageRow(index, rows) {
       readedMessage({ id: rows[index].id });
-      },
+    },
+    deleteAllMessage() {
+      readedAllMessage({});
+    },
     tableRowClassName({ row, rowIndex }) {
       if (rowIndex === 1) {
         return "warning-row";

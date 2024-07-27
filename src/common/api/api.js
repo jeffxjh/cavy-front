@@ -115,7 +115,11 @@ export const roleList = params => {
 export const messageList = params => {
   return postJsonRequest("/message", params, true, "#message");
 };
-// 获取消息标记已读
+// 消息标记已读
 export const readedMessage = params => {
   return putRequest("/message/readed", params, false, "#message");
+};
+// 所有当前用户消息标记已读
+export const readedAllMessage = params => {
+  return putRequest("/message/readedAll", params, false, "#message");
 };
