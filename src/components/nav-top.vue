@@ -48,7 +48,11 @@
       height="250"
       max-height="250"
     >
-      <el-table :data="messageData" :row-class-name="tableRowClassName">
+      <el-table
+        :data="messageData"
+        :row-class-name="tableRowClassName"
+        @row-dblclick="rowDblclickHandler"
+      >
         <el-table-column label="日期" width="255">
           <template slot-scope="scope">
             <i class="el-icon-time"></i>
@@ -82,13 +86,43 @@
           </template>
         </el-table-column>
         <el-table-column property="title" label="标题"></el-table-column>
+        <el-table-column fixed="right" label="操作" width="120">
+          <template slot-scope="scope">
+            <el-button
+              @click.native.prevent="deleteMessageRow(scope.$index, messageData)"
+              type="text"
+              size="small"
+            >
+              清除
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-drawer>
+
+    <el-dialog
+      :title="messageDetail.title"
+      :visible.sync="messageDetailDialogVisible"
+      width="30%"
+      center
+    >
+      <span>{{ messageDetail.content }}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="messageDetailDialogCloseHandler('close')"
+          >关 闭</el-button
+        >
+        <el-button
+          type="primary"
+          @click="messageDetailDialogCloseHandler('readed')"
+          >已 读</el-button
+        >
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 
 <script>
-import { messageList } from "../common/api/api";
+import { messageList, readedMessage } from "../common/api/api";
 import ws from "@/components/ws.vue";
 var $this = {};
 export default {
@@ -104,6 +138,11 @@ export default {
       messageData: [],
       wsPath: "/ws/message",
       compomentName: "message",
+      messageDetailDialogVisible: false,
+      messageDetail: {
+        title: "",
+        content: "",
+      },
     };
   },
   beforeCreate() {
@@ -147,7 +186,24 @@ export default {
         return;
       }
     },
-
+    rowDblclickHandler(row, column, event) {
+      this.messageDetailDialogVisible = true;
+      this.messageDetail.id = row.id;
+      this.messageDetail.title = row.title;
+      this.messageDetail.content = row.content;
+    },
+    messageDetailDialogCloseHandler(action) {
+      if (action === "readed") {
+        readedMessage({ id: this.messageDetail.id });
+      }
+      this.messageDetail.id = "";
+      this.messageDetail.title = "";
+      this.messageDetail.content = "";
+      this.messageDetailDialogVisible = false;
+    },
+    deleteMessageRow(index, rows) {
+      readedMessage({ id: rows[index].id });
+      },
     tableRowClassName({ row, rowIndex }) {
       if (rowIndex === 1) {
         return "warning-row";
