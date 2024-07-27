@@ -6,8 +6,17 @@ import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import axios from "axios";
+// import TreeTable from 'vue-table-with-tree-grid'
+// Vue.component('tree-table', TreeTable)
+import TreeTable  from 'vue-table-with-tree-grid'
+import * as filters from './common/api/filters'
 
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
+Vue.component('tree-table', TreeTable)
+Vue.use(TreeTable )
 
 Vue.use(ElementUI);
 axios.defaults.timeout = 6000;

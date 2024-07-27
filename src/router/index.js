@@ -79,16 +79,16 @@ const routes = [
         name: "Role",
         component: Role
       },
-      {
-        path: "/power/menu",
-        name: "Menu",
-        component: Menu
-      },
-      {
-        path: "/power/user",
-        name: "User",
-        component: User
-      },
+      // {
+      //   path: "/power/menu",
+      //   name: "Menu",
+      //   component: Menu
+      // },
+      // {
+      //   path: "/power/user",
+      //   name: "User",
+      //   component: User
+      // },
       {
         path: "/knowledge",
         name: "Knowledge",
@@ -150,13 +150,13 @@ const routes = [
     component: Login
   }
   ,
-  {
-    path: "/",
-    redirect:'/index',
-    name: "Layout",
-    component: Layout
-  }
-  ,
+  // {
+  //   path: "/",
+  //   redirect:'/index',
+  //   name: "Layout",
+  //   component: Layout
+  // }
+  // ,
   {
     path: "/home",
     name: "Home",

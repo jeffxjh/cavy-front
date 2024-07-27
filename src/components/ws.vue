@@ -1,22 +1,23 @@
-<template>
-  <div class="ws">
-    <el-button type="text" @click="open">发送ws消息</el-button>
-  </div>
-</template>
+<template></template>
 
 <script>
 export default {
   name: "ws",
-  props:{
-    compomentName:{
+  props: {
+    compomentName: {
       typeof: String,
-      default: '默认主键',
-      required: true
-    }
+      default: "default",
+      required: true,
+    },
+    //ws地址
+    path: {
+      typeof: String,
+      required: true,
+    },
   },
   data() {
     return {
-      websock: null
+      websock: null,
     };
   },
   created() {
@@ -28,11 +29,10 @@ export default {
   methods: {
     initWebSocket() {
       //初始化weosocket
-      //const wsuri = "ws://localhost:8011/cavy/websocket/DPS007";
-      const wsuri = "ws://localhost:8011/cavy/ws/serverTwo";
-      let token = localStorage.getItem("token")
+      const ws_base_path = process.env.BASE_WEBSOCKET_PATH;
+      const wsuri = ws_base_path + this.path;
+      let token = localStorage.getItem("token");
       this.websock = new WebSocket(wsuri, [token]);
-      // this.websock = new WebSocket(wsuri);
       this.websock.onmessage = this.websocketonmessage;
       this.websock.onopen = this.websocketonopen;
       this.websock.onerror = this.websocketonerror;
@@ -40,7 +40,7 @@ export default {
     },
     websocketonopen() {
       //连接建立之后执行send方法发送数据
-      let actions = {compomentName: this.compomentName};
+      let actions = { compomentName: this.compomentName};
       this.websocketsend(JSON.stringify(actions));
     },
     websocketonerror() {
@@ -50,10 +50,20 @@ export default {
     websocketonmessage(e) {
       //数据接收
       const redata = JSON.parse(e.data);
+      console.info("收到消息：" + e.data);
+      if(redata.bussType===this.compomentName){
+        this.$emit('on-message',redata.content);
+      }
     },
     websocketsend(Data) {
-      //数据发送
-      this.websock.send(Data);
+      //延迟数据发送
+      setTimeout(() => {
+        if (this.websock.readyState === WebSocket.OPEN) {
+          this.websock.send(Data);
+        } else {
+          this.websocketsend(Data);
+        }
+      }, 1000);
     },
     websocketclose(e) {
       //关闭
@@ -62,9 +72,9 @@ export default {
     open() {
       this.$prompt("请输入邮箱", "提示", {
         confirmButtonText: "确定",
-        cancelButtonText: "取消"
+        cancelButtonText: "取消",
       })
-        .then(({value}) => {
+        .then(({ value }) => {
           // this.$message({
           //   type: "success",
           //   message: "你的邮箱是: " + value
@@ -74,10 +84,10 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "取消输入"
+            message: "取消输入",
           });
         });
-    }
-  }
+    },
+  },
 };
 </script>

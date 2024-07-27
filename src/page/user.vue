@@ -120,9 +120,9 @@
         :formatter="formatDefaultUser"
         width="180"
       ></el-table-column>
-      <el-table-column prop="adduser" label="添加人" width="180">
+      <el-table-column prop="addUser" label="添加人" width="180">
       </el-table-column>
-      <el-table-column prop="addtime" label="添加日期" width="180">
+      <el-table-column prop="addTime" label="添加日期" width="180">
       </el-table-column>
       <el-table-column label="操作" width="255">
         <template slot-scope="scope">

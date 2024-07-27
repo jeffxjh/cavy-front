@@ -111,3 +111,7 @@ export const updateUser = params => {
 export const roleList = params => {
   return postRequest("/role", params, true, "#role");
 };
+// 获取消息列表
+export const messageList = params => {
+  return postJsonRequest("/message", params, true, "#message");
+};

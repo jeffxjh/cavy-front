@@ -19,6 +19,7 @@
     "vue-axios": "^3.2.4",
     "vue-fragment": "^1.5.2",
     "vue-router": "^3.0.1",
+    "vue-table-with-tree-grid": "^0.2.4",
     "wangeditor": "^4.7.6"
   },
   "devDependencies": {

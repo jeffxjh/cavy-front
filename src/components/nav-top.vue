@@ -4,20 +4,34 @@
       <img class="logo" src="@/assets/icons/logo.png" alt="Logo" />
     </el-aside>
     <el-aside width="auto" class="header-logo tap">
-      <!-- :value="messageNum" -->
-           <el-badge :is-dot="hasMessage"  :max="99" class="item">
-              <el-button class="share-button" icon="el-icon-share" type="primary">通知</el-button>
-           </el-badge>
+      <!-- :value="messageNum" :is-dot="hasMessage"  -->
+      <el-badge :value="messageNum" :max="99" class="item">
+        <el-button
+          class="share-button"
+          icon="el-icon-share"
+          type="primary"
+          size="small"
+          @click="drawer = true"
+          >通知</el-button
+        >
+        <ws
+          ref="ws"
+          :path="wsPath"
+          :compoment-name="compomentName"
+          @on-message="onMessage"
+        ></ws>
+      </el-badge>
 
       <el-dropdown @command="handleCommand" style="overflow: hidden">
-          <el-avatar style="vertical-align: middle;"
-            src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-            @error="errorHandler"
-          >
-            <img
-              src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
-            />
-          </el-avatar>
+        <el-avatar
+          style="vertical-align: middle"
+          src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+          @error="errorHandler"
+        >
+          <img
+            src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
+          />
+        </el-avatar>
 
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>个人信息</el-dropdown-item>
@@ -26,24 +40,122 @@
         </el-dropdown-menu>
       </el-dropdown>
     </el-aside>
+
+    <el-drawer
+      title="消息列表"
+      :visible.sync="drawer"
+      :with-header="false"
+      height="250"
+      max-height="250"
+    >
+      <el-table :data="messageData" :row-class-name="tableRowClassName">
+        <el-table-column label="日期" width="255">
+          <template slot-scope="scope">
+            <i class="el-icon-time"></i>
+            <span style="margin-left: 10px">{{ scope.row.addTime }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="msgLevel" label="等级" width="100">
+          <template slot-scope="scope">
+            <el-tag
+              :type="
+                scope.row.msgLevel === '1'
+                  ? 'danger'
+                  : scope.row.msgLevel === '2'
+                  ? 'success'
+                  : 'info'
+              "
+              disable-transitions
+              >{{ scope.row.msgLevel | formatterMsgLevel }}</el-tag
+            >
+          </template>
+        </el-table-column>
+        <el-table-column label="发送人" width="180">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>姓名: {{ scope.row.addUser }}</p>
+              <p>住址: {{ scope.row.address }}</p>
+              <div slot="reference" class="name-wrapper">
+                <el-tag size="medium">{{ scope.row.addUser }}</el-tag>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column property="title" label="标题"></el-table-column>
+      </el-table>
+    </el-drawer>
   </el-container>
 </template>
 
 <script>
-// import { logout } from "../common/api/api";
+import { messageList } from "../common/api/api";
+import ws from "@/components/ws.vue";
 var $this = {};
 export default {
+  components: {
+    ws,
+  },
   data() {
     return {
       activeIndex: "1",
-      hasMessage:true,
-      messageNum:0,
+      hasMessage: true,
+      drawer: false,
+      messageNum: 0,
+      messageData: [],
+      wsPath: "/ws/message",
+      compomentName: "message",
     };
   },
   beforeCreate() {
     $this = this;
   },
+  computed: {
+    // messageNum() {
+    //   return this.messageData.length;
+    // },
+  },
+  mounted() {
+    this.messageList();
+  },
+  created() {
+    this.$nextTick(() => {
+      this.$refs.ws.websocketsend("首页初始化");
+    });
+  },
+  watch: {
+    // messageData: function (newVlaue, oldVlaue) {
+    //   this.messageNum=newVlaue.length;
+    //   debugger
+    // }
+  },
   methods: {
+    onMessage(data) {
+      let messageData = JSON.parse(data);
+      if (messageData != undefined) {
+        // this.$set(this.messageData, messageData);
+        this.messageData = messageData;
+        this.messageNum = messageData.length;
+      } else {
+        this.messageData = [];
+        this.messageNum = 0;
+      }
+    },
+    async messageList() {
+      const res = await messageList();
+      if (res.status == "200" && res.data.code == "1000") {
+        this.messageData = res.data.data;
+        return;
+      }
+    },
+
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex === 1) {
+        return "warning-row";
+      } else if (rowIndex === 3) {
+        return "success-row";
+      }
+      return "";
+    },
     errorHandler() {
       return true;
     },
@@ -65,7 +177,6 @@ export default {
 </script>
 
 <style scoped>
-
 .el-aside {
   display: flex;
   justify-content: center;
@@ -90,5 +201,8 @@ section {
 .item {
   margin-top: 4px;
   margin-right: 40px;
+}
+.tap {
+  height: 100%;
 }
 </style>
