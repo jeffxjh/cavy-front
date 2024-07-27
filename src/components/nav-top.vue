@@ -34,7 +34,7 @@
         </el-avatar>
 
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>个人信息</el-dropdown-item>
+          <el-dropdown-item command="userInfo">个人信息</el-dropdown-item>
           <el-dropdown-item>通知</el-dropdown-item>
           <el-dropdown-item command="logout">登出</el-dropdown-item>
         </el-dropdown-menu>
@@ -129,6 +129,78 @@
         >
       </span>
     </el-dialog>
+
+    <el-drawer
+      title="个人信息"
+      :visible.sync="showUserInfo"
+      :with-header="false"
+      height="250"
+      max-height="250"
+    >
+      <el-card class="box-card">
+        <el-form
+          ref="form"
+          :model="userInfoForm"
+          label-width="80px"
+          size="mini"
+        >
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="用户账号" style="width: 80%" prop="userName">
+                <span v-if="disabled">{{ userInfoForm.userName }}</span>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
+              <el-form-item label="真实姓名" style="width: 80%" prop="realName">
+                <span v-if="disabled">{{ userInfoForm.realName }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="性别" style="width: 80%" prop="gender">
+                <span v-if="disabled">{{ userInfoForm.genderName }}</span>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
+              <el-form-item label="手机号" style="width: 80%" prop="phone">
+                <span v-if="disabled">{{ userInfoForm.phone }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="邮箱" style="width: 80%" prop="email">
+                <span v-if="disabled">{{ userInfoForm.email }}</span>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
+              <el-form-item
+                label="默认用户"
+                style="width: 80%"
+                prop="defaultUser"
+              >
+                <span v-if="disabled">{{ userInfoForm.defaultUserName }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item label="用户角色">
+            <div v-if="disabled">
+              <el-tag
+                :key="role.id"
+                v-for="role in userInfoForm.roleList"
+                :disable-transitions="true"
+              >
+                {{ role.roleName }}
+              </el-tag>
+            </div>
+          </el-form-item>
+        </el-form>
+      </el-card>
+    </el-drawer>
   </el-container>
 </template>
 
@@ -157,6 +229,11 @@ export default {
       messageDetail: {
         title: "",
         content: "",
+      },
+      disabled: true,
+      showUserInfo: false,
+      userInfoForm: {
+        realName: "",
       },
     };
   },
@@ -244,6 +321,14 @@ export default {
         //可能需要调接口清除token有效性或者用户在线状态来统计在线状态
         $this.$router.push(`/login`).catch((error) => error);
       }
+      if (command === "userInfo") {
+        this.showUserInfo = true;
+        this.userInfoForm = JSON.parse(window.localStorage["userinfo"]);
+        this.userInfoForm.defaultUserName =
+          this.userInfoForm.defaultUser == "0" ? "否" : "是";
+        this.userInfoForm.genderName =
+          this.userInfoForm.gender == "2" ? "女" : "男";
+      }
       // this.$message("click on item " + command);
     },
   },
@@ -278,5 +363,9 @@ section {
 }
 .tap {
   height: 100%;
+}
+
+form span {
+  font-weight: bolder;
 }
 </style>

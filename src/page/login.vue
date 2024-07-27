@@ -125,7 +125,6 @@ export default {
             window.localStorage["token"] = res.data.data.token;
             that.$router.replace({ path: "/index" });
             console.info(JSON.stringify(res.data.data), "用户信息");
-            JSON.parse("jsonString");
             window.localStorage["userinfo"] = JSON.stringify(res.data.data);
           } else {
             that.$message.error(res.data.msg);
