@@ -172,11 +172,17 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // 访问登录页，放行
   if (to.path === "/login") {
-    
     if (window.localStorage.getItem("token")) {
       next("/index");
     }
     return next();
+  }
+  //默认访问页 推到首页或者登录页
+  if (to.path === "/") {
+    if (window.localStorage.getItem("token")) {
+      next("/index");
+    }
+    return next("/login");
   }
   // console.info("localStorage.token", localStorage.token);
   // 获取token
