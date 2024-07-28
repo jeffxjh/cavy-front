@@ -10,6 +10,7 @@ import axios from "axios";
 // Vue.component('tree-table', TreeTable)
 import TreeTable  from 'vue-table-with-tree-grid'
 import * as filters from './common/api/filters'
+import * as echarts from 'echarts';
 
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
@@ -25,6 +26,7 @@ axios.defaults.baseURL = process.env.BASE_API;
 // 挂在到Vue实例，后面可通过this调用
 Vue.prototype.$http = axios
 Vue.prototype.$axios = axios;
+Vue.prototype.$echarts = echarts;
 
 Vue.config.productionTip = false
 
