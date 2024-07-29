@@ -12,16 +12,24 @@
           <div><span style="color: red;">-9%</span></div>
         </el-card></el-col>
       <el-col :span="6">
-        <el-card class="box-card">
-          <el-row>
-            <el-col :span="10">
-              <div><span style="color: grey;">Total Application</span></div>
-              <div><span style="font-size:xx-large ;font-weight: bolder;">5672</span></div>
-              <div><span style="color: grey;font-size: smaller;"> <img class="curves" src="@/assets/main/curves.png"
-                       alt="curves" />+14% Inc</span></div>
+        <el-card class="box-card" body-style="padding: 0;">
+          <el-row align="bottom">
+            <el-col :span="12">
+              <div style="width: 100%;height:32%;align-content: end;"><span style="color: grey;">Total User</span>
+              </div>
+              <div style="width: 100%;height:32%;align-content: center;"><span
+                      style="font-size:xxx-large ;font-weight: bolder;">{{ userChange.total }}</span>
+              </div>
+              <div style="width: 100%;height:32%;">
+                <span style="color: grey;font-size: large;"><img class="curves" src="@/assets/main/curves.png"
+                       alt="curves" />
+                      <span v-if="userChangeNum>0" style="color: green;font-size: large;">+{{ userChangeNum }}% Inc</span>
+                      <span v-else style="color: red;font-size: large;">{{ userChangeNum }}% Red</span>
+                      </span>
+              </div>
             </el-col>
-            <el-col :span="10">
-              <div id="aa"></div>
+            <el-col :span="12">
+              <div id="drawUserPic" :style="{ width: '198px', height: '198px' }"></div>
             </el-col>
           </el-row>
         </el-card></el-col>
@@ -88,7 +96,7 @@
           </div>
         </el-card></el-col>
     </el-row>
-    <el-row :gutter="20" class="el-row">
+    <!-- <el-row :gutter="20" class="el-row">
       <el-col :span="24"><el-card shadow="always">
           <span>最近人情记录</span>
           <div style="height: 500px">
@@ -112,9 +120,8 @@
             </el-table>
           </div>
         </el-card></el-col>
-    </el-row>
+    </el-row> -->
     <div id="myChart" :style="{ width: '300px', height: '300px' }"></div>
-    <div id="aaa" :style="{ width: '300px', height: '300px' }"></div>
   </div>
 </template>
 
@@ -137,7 +144,17 @@ export default {
         data3: [{ buss: "结婚", name: "张三", amt: 1233, type: "收入" }],
         data4: [{ date: "asd", name: "jj", address: "长沙" }],
       },
+      userChange: {
+        add: 10,
+        total: 100,
+        delete: 2
+      }
     };
+  },
+  computed:{
+    userChangeNum() {
+      return this.userChange.add-this.userChange.delete
+    }
   },
   created() { },
   methods: {
@@ -160,14 +177,18 @@ export default {
         ],
       });
     },
-    aa() {
-      let aa = this.$echarts.init(document.getElementById("aa"));
+    drawUserPic() {
+      // 初始化ECharts实例
+      this.drawUserPic = this.$echarts.init(document.getElementById("drawUserPic"));
+
       // 绘制图表
-      aa.setOption({
+      this.drawUserPic.setOption({
         tooltip: {
           trigger: 'item'
         },
+        //铭文
         legend: {
+          show: false,
           top: '5%',
           left: 'center'
         },
@@ -175,15 +196,36 @@ export default {
           {
             name: 'Access From',
             type: 'pie',
-            radius: ['40%', '70%'],
+            //圆弧内半径和外半径
+            radius: ['55%', '70%'],
             avoidLabelOverlap: false,
-            padAngle: 5,
+            padAngle: 2,
             itemStyle: {
               borderRadius: 10
             },
             label: {
-              show: false,
-              position: 'center'
+              normal: {
+                show: true,
+                position: 'center',
+                color: '#4c4a4a',
+                formatter: '{total|' + '+1位' + '}' + '\n\r' + '{active|活跃用户}',
+                rich: {
+                  total: {
+                    fontSize: 20,
+                    fontFamily: "微软雅黑",
+                    color: '#454c5c'
+                  },
+                  active: {
+                    fontFamily: "微软雅黑",
+                    fontSize: 12,
+                    color: '#6c7a89',
+                    lineHeight: 30,
+                  },
+                }
+              },
+              emphasis: {//中间文字显示
+                show: true,
+              }
             },
             emphasis: {
               label: {
@@ -196,9 +238,14 @@ export default {
               show: false
             },
             data: [
-              { value: 1048, name: 'Search Engine' }
+              // { value: 1048, name: '全部', itemStyle : {normal : {color :'#76d1fa'}} },
+              // { value: 110, name: '新增', itemStyle : {normal : {color :'#31cc88'}} },
+              // { value: 20, name: '删除', itemStyle : {normal : {color :'#f84d20'}} }, 
+              { value: this.userChange.total, name: '全部' },
+              { value: this.userChange.add, name: '新增' },
+              { value: this.userChange.delete, name: '删除' },
             ]
-          }
+          },
         ]
       });
     },
@@ -211,8 +258,20 @@ export default {
     //然后异步执行echarts的初始化函数
     newPromise.then(() => {
       this.drawLine();
-      this.aa();
     });
+
+    // 使用箭头函数保持this上下文
+    setTimeout(() => {
+      this.drawUserPic();
+    }, 0);
+
+    // 使用箭头函数保持this上下文
+    window.addEventListener('resize', () => {
+      if (this.drawUserPic) {
+        this.drawUserPic.resize();
+      }
+    });
+
   },
 };
 </script>
