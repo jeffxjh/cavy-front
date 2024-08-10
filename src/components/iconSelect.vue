@@ -49,7 +49,7 @@ export default {
             this.userChooseIcon = icon;//将i的样式设为选中的样式el-icon-xxx
         },
     clear(){
-            this.userChooseIcon = ''
+            this.userChooseIcon = "请选择图标"
         }
        
     }
