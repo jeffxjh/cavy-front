@@ -1,49 +1,47 @@
 <template>
   <div id="user">
+
     <body id="poster">
       <el-form
-        :model="loginForm"
-        ref="loginForm"
-        class="login-container"
-        label-position="left"
-        label-width="0px"
-        :rules="rules"
-   
-        
-      >
-      <!--      v-loading="loading"
+               :model="loginForm"
+               ref="loginForm"
+               class="login-container"
+               label-position="left"
+               label-width="0px"
+               :rules="rules">
+        <!--      v-loading="loading"
         element-loading-text="登录中"
         element-loading-spinner="el-icon-loading" 
       element-loading-background="rgba(0, 0, 0, 0.8)" -->
         <h3 class="login_title">Cavy</h3>
         <el-form-item prop="username">
           <el-input
-            class="login-el-input"
-            type="text"
-            v-model="loginForm.username"
-            auto-complete="off"
-            placeholder="账号"
-          ></el-input>
+                    class="login-el-input"
+                    type="text"
+                    v-model="loginForm.username"
+                    auto-complete="off"
+                    placeholder="账号"></el-input>
         </el-form-item>
 
         <el-form-item prop="password">
           <el-input
-            class="login-el-input"
-            type="password"
-            v-model="loginForm.password"
-            auto-complete="off"
-            placeholder="密码"
-          ></el-input>
+                    class="login-el-input"
+                    type="password"
+                    v-model="loginForm.password"
+                    auto-complete="off"
+                    placeholder="密码"></el-input>
           <!--  @keyup.enter.native="login" -->
         </el-form-item>
-
+        <el-checkbox
+                     v-model="remenber"
+                     label="记住密码"
+                     name="type"></el-checkbox>
         <el-form-item style="width: 100%">
           <el-button
-            class="loginbutton"
-            type="primary"
-            @click="login"
-            @keyup.enter="keyDown(e)"
-            >登录
+                     class="loginbutton"
+                     type="primary"
+                     @click="login"
+                     @keyup.enter="keyDown(e)">登录
           </el-button>
         </el-form-item>
       </el-form>
@@ -53,7 +51,7 @@
 
 <script>
 import { login } from "../common/api/api";
-
+const Base64 = require('js-base64').Base64
 export default {
   name: "Login",
   data() {
@@ -61,8 +59,9 @@ export default {
       // loading:false,
       loginForm: {
         username: "",
-        password: "",
+        password: ""
       },
+      remenber: false,
       responseResult: [],
       rules: {
         username: [
@@ -88,6 +87,7 @@ export default {
   },
   mounted() {
     window.addEventListener("keydown", this.keyDown, true);
+    this.loadStore();
   },
   destroyed() {
     window.removeEventListener("keydown", this.keyDown, false);
@@ -126,12 +126,31 @@ export default {
             that.$router.replace({ path: "/index" });
             console.info(JSON.stringify(res.data.data), "用户信息");
             window.localStorage["userinfo"] = JSON.stringify(res.data.data);
+            this.stroeInfo()
           } else {
             that.$message.error(res.data.msg);
           }
         })
-        .catch((failResponse) => {});
+        .catch((failResponse) => { });
     },
+    stroeInfo() {
+      if (this.remenber) {
+        let password = Base64.encode(this.loginForm.password); // base64加密
+        window.localStorage.setItem('username', this.loginForm.username);
+        window.localStorage.setItem('password', password);
+      } else {
+        window.localStorage.removeItem('username');
+        window.localStorage.removeItem('password');
+      }
+    },
+    loadStore() {
+      let username = localStorage.getItem('username')
+      if (username) {
+        this.loginForm.username = localStorage.getItem('username')
+        this.loginForm.password = Base64.decode(localStorage.getItem('password'))// base64解密
+        this.remenber = true
+      }
+    }
   },
 };
 </script>
@@ -194,10 +213,12 @@ body {
 .el-input__inner {
   border: 0;
 }
+
 .el-input__inner::placeholder {
   color: #000;
   text-align: left;
 }
+
 /* 谷歌 */
 .el-input__inner::-webkit-input-placeholder {
   color: #000;
