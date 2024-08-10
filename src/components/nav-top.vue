@@ -323,6 +323,7 @@ export default {
         console.info("登出");
         window.localStorage["token"] = "";
         window.localStorage["userinfo"] = "";
+        window.sessionStorage.removeItem('activePath')
         //可能需要调接口清除token有效性或者用户在线状态来统计在线状态
         $this.$router.push(`/login`).catch((error) => error);
       }

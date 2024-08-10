@@ -11,6 +11,11 @@ import axios from "axios";
 import TreeTable  from 'vue-table-with-tree-grid'
 import * as filters from './common/api/filters'
 import * as echarts from 'echarts';
+import { handleTree,resetForm } from "./common/api/utils";
+
+// 全局方法挂载
+Vue.prototype.handleTree = handleTree
+Vue.prototype.resetForm = resetForm
 
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])

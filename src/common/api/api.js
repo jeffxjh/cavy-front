@@ -123,3 +123,20 @@ export const readedMessage = params => {
 export const readedAllMessage = params => {
   return putRequest("/message/readedAll", params, false, "#message");
 };
+
+
+export const listMenu = params => {
+  return postJsonRequest("/menu/listTree", params);
+};
+export const getMenu = params => {
+  return getRequest("/menu/"+params.menuId, params);
+}; 
+export const delMenu = params => {
+  return postRequest("/user", params);
+}; 
+export const addMenu = params => {
+  return postRequest("/user", params);
+}; 
+export const updateMenu = params => {
+  return postRequest("/user", params);
+};
