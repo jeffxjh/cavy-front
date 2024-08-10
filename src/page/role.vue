@@ -158,7 +158,6 @@ export default {
       that.listLoading = true;
       roleList(that.params)
         .then((response) => {
-          debugger
           that.tableData = response.data.data;
           console.info(response.data.data, 3);
           that.total = response.data.total;
