@@ -58,7 +58,7 @@
         :selectable="selectable"
       ></el-table-column> 
       <!-- <el-table-column type="" prop="id" label="id" width="160"></el-table-column> -->
-      <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" width="160"></el-table-column>
+      <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" align="left" width="160"></el-table-column>
       <el-table-column prop="icon" label="图标" align="center" width="100">
         <template slot-scope="scope">
           <!-- <svg-icon :icon-class="scope.row.icon" /> -->
@@ -77,17 +77,17 @@
         <template slot-scope="scope">
           <el-button
                      size="mini"
-                     type="text"
+                     type="warning"
                      icon="el-icon-edit"
-                     @click="handleUpdate(scope.row)">修改</el-button>
+                     @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button
                      size="mini"
-                     type="text"
+                     type="success"
                      icon="el-icon-plus"
-                     @click="handleAdd(scope.row)">新增</el-button>
+                     @click="handleAdd(scope.row)">添加</el-button>
           <el-button
                      size="mini"
-                     type="text"
+                     type="danger"
                      icon="el-icon-delete"
                      @click="handleDelete(scope.row)">删除</el-button>
         </template>
@@ -95,8 +95,8 @@
     </el-table>
 
     <!-- 添加或修改菜单对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="680px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+    <el-dialog :title="title" :visible.sync="open" :close-on-click-modal ="false" width="680px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-row>
           <el-col :span="24">
             <el-form-item label="上级菜单" prop="parentId">
@@ -107,6 +107,7 @@
                 :show-count="true"
                 placeholder="选择上级菜单"
               /> -->
+              <span>【{{ form.parentName }}】</span>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -120,6 +121,9 @@
           </el-col>
           <el-col :span="24" v-if="form.menuType != 'F'">
             <el-form-item label="菜单图标" prop="icon">
+              <icon-select :form="form" v-bind:icon.sync="form.icon" ref="iconSelectRef">
+
+              </icon-select>
               <!-- <el-popover
                 placement="bottom-start"
                 width="460"
@@ -164,7 +168,7 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
-          <el-col :span="12" v-if="form.menuType != 'F'">
+          <el-col :span="24" v-if="form.menuType != 'F'">
             <el-form-item prop="path">
               <span slot="label">
                 <el-tooltip content="访问的路由地址，如：`user`，如外网地址需内链访问则以`http(s)://`开头" placement="top">
@@ -267,10 +271,11 @@
 </template>
 
 <script>
+import iconSelect from '@/components/iconSelect'
 import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "@/common/api/api";
-
 export default {
   name: "Menu",
+  components:{iconSelect},
   data() {
     return {
       // 遮罩层
@@ -313,12 +318,17 @@ export default {
   created() {
     this.getList();
   },
+  watch: {
+    'form.icon': function (newVlaue, oldVlaue) {
+    }
+  },
   methods: {
     selectable(row, index) {
       return true;
     },
     // 选择图标
-    selected(name) {
+    iconChange(name) {
+      debugger
       this.form.icon = name;
     },
     /** 查询菜单列表 */
@@ -385,10 +395,14 @@ export default {
       this.getTreeselect();
       if (row != null && row.menuId) {
         this.form.parentId = row.menuId;
+        this.form.parentName = row.menuName;
       } else {
         this.form.parentId = 0;
       }
       this.open = true;
+      this.$nextTick(()=>{
+        this.$refs.iconSelectRef.clear();
+        })
       this.title = "添加菜单";
     },
     /** 展开/折叠操作 */
