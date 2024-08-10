@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-aside width="auto" class="header-logo tap">
-      <img class="logo" src="@/assets/icons/logo.png" alt="Logo" />
+      <img class="logo" src="@/assets/icons/logo.png" alt="Logo"  @click="toIndex"/>
     </el-aside>
     <el-aside width="auto" class="header-logo tap">
       <!-- :value="messageNum" :is-dot="hasMessage"  -->
@@ -260,6 +260,11 @@ export default {
     // }
   },
   methods: {
+    toIndex(){
+      if (this.$route.path !== "/index"){
+        this.$router.push("/index");
+      }
+    },
     onMessage(data) {
       let messageData = JSON.parse(data);
       if (messageData != undefined) {
