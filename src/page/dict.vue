@@ -1,4 +1,3 @@
-<style></style>
 <template>
     <div id="user">
         <el-breadcrumb separator="/" style="margin-bottom: 10px; font-size: 15px">
@@ -32,6 +31,7 @@
             </el-button>
         </div>
         <el-table
+                  ref="mainTable"
                   v-loading="listLoading"
                   :data="tableData"
                   highlight-current-row
@@ -45,7 +45,10 @@
                              type="selection"
                              width="55"
                              :selectable="selectable"></el-table-column>
-            <el-table-column type="expand">
+            <el-table-column type="expand" width="100px">
+                <template slot="header" >
+                    <el-button type="text" @click="change">{{ isExpand ? '收起' : '展开' }}</el-button>
+                </template>
                 <template slot-scope="props">
                     <el-table
                               v-if="props.row.childrenData.length > 0"
@@ -58,7 +61,7 @@
                         </el-table-column>
                         <el-table-column prop="label" label="码值">
                         </el-table-column>
-                        <el-table-column label="操作"  width="100">
+                        <el-table-column label="操作" width="100">
                             <template slot-scope="scope">
                                 <el-button
                                            size="mini"
@@ -90,13 +93,14 @@
                 <template slot-scope="scope">
                     <el-button size="mini" type="success" @click="handleAddItem(scope.$index, scope.row)">添加项
                     </el-button>
-                    <el-button size="mini"  type="warning" @click="handleEdit(scope.$index, scope.row)">修改
+                    <el-button size="mini" type="warning" @click="handleEdit(scope.$index, scope.row)">修改
                     </el-button>
                     <el-button
                                size="mini"
                                type="danger"
                                @click="handleDelete(scope.$index, scope.row)">删除
                     </el-button>
+                    <!-- <el-button type="text" @click="toogleExpand(scope.row)">查看详情</el-button> -->
                 </template>
             </el-table-column>
         </el-table>
@@ -142,12 +146,13 @@
 </template>
 
 <script>
-import { pageDict, getDict, addDictItem, delDict,delDictItem } from "@/common/api/api";
+import { pageDict, getDict, addDictItem, delDict, delDictItem } from "@/common/api/api";
 
 export default {
     name: "Dict",
     data() {
         return {
+            isExpand: false,//默认收起
             item: {
                 drawer: false,
                 tempList: [],
@@ -192,6 +197,26 @@ export default {
         this.getList();
     },
     methods: {
+        toogleExpand(row) {
+            this.tableData.map((item) => {
+                this.$refs.mainTable.toggleRowExpansion(item, false)
+            })
+            this.$refs.mainTable.toggleRowExpansion(row);
+        },
+        change() {
+            //如果表格没有数据，操作不起作用
+            if (this.tableData.length == 0)
+                return
+            //取反
+            this.isExpand = !this.isExpand
+            //遍历设置
+            this.tableData.forEach(e => {
+                //没有子节点的不操作
+                // if(e.childrenData.length!==0){
+                    this.$refs.mainTable.toggleRowExpansion(e, this.isExpand)
+                // }
+            });
+        },
         selectable(row, index) {
             return true;
         },
@@ -313,7 +338,7 @@ export default {
             // });
             // });
         },
-   
+
         handleDeleteItem(index, row) {
             this.$confirm("确认删除该字典项?", "提示", {
                 confirmButtonText: "确定",
@@ -412,25 +437,5 @@ export default {
 <style scoped>
 .el-table th>.cell {
     padding-left: 14px;
-}
-
-::deep .row-expand-cover {
-    background-color: brown;
-}
-
-::deep .el-table .row-expand-cover .cell .el-table__expand-icon {
-    display: none;
-}
-
-::deep .row-expand-cover td:first-child .el-icon-arrow-right {
-    visibility: hidden;
-}
-
-::deep .row-expand-cover .el-table__expand-column {
-    pointer-events: none;
-}
-
-::deep .row-expand-cover .el-table__expand-column .el-icon {
-    visibility: hidden;
 }
 </style>

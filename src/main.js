@@ -5,6 +5,8 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import './assets/global.css'
+
 import axios from "axios";
 // import TreeTable from 'vue-table-with-tree-grid'
 // Vue.component('tree-table', TreeTable)

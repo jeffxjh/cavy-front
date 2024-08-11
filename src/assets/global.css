@@ -1,0 +1,11 @@
+
+/* 当表格没有子节点时隐藏展开图标 */
+.el-table .row-expand-cover .cell .el-table__expand-icon {
+    display: none;
+}
+
+.row-expand-cover .el-table__expand-column {
+    pointer-events: none;
+}
+
+/* 当表格没有子节点时隐藏展开图标 */
