@@ -6,15 +6,18 @@
       <el-breadcrumb-item>菜单管理</el-breadcrumb-item>
     </el-breadcrumb>
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
-      <el-form-item label="菜单名称" prop="menuName">
+      <el-form-item label="" prop="menuName">
         <el-input
                   v-model="queryParams.menuName"
-                  placeholder="请输入菜单名称"
+                  placeholder="请输入菜单名称/菜单编号"
                   clearable
+                  @change="menuNameQueryChange"
                   @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
+      <el-form-item label="" prop="status">
         <el-select v-model="queryParams.status" placeholder="菜单状态" clearable>
+          <el-option label="启用" value="1"></el-option>
+            <el-option label="禁用" value="0"></el-option>
           <!-- <el-option
             v-for="dict in dict.type.sys_normal_disable"
             :key="dict.value"
@@ -284,7 +287,7 @@ export default {
       // 查询参数
       queryParams: {
         menuName: undefined,
-        visible: undefined
+        status: undefined
       },
       // 表单参数
       form: {},
@@ -316,6 +319,11 @@ export default {
     }
   },
   methods: {
+    menuNameQueryChange(){
+      if(this.queryParams.menuName==""){
+        this.queryParams.menuName=undefined
+      }
+    },
     selectable(row, index) {
       return true;
     },
