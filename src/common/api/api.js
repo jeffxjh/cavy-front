@@ -124,19 +124,22 @@ export const readedAllMessage = params => {
   return putRequest("/message/readedAll", params, false, "#message");
 };
 
-
+// 菜单树
 export const listMenu = params => {
   return postJsonRequest("/menu/listTree", params);
 };
+// 菜单详情
 export const getMenu = params => {
-  return getRequest("/menu/"+params.menuId, params);
-}; 
+  return getRequest("/menu/"+params, params);
+};
+// 菜单删除 
 export const delMenu = params => {
-  return postRequest("/user", params);
+  return deleteRequest("/menu/"+params, params);
 }; 
+// 添加菜单
 export const addMenu = params => {
-  return postRequest("/user", params);
+  return postJsonRequest("/menu/add", params);
 }; 
 export const updateMenu = params => {
-  return postRequest("/user", params);
+  return postJsonRequest("/menu/update", params);
 };

@@ -38,9 +38,18 @@ export default {
     },
     watch: {
         iconList(val) {
+        },
+        "form.icon"(n, o) {
+            this.userChooseIcon = n
         }
     },
+    beforeDestroy() {
+        this.userChooseIcon = ""
+    },
     mounted() {
+        if (this.form != undefined) {
+            this.userChooseIcon = this.form.icon
+        }
     },
     methods: {
         //给icon绑定的点击事件
@@ -48,10 +57,10 @@ export default {
             this.$emit('update:icon', icon)
             this.userChooseIcon = icon;//将i的样式设为选中的样式el-icon-xxx
         },
-    clear(){
+        clear() {
             this.userChooseIcon = "请选择图标"
         }
-       
+
     }
 }
 </script>
@@ -102,7 +111,7 @@ export default {
 
 .iconName {
     width: 50%;
-    height: 45px!important;
+    height: 45px !important;
     text-align: center;
     border: 1px solid #eee;
     -webkit-appearance: none;
@@ -115,13 +124,13 @@ export default {
     color: #606266;
     display: inline-block;
     font-size: inherit;
-    font:#DCDFE6;
+    font: #DCDFE6;
     height: 40px;
     line-height: 40px;
     outline: 0;
     padding: 0 15px;
-    -webkit-transition: border-color .2s cubic-bezier(.645,.045,.355,1);
-    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    -webkit-transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
+    transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
 }
 </style>
  

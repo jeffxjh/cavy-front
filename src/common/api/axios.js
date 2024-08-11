@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getStore, setStore } from "./storage";
+import { Message } from "element-ui";
 import router from "@/router";
 import errorHandler from "./errorHandler";
 import { showLoading, hideLoading } from "./loading";
@@ -42,6 +43,9 @@ axios.interceptors.response.use(
       console.log("token过期");
       window.localStorage.removeItem("token");
       window.location.href = "/";
+    }
+    if(response.data.code !== 1000){
+      Message.error(response.data.msg+':'+JSON.stringify(response.data.data));
     }
 
     // 判断当前请求是否设置了不显示Loading（不显示自然无需隐藏）

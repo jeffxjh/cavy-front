@@ -23,7 +23,7 @@
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select> -->
-      <el-button class="filter-item" icon="el-icon-search" @click="getList">
+      <el-button class="filter-item" icon="el-icon-search" @click="getList" size="mini">
         搜索
       </el-button>
       <!-- <el-button
@@ -40,6 +40,7 @@
         style="margin-left: 10px"
         type="primary"
         icon="el-icon-document"
+        size="mini"
         @click="handleCreate"
       >
         添加
@@ -58,6 +59,7 @@
         style="margin-left: 10px"
         type="danger"
         icon="el-icon-delete"
+        size="mini"
         @click="handleBatchDelete"
       >
         删除
@@ -67,6 +69,7 @@
         style="margin-left: 10px"
         type="success"
         icon="el-icon-download"
+        size="mini"
         @click="downTemplate"
       >
         导出
@@ -76,6 +79,7 @@
         style="margin-left: 10px"
         type="success"
         icon="el-icon-upload"
+        size="mini"
         @click="show"
       >
         导入
@@ -84,6 +88,7 @@
         :addOrUpdateVisible="addOrUpdateVisible"
         :excelUrl="excelUrl"
         :width="width"
+        size="mini"
         @changeShow="showAddOrUpdate"
         @close="close"
         ref="addOrUpdateRef"
