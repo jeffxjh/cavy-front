@@ -6,12 +6,13 @@
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <div style="margin-bottom: 10px">
+    <div style="margin-bottom: 18px">
       <el-input
         v-model="params.userName"
         clearable
         placeholder="账号/姓名/邮箱"
         style="width: 200px"
+        size="small"
         class="filter-item"
       />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">

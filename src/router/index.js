@@ -4,6 +4,7 @@ import User from "@/page/user";
 import Order from "@/page/order";
 import Main from "@/page/main";
 import System from "@/page/system";
+import Dict from "@/page/dict";
 import File from "@/page/file";
 import Knowledge from "@/page/knowledge";
 import Article from "@/page/article";
@@ -16,6 +17,7 @@ import Task from "@/page/task";
 import Login from "@/page/login";
 import Questionanswer from "@/page/questionanswer";
 import Questionform from "@/page/form/questionform";
+import Dictform from "@/page/form/dictform";
 import Userform from "@/page/form/userform";
 import Taskform from "@/page/form/taskform";
 import Websocket from "@/page/websocket";
@@ -114,12 +116,23 @@ const routes = [
         path: "/system",
         name: "System",
         component: System,
-        children: []
-      },
-      {
-        path: "/system/file",
-        name: "File",
-        component: File
+        children: [
+          {
+            path: "/system/dict",
+            name: "Dict",
+            component: Dict
+          },
+          {
+            path: "/system/file",
+            name: "File",
+            component: File
+          },
+          {
+            path: "/form/dictform",
+            name: "Dictform",
+            component: Dictform
+          },
+        ]
       }
       ,
       {

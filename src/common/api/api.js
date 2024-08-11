@@ -140,6 +140,36 @@ export const delMenu = params => {
 export const addMenu = params => {
   return postJsonRequest("/menu/add", params);
 }; 
+// 修改菜单
 export const updateMenu = params => {
   return postJsonRequest("/menu/update", params);
+};
+
+// 分页查询数据字典
+export const pageDict = params => {
+  return postJsonRequest("/dict", params);
+};
+// 详情数据字典
+export const getDict = params => {
+  return getRequest("/dict/"+params, params);
+};
+// 删除数据字典 
+export const delDict = params => {
+  return deleteRequest("/dict/del/"+params, params);
+};
+// 删除数据字典项 
+export const delDictItem = params => {
+  return deleteRequest("/dict/item/del/"+params, params);
+}; 
+// 添加数据字典
+export const addDict = params => {
+  return postJsonRequest("/dict/add", params);
+}; 
+// 修改数据字典
+export const updateDict = params => {
+  return postJsonRequest("/dict/update", params);
+};
+// 添加数据字典项
+export const addDictItem = params => {
+  return postJsonRequest("/dict/item/add", params);
 };

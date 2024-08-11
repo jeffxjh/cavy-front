@@ -1,9 +1,7 @@
- <style>
-</style>
+<style></style>
 <template>
   <div id="user">
-    <h1>系统管理列表</h1>
-<router-view></router-view>
+    <router-view></router-view>
   </div>
 </template>
 
