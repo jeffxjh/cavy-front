@@ -46,7 +46,7 @@
                              width="55"
                              :selectable="selectable"></el-table-column>
             <el-table-column type="expand" width="100px">
-                <template slot="header" >
+                <template slot="header" slot-scope="{}">
                     <el-button type="text" @click="change">{{ isExpand ? '收起' : '展开' }}</el-button>
                 </template>
                 <template slot-scope="props">
@@ -212,9 +212,9 @@ export default {
             //遍历设置
             this.tableData.forEach(e => {
                 //没有子节点的不操作
-                // if(e.childrenData.length!==0){
+                 if(e.childrenData.length!==0){
                     this.$refs.mainTable.toggleRowExpansion(e, this.isExpand)
-                // }
+                 }
             });
         },
         selectable(row, index) {
