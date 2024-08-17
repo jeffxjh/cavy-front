@@ -6,6 +6,7 @@ import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import './assets/global.css'
+import store from './store/index';
 
 import axios from "axios";
 // import TreeTable from 'vue-table-with-tree-grid'
@@ -24,7 +25,6 @@ Object.keys(filters).forEach(key => {
 
 Vue.component('tree-table', TreeTable)
 Vue.use(TreeTable )
-
 Vue.use(ElementUI);
 axios.defaults.timeout = 6000;
 axios.defaults.baseURL = process.env.BASE_API;
@@ -40,6 +40,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

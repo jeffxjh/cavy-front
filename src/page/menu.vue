@@ -17,7 +17,7 @@
       <el-form-item label="" prop="status">
         <el-select v-model="queryParams.status" placeholder="菜单状态" clearable>
           <el-option label="启用" value="1"></el-option>
-            <el-option label="禁用" value="0"></el-option>
+          <el-option label="禁用" value="0"></el-option>
           <!-- <el-option
             v-for="dict in dict.type.sys_normal_disable"
             :key="dict.value"
@@ -60,12 +60,22 @@
       </el-table-column>
       <el-table-column prop="code" label="菜单编号" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="url" label="路由地址" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="menuType" label="菜单类型" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="menuType" label="菜单类型" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          {{ getDictionaryItem('MENU_TYPE', scope.row.menuType) }}
+        </template></el-table-column>
       <el-table-column prop="sort" label="排序" width="60"></el-table-column>
       <el-table-column prop="weight" label="权重" width="80"></el-table-column>
       <el-table-column prop="isDefault" label="是否默认" width="80">
+        <template slot-scope="scope">
+          {{ getDictionaryItem('IS_OR_NOT', scope.row.isDefault) }}
+        </template>
       </el-table-column>
-      <el-table-column prop="hidden" label="是否隐藏" width="80"></el-table-column>
+      <el-table-column prop="hidden" label="是否隐藏" width="80">
+        <template slot-scope="scope">
+          {{ getDictionaryItem('IS_OR_NOT', scope.row.hidden) }}
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime"></el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -170,8 +180,8 @@
                 </el-tooltip>
                 路由地址
               </span>
-              <el-input v-model="form.url" placeholder="请输入路由地址" >
-                <template  slot="prepend">{{ form.parentUrl }}</template>
+              <el-input v-model="form.url" placeholder="请输入路由地址">
+                <template slot="prepend">{{ form.parentUrl }}</template>
               </el-input>
             </el-form-item>
           </el-col>
@@ -262,6 +272,7 @@
 
 <script>
 import iconSelect from '@/components/iconSelect'
+import { mapGetters } from 'vuex';
 import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "@/common/api/api";
 export default {
   name: "Menu",
@@ -311,7 +322,12 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapGetters(['getDictionaryItem'])
+  },
   created() {
+    // 获取字典项数据
+    this.$store.dispatch('fetchDictionary',{items:['IS_OR_NOT','MENU_TYPE']});
     this.getList();
   },
   watch: {
@@ -319,9 +335,9 @@ export default {
     }
   },
   methods: {
-    menuNameQueryChange(){
-      if(this.queryParams.menuName==""){
-        this.queryParams.menuName=undefined
+    menuNameQueryChange() {
+      if (this.queryParams.menuName == "") {
+        this.queryParams.menuName = undefined
       }
     },
     selectable(row, index) {
@@ -428,8 +444,8 @@ export default {
       this.getTreeselect();
       getMenu(row.menuId).then(response => {
         this.form = response.data.data;
-        this.form.parentUrl=response.data.data.parentUrl
-        this.form.url=response.data.data.curUrl
+        this.form.parentUrl = response.data.data.parentUrl
+        this.form.url = response.data.data.curUrl
         this.open = true;
         this.title = "修改菜单";
       });
@@ -438,8 +454,8 @@ export default {
     submitForm: function () {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if(this.form.parentUrl!=undefined&&this.form.parentUrl!=""){
-            this.form.url=this.form.parentUrl+"/"+this.form.url
+          if (this.form.parentUrl != undefined && this.form.parentUrl != "") {
+            this.form.url = this.form.parentUrl + "/" + this.form.url
           }
           if (this.form.menuId != undefined) {
             updateMenu(this.form).then(response => {

@@ -144,7 +144,9 @@ export const addMenu = params => {
 export const updateMenu = params => {
   return postJsonRequest("/menu/update", params);
 };
-
+export const listDict = params => {
+  return postJsonRequest("/dict/store", params);
+};
 // 分页查询数据字典
 export const pageDict = params => {
   return postJsonRequest("/dict", params);
