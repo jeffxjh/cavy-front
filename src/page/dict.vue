@@ -120,27 +120,29 @@
                    :with-header="false"
                    height="250"
                    max-height="250">
-            <el-form ref="itemForm" :model="item.form" label-width="80px" :rules="item.rules">
-                <el-form-item label="值" style="width: 90%" prop="label">
-                    <el-input v-model="item.form.label"></el-input>
-                </el-form-item>
-                <el-form-item label="关键字" style="width: 90%" prop="item">
-                    <el-input v-model="item.form.item"></el-input>
-                </el-form-item>
-                <el-form-item>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="itemFormAdd()" size="small">添加</el-button>
-                    <el-button @click="itemFormCancel()" size="small">取消</el-button>
-                    <el-button type="success" @click="itemFormSubmit()" size="small">保存</el-button>
-                </el-form-item>
-            </el-form>
-            <el-table
-                      size="mini"
-                      :data="item.tempList">
-                <el-table-column property="label" label="值"></el-table-column>
-                <el-table-column property="item" label="关键字"></el-table-column>
-            </el-table>
+            <div style="padding:20px;border-radius: 4px;border: 2px; border: 1px solid #666; margin: 5px;height: 100%;">
+                <el-form ref="itemForm" :model="item.form" label-width="80px" :rules="item.rules">
+                    <el-form-item label="代码" style="width: 100%" prop="item">
+                        <el-input v-model="item.form.item"></el-input>
+                    </el-form-item>
+                    <el-form-item label="码值" style="width: 100%" prop="label">
+                        <el-input v-model="item.form.label"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="itemFormAdd()" size="small">添加</el-button>
+                        <el-button @click="itemFormCancel()" size="small">取消</el-button>
+                        <el-button type="success" @click="itemFormSubmit()" size="small">保存</el-button>
+                    </el-form-item>
+                </el-form>
+                <el-table
+                          size="mini"
+                          :data="item.tempList">
+                    <el-table-column property="label" label="值"></el-table-column>
+                    <el-table-column property="item" label="关键字"></el-table-column>
+                </el-table>
+            </div>
         </el-drawer>
     </div>
 </template>
@@ -212,9 +214,9 @@ export default {
             //遍历设置
             this.tableData.forEach(e => {
                 //没有子节点的不操作
-                 if(e.childrenData.length!==0){
+                if (e.childrenData.length !== 0) {
                     this.$refs.mainTable.toggleRowExpansion(e, this.isExpand)
-                 }
+                }
             });
         },
         selectable(row, index) {
@@ -410,14 +412,19 @@ export default {
                 console.info(err);
             });
             if (valid === true) {
-                this.item.tempList.push(this.item.form)
+                let obj={...this.item.form}
+                this.item.form.label=""
+                this.item.form.item=""
+                this.item.tempList.push(obj)
             }
 
         },
         async itemFormSubmit() {
             if (this.item.tempList.length == 0) {
                 this.$message.error("请先添加项");
+                return
             }
+            let that=this
             addDictItem({ items: this.item.tempList, dicId: this.item.form.dicId })
                 .then((response) => {
                     if (response.status == 200 && response.data.code == 1000) {
@@ -427,7 +434,7 @@ export default {
                     }
                 })
                 .catch(function (error) {
-                    this.$message.error("添加失败");
+                    that.$message.error("添加失败");
                 });
 
         }
