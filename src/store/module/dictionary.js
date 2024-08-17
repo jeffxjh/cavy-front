@@ -20,7 +20,7 @@ const dictionary = {
         }
     },
     getters: {
-        getDictionaryItem: (state) => (code, key) => {
+        fmtDic: (state) => (code, key) => {
             if (state.data.length > 0) {
                 let dict=state.data
                 for (const i in state.data) {

@@ -62,18 +62,18 @@
       <el-table-column prop="url" label="路由地址" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="menuType" label="菜单类型" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ getDictionaryItem('MENU_TYPE', scope.row.menuType) }}
+          {{ fmtDic('MENU_TYPE', scope.row.menuType) }}
         </template></el-table-column>
       <el-table-column prop="sort" label="排序" width="60"></el-table-column>
       <el-table-column prop="weight" label="权重" width="80"></el-table-column>
       <el-table-column prop="isDefault" label="是否默认" width="80">
         <template slot-scope="scope">
-          {{ getDictionaryItem('IS_OR_NOT', scope.row.isDefault) }}
+          {{ fmtDic('IS_OR_NOT', scope.row.isDefault) }}
         </template>
       </el-table-column>
       <el-table-column prop="hidden" label="是否隐藏" width="80">
         <template slot-scope="scope">
-          {{ getDictionaryItem('IS_OR_NOT', scope.row.hidden) }}
+          {{ fmtDic('IS_OR_NOT', scope.row.hidden) }}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime"></el-table-column>
@@ -323,7 +323,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getDictionaryItem'])
+    ...mapGetters(['fmtDic'])
   },
   created() {
     // 获取字典项数据

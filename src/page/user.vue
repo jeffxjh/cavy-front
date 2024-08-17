@@ -8,13 +8,12 @@
     </el-breadcrumb>
     <div style="margin-bottom: 18px">
       <el-input
-        v-model="params.userName"
-        clearable
-        placeholder="账号/姓名/邮箱"
-        style="width: 200px"
-        size="small"
-        class="filter-item"
-      />
+                v-model="params.userName"
+                clearable
+                placeholder="账号/姓名/邮箱"
+                style="width: 200px"
+                size="small"
+                class="filter-item" />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
       </el-select>
@@ -37,13 +36,12 @@
         明细
       </el-button>     -->
       <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="primary"
-        icon="el-icon-document"
-        size="mini"
-        @click="handleCreate"
-      >
+                 class="filter-item"
+                 style="margin-left: 10px"
+                 type="primary"
+                 icon="el-icon-document"
+                 size="mini"
+                 @click="handleCreate">
         添加
       </el-button>
       <!-- <el-button
@@ -56,76 +54,73 @@
         编辑
       </el-button> -->
       <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="danger"
-        icon="el-icon-delete"
-        size="mini"
-        @click="handleBatchDelete"
-      >
+                 class="filter-item"
+                 style="margin-left: 10px"
+                 type="danger"
+                 icon="el-icon-delete"
+                 size="mini"
+                 @click="handleBatchDelete">
         删除
       </el-button>
       <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="success"
-        icon="el-icon-download"
-        size="mini"
-        @click="downTemplate"
-      >
+                 class="filter-item"
+                 style="margin-left: 10px"
+                 type="success"
+                 icon="el-icon-download"
+                 size="mini"
+                 @click="downTemplate">
         导出
       </el-button>
       <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="success"
-        icon="el-icon-upload"
-        size="mini"
-        @click="show"
-      >
+                 class="filter-item"
+                 style="margin-left: 10px"
+                 type="success"
+                 icon="el-icon-upload"
+                 size="mini"
+                 @click="show">
         导入
       </el-button>
       <uploadFile
-        :addOrUpdateVisible="addOrUpdateVisible"
-        :excelUrl="excelUrl"
-        :width="width"
-        size="mini"
-        @changeShow="showAddOrUpdate"
-        @close="close"
-        ref="addOrUpdateRef"
-      ></uploadFile>
+                  :addOrUpdateVisible="addOrUpdateVisible"
+                  :excelUrl="excelUrl"
+                  :width="width"
+                  size="mini"
+                  @changeShow="showAddOrUpdate"
+                  @close="close"
+                  ref="addOrUpdateRef"></uploadFile>
     </div>
     <el-table
-      v-loading="listLoading"
-      :data="tableData"
-      highlight-current-row
-      style="width: 100%"
-      @sort-change="sortChange"
-      @selection-change="handleSelectionChange"
-      @row-dblclick="dbSelected"
-    >
+              v-loading="listLoading"
+              :data="tableData"
+              highlight-current-row
+              style="width: 100%"
+              @sort-change="sortChange"
+              @selection-change="handleSelectionChange"
+              @row-dblclick="dbSelected">
       <el-table-column
-        type="selection"
-        width="55"
-        :selectable="selectable"
-      ></el-table-column>
+                       type="selection"
+                       width="55"
+                       :selectable="selectable"></el-table-column>
       <el-table-column prop="userName" label="用户名"> </el-table-column>
       <el-table-column prop="realName" label="真实姓名"> </el-table-column>
       <el-table-column prop="phone" label="手机号" width="180">
       </el-table-column>
       <el-table-column prop="email" label="邮件" width="180"></el-table-column>
       <el-table-column
-        prop="status"
-        label="状态"
-        :formatter="formatStatus"
-        width="180"
-      ></el-table-column>
+                       prop="status"
+                       label="状态"
+                       width="180">
+        <template slot-scope="scope">
+          {{ fmtDic('USER_STATUS', scope.row.status) }}
+        </template>
+      </el-table-column>
       <el-table-column
-        prop="defaultUser"
-        label="是否默认用户"
-        :formatter="formatDefaultUser"
-        width="180"
-      ></el-table-column>
+                       prop="defaultUser"
+                       label="是否默认用户"
+                       width="180">
+        <template slot-scope="scope">
+          {{ fmtDic('IS_OR_NOT', scope.row.defaultUser) }}
+        </template></el-table-column>
       <el-table-column prop="addUser" label="添加人" width="180">
       </el-table-column>
       <el-table-column prop="addTime" label="添加日期" width="180">
@@ -134,42 +129,39 @@
         <template slot-scope="scope">
           <!-- :disabled="scope.row.defaultUser == '1'" -->
           <el-button
-            size="mini"
-            type="success"
-            @click="handleRowDetail(scope.$index, scope.row)"
-            >明细
+                     size="mini"
+                     type="success"
+                     @click="handleRowDetail(scope.$index, scope.row)">明细
           </el-button>
           <el-button
-            size="mini"
-            type="warning"
-            :disabled="scope.row.defaultUser == '1'"
-            @click="handleRowEdit(scope.$index, scope.row)"
-            >编辑
+                     size="mini"
+                     type="warning"
+                     :disabled="scope.row.defaultUser == '1'"
+                     @click="handleRowEdit(scope.$index, scope.row)">编辑
           </el-button>
           <el-button
-            :disabled="scope.row.defaultUser == '1'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
-            >删除
+                     :disabled="scope.row.defaultUser == '1'"
+                     size="mini"
+                     type="danger"
+                     @click="handleDelete(scope.$index, scope.row)">删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination
-      background
-      layout="prev, pager, next, sizes, total, jumper"
-      :page-sizes="[1, 10, 15, 20]"
-      :page-size="params.pageSize"
-      :total="total"
-      @current-change="handleCurrentChange"
-      @size-change="handleSizeChange"
-    >
+                   background
+                   layout="prev, pager, next, sizes, total, jumper"
+                   :page-sizes="[1, 10, 15, 20]"
+                   :page-size="params.pageSize"
+                   :total="total"
+                   @current-change="handleCurrentChange"
+                   @size-change="handleSizeChange">
     </el-pagination>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { userList, exportUser, deleteUser } from "@/common/api/api";
 import uploadFile from "../view/home/uploadExcelFile";
 export default {
@@ -196,7 +188,12 @@ export default {
   },
   watch: {},
   created() {
+    // 获取字典项数据
+    this.$store.dispatch('fetchDictionary', { items: ['IS_OR_NOT', 'USER_STATUS'] });
     this.getList();
+  },
+  computed: {
+    ...mapGetters(['fmtDic'])
   },
   methods: {
     selectable(row, index) {
@@ -213,7 +210,6 @@ export default {
       userList(that.params)
         .then((response) => {
           that.tableData = response.data.data.data;
-          console.info(response.data.data, 3);
           that.total = response.data.data.total;
           that.params.pageIndex = response.data.data.pageIndex;
           that.listLoading = false;
@@ -288,7 +284,7 @@ export default {
                 this.getList();
               }
             })
-            .catch(function (error) {});
+            .catch(function (error) { });
         })
         .catch(() => {
           // this.$message({
@@ -302,9 +298,9 @@ export default {
       if (this.multipleSelection.length == 0) {
         that.$message.error("请勾选需要删除的数据");
       }
-      let defaultUsers=[]
+      let defaultUsers = []
       let ids = this.multipleSelection.map(function (item) {
-        if(item['defaultUser']=='1'){
+        if (item['defaultUser'] == '1') {
           defaultUsers.push(item)
         }
         return item["id"];
@@ -326,7 +322,7 @@ export default {
                 this.getList();
               }
             })
-            .catch(function (error) {});
+            .catch(function (error) { });
         })
         .catch(() => {
           // this.$message({
@@ -387,41 +383,11 @@ export default {
         this.addOrUpdateVisible = true;
       }
     },
-    formatStatus(row, column) {
-      switch (row.status) {
-        case "3":
-          return "已冻结";
-          break;
-        case "2":
-          return "已禁用";
-          break;
-        case "1":
-          return "已使用";
-          break;
-        case "0":
-          return "已新建";
-          break;
-        default:
-          return row.status;
-      }
-    },
-    formatDefaultUser(row, column) {
-      switch (row.defaultUser) {
-        case "1":
-          return "是";
-          break;
-        case "0":
-          return "否";
-          break;
-        default:
-          return row.defaultUser;
-      }
-    },
   },
 };
 </script>
 <style>
-.el-table th > .cell {
+.el-table th>.cell {
   padding-left: 14px;
 }
 </style>
