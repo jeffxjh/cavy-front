@@ -90,6 +90,7 @@
                   ref="addOrUpdateRef"></uploadFile>
     </div>
     <el-table
+              :cell-style="cellStyle"
               v-loading="listLoading"
               :data="tableData"
               highlight-current-row
@@ -382,6 +383,27 @@ export default {
       } else {
         this.addOrUpdateVisible = true;
       }
+    },
+    cellStyle({ row, column, rowIndex, columnIndex }) {
+      //根据报警级别显示颜色
+      if (
+        row.status == "0" && columnIndex == 5
+      ) {
+        return "color:black;";
+      } else if (
+        row.status == "1" && columnIndex == 5
+      ) {
+        return "color:green;";
+      } else if (
+        row.status == "2" && columnIndex == 5
+      ) {
+        return "color:red;";
+      } else if (
+        row.status == "3" && columnIndex == 5
+      ) {
+        return "color:orange;";
+      }
+
     },
   },
 };
