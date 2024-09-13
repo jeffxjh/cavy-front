@@ -6,7 +6,7 @@
       <el-breadcrumb-item>新增字典</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
-      <el-form ref="form" :model="form" label-width="80px">
+      <el-form ref="form" :model="form" label-width="auto">
         <el-form-item label="字典名称" style="width: 80%">
           <el-input v-model="form.name"></el-input>
         </el-form-item>

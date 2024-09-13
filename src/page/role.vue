@@ -8,16 +8,18 @@
     </el-breadcrumb>
     <div style="margin-bottom: 10px">
       <el-input
+      :size="btnSize"
         v-model="params.roleName"
         clearable
         placeholder="名称"
         style="width: 200px"
         class="filter-item"
       />
-      <el-button class="filter-item" icon="el-icon-search" @click="getList">
+      <el-button :size="btnSize" class="filter-item" icon="el-icon-search" @click="getList">
         搜索
       </el-button>
       <el-button
+      :size="btnSize"
         class="filter-item"
         style="margin-left: 10px"
         type="primary"
@@ -27,6 +29,7 @@
         添加
       </el-button>
       <el-button
+      :size="btnSize"
         class="filter-item"
         style="margin-left: 10px"
         type="danger"
@@ -45,10 +48,10 @@
         ref="addOrUpdateRef"
       ></uploadFile>
     </div>
-    /*分类表格 :data(设置数据源) :columns(设置表格中列配置信息)
+    <!-- 分类表格 :data(设置数据源) :columns(设置表格中列配置信息)
     :selection-type(是否有复选框) :expand-type(是否展开数据)
     show-index(是否设置索引列) index-text(设置索引列头) border(是否添加纵向边框)
-    :show-row-hover(是否鼠标悬停高亮) */
+    :show-row-hover(是否鼠标悬停高亮)  -->
     <tree-table
       :data="tableData"
       :columns="columns"
@@ -78,17 +81,17 @@
         <div class="optbox">
           <el-button
             type="primary"
-            size="mini"
+            :size="btnSize"
             class="el-icon-plus"
             @click="add(scope.row)"
             >添加</el-button
           >
-          <el-button type="primary" size="mini" class="el-icon-edit"  @click="edit(scope.row)"
+          <el-button type="primary" :size="btnSize" class="el-icon-edit"  @click="edit(scope.row)"
             >编辑</el-button
           >
           <el-button
             type="danger"
-            size="mini"
+            :size="btnSize"
             class="el-icon-delete"
             @click="del(scope.row)"
             >删除</el-button

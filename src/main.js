@@ -15,7 +15,8 @@ import TreeTable  from 'vue-table-with-tree-grid'
 import * as filters from './common/api/filters'
 import * as echarts from 'echarts';
 import { resetForm } from "./common/api/utils";
-
+import mixin from './mixin/mixin.js'
+Vue.mixin(mixin)
 // 全局方法挂载
 Vue.prototype.resetForm = resetForm
 

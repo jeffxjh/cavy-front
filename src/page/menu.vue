@@ -27,13 +27,13 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" :size="btnSize" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" :size="btnSize" @click="resetQuery">重置</el-button>
         <el-button
                    type="primary"
                    plain
                    icon="el-icon-plus"
-                   size="mini"
+                   :size="btnSize"
                    @click="handleAdd">新增</el-button>
       </el-form-item>
     </el-form>
@@ -80,17 +80,17 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-                     size="mini"
+          :size="btnSize"
                      type="warning"
                      icon="el-icon-edit"
                      @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button
-                     size="mini"
+          :size="btnSize"
                      type="success"
                      icon="el-icon-plus"
                      @click="handleAdd(scope.row)">添加</el-button>
           <el-button
-                     size="mini"
+          :size="btnSize"
                      type="danger"
                      icon="el-icon-delete"
                      @click="handleDelete(scope.row)">删除</el-button>
@@ -263,8 +263,8 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+        <el-button :size="btnSize" type="primary" @click="submitForm">确 定</el-button>
+        <el-button :size="btnSize" @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
   </div>

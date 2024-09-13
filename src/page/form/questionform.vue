@@ -6,7 +6,7 @@
       <el-breadcrumb-item>新增问题</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
-      <el-form ref="form" :model="form" label-width="80px">
+      <el-form ref="form" :model="form" label-width="auto">
         <el-form-item label="问题标题" style="width: 80%">
           <el-input v-model="form.title"></el-input>
         </el-form-item>

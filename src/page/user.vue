@@ -12,7 +12,7 @@
                 clearable
                 placeholder="账号/姓名/邮箱"
                 style="width: 200px"
-                size="small"
+                :size="btnSize"
                 class="filter-item" />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
@@ -23,7 +23,7 @@
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select> -->
-      <el-button class="filter-item" icon="el-icon-search" @click="getList" size="mini">
+      <el-button class="filter-item" icon="el-icon-search" @click="getList" :size="btnSize">
         搜索
       </el-button>
       <!-- <el-button
@@ -40,7 +40,7 @@
                  style="margin-left: 10px"
                  type="primary"
                  icon="el-icon-document"
-                 size="mini"
+                 :size="btnSize"
                  @click="handleCreate">
         添加
       </el-button>
@@ -58,7 +58,7 @@
                  style="margin-left: 10px"
                  type="danger"
                  icon="el-icon-delete"
-                 size="mini"
+                 :size="btnSize"
                  @click="handleBatchDelete">
         删除
       </el-button>
@@ -67,7 +67,7 @@
                  style="margin-left: 10px"
                  type="success"
                  icon="el-icon-download"
-                 size="mini"
+                 :size="btnSize"
                  @click="downTemplate">
         导出
       </el-button>
@@ -76,7 +76,7 @@
                  style="margin-left: 10px"
                  type="success"
                  icon="el-icon-upload"
-                 size="mini"
+                 :size="btnSize"
                  @click="show">
         导入
       </el-button>
@@ -84,7 +84,7 @@
                   :addOrUpdateVisible="addOrUpdateVisible"
                   :excelUrl="excelUrl"
                   :width="width"
-                  size="mini"
+                  :size="btnSize"
                   @changeShow="showAddOrUpdate"
                   @close="close"
                   ref="addOrUpdateRef"></uploadFile>
@@ -130,19 +130,19 @@
         <template slot-scope="scope">
           <!-- :disabled="scope.row.defaultUser == '1'" -->
           <el-button
-                     size="mini"
+          :size="btnSize"
                      type="success"
                      @click="handleRowDetail(scope.$index, scope.row)">明细
           </el-button>
           <el-button
-                     size="mini"
+          :size="btnSize"
                      type="warning"
                      :disabled="scope.row.defaultUser == '1'"
                      @click="handleRowEdit(scope.$index, scope.row)">编辑
           </el-button>
           <el-button
                      :disabled="scope.row.defaultUser == '1'"
-                     size="mini"
+                     :size="btnSize"
                      type="danger"
                      @click="handleDelete(scope.$index, scope.row)">删除
           </el-button>
