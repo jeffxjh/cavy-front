@@ -106,7 +106,7 @@ const routes = [
         path: "/knowledge/article",
         name: "Article",
         component: Article
-      },  
+      },
       {
         path: "/knowledge/label",
         name: "LabelLabel",
@@ -154,6 +154,11 @@ const routes = [
         path: "/form/userform",
         name: "Userform",
         component: Userform
+      },
+      {
+        path: "/form/roleform",
+        name: "RoleForm",
+        component: () => import('@/page/form/roleform.vue')
       }
     ]
   },

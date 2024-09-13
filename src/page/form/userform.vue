@@ -160,7 +160,7 @@
 
 <script>
   import Editor from "@/components/editor";
-  import { addUser, getUser, updateUser, roleList } from "@/common/api/api";
+  import { addUser, getUser, updateUser, userGetRoleList } from "@/common/api/api";
 
   export default {
     components: {
@@ -207,7 +207,7 @@
       };
       const generateData = (_) => {
         const data = [];
-        roleList({})
+        userGetRoleList({})
           .then((response) => {
             if (response.status == 200 && response.data.code == 1000) {
               response.data.data.forEach((role, index) => {

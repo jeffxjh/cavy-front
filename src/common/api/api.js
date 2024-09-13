@@ -111,6 +111,10 @@ export const updateUser = params => {
 export const roleList = params => {
   return postRequest("/role", params, true, "#role");
 };
+//todo 获取角色列表
+export const userGetRoleList = (params,arg) => {
+  return postRequest("/role", params);
+};
 // 获取消息列表
 export const messageList = params => {
   return postJsonRequest("/message", params, true, "#message");
