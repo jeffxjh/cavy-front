@@ -161,6 +161,21 @@ export const putRequest = (url, params, showLoading, loadingTarget) => {
   });
 };
 
+export const putJsonRequest = (url, params, showLoading, loadingTarget) => {
+  let accessToken = getStore("accessToken");
+  return axios({
+    method: "put",
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      "Content-Type": "application/json",
+      accessToken: accessToken,
+      showLoading: showLoading != undefined,
+      loadingTarget: loadingTarget
+    }
+  });
+};
+
 export const deleteRequest = (url, params, showLoading, loadingTarget) => {
   let accessToken = getStore("accessToken");
   return axios({

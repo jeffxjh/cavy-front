@@ -39,6 +39,7 @@
     </el-form>
 
     <el-table
+              :header-cell-style="{background:'#eee',color:'black'}"
               v-if="refreshTable"
               v-loading="loading"
               :data="menuList"
@@ -63,7 +64,8 @@
       <el-table-column prop="menuType" label="菜单类型" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ fmtDic('MENU_TYPE', scope.row.menuType) }}
-        </template></el-table-column>
+        </template>
+      </el-table-column>
       <el-table-column prop="sort" label="排序" width="60"></el-table-column>
       <el-table-column prop="weight" label="权重" width="80"></el-table-column>
       <el-table-column prop="isDefault" label="是否默认" width="80">
@@ -80,17 +82,17 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-          :size="btnSize"
+                     :size="btnSize"
                      type="warning"
                      icon="el-icon-edit"
                      @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button
-          :size="btnSize"
+                     :size="btnSize"
                      type="success"
                      icon="el-icon-plus"
                      @click="handleAdd(scope.row)">添加</el-button>
           <el-button
-          :size="btnSize"
+                     :size="btnSize"
                      type="danger"
                      icon="el-icon-delete"
                      @click="handleDelete(scope.row)">删除</el-button>
@@ -271,221 +273,221 @@
 </template>
 
 <script>
-import iconSelect from '@/components/iconSelect'
-import { mapGetters } from 'vuex';
-import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "@/common/api/api";
-export default {
-  name: "Menu",
-  components: { iconSelect },
-  data() {
-    return {
-      // 遮罩层
-      loading: false,
-      // 显示搜索条件
-      showSearch: true,
-      // 菜单表格树数据
-      menuList: [],
-      // 菜单树选项
-      menuOptions: [],
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
-      // 是否展开，默认全部折叠
-      isExpandAll: false,
-      // 重新渲染表格状态
-      refreshTable: true,
-      // 查询参数
-      queryParams: {
-        menuName: undefined,
-        status: undefined
-      },
-      // 表单参数
-      form: {},
-      // 表单校验
-      rules: {
-        menuCode: [
-          { required: true, message: "菜单编号不能为空", trigger: "blur" }
-        ],
-        menuType: [
-          { required: true, message: "菜单类型不能为空", trigger: "blur" }
-        ],
-        menuName: [
-          { required: true, message: "菜单名称不能为空", trigger: "blur" }
-        ],
-        sort: [
-          { required: true, message: "菜单顺序不能为空", trigger: "blur" }
-        ],
-        url: [
-          { required: true, message: "路由地址不能为空", trigger: "blur" }
-        ]
-      }
-    };
-  },
-  computed: {
-    ...mapGetters(['fmtDic'])
-  },
-  created() {
-    // 获取字典项数据
-    this.$store.dispatch('fetchDictionary',{items:['IS_OR_NOT','MENU_TYPE']});
-    this.getList();
-  },
-  watch: {
-    'form.icon': function (newVlaue, oldVlaue) {
-    }
-  },
-  methods: {
-    menuNameQueryChange() {
-      if (this.queryParams.menuName == "") {
-        this.queryParams.menuName = undefined
-      }
-    },
-    selectable(row, index) {
-      return true;
-    },
-    // 选择图标
-    iconChange(name) {
-      debugger
-      this.form.icon = name;
-    },
-    /** 查询菜单列表 */
-    getList() {
-      this.loading = true;
-      listMenu(this.queryParams).then(response => {
-        this.menuList = response.data.data;
-        this.loading = false;
-      });
-    },
-    /** 转换菜单数据结构 */
-    normalizer(node) {
-      if (node.children && !node.children.length) {
-        delete node.children;
-      }
+  import iconSelect from '@/components/iconSelect'
+  import { mapGetters } from 'vuex';
+  import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "@/common/api/api";
+  export default {
+    name: "Menu",
+    components: { iconSelect },
+    data() {
       return {
-        id: node.menuId,
-        label: node.menuName,
-        children: node.children
+        // 遮罩层
+        loading: false,
+        // 显示搜索条件
+        showSearch: true,
+        // 菜单表格树数据
+        menuList: [],
+        // 菜单树选项
+        menuOptions: [],
+        // 弹出层标题
+        title: "",
+        // 是否显示弹出层
+        open: false,
+        // 是否展开，默认全部折叠
+        isExpandAll: false,
+        // 重新渲染表格状态
+        refreshTable: true,
+        // 查询参数
+        queryParams: {
+          menuName: undefined,
+          status: undefined
+        },
+        // 表单参数
+        form: {},
+        // 表单校验
+        rules: {
+          menuCode: [
+            { required: true, message: "菜单编号不能为空", trigger: "blur" }
+          ],
+          menuType: [
+            { required: true, message: "菜单类型不能为空", trigger: "blur" }
+          ],
+          menuName: [
+            { required: true, message: "菜单名称不能为空", trigger: "blur" }
+          ],
+          sort: [
+            { required: true, message: "菜单顺序不能为空", trigger: "blur" }
+          ],
+          url: [
+            { required: true, message: "路由地址不能为空", trigger: "blur" }
+          ]
+        }
       };
     },
-    /** 查询菜单下拉树结构 */
-    getTreeselect() {
-      listMenu({}).then(response => {
-        this.menuOptions = [];
-        const menu = { menuId: 0, menuName: '主类目', children: [] };
-        menu.children = response.data.data;
-        this.menuOptions.push(menu);
-      });
+    computed: {
+      ...mapGetters(['fmtDic'])
     },
-    // 取消按钮
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
-    // 表单重置
-    reset() {
-      this.form = {
-        menuId: undefined,
-        parentId: 0,
-        parentName: undefined,
-        parentUrl: undefined,
-        menuName: undefined,
-        menuCode: undefined,
-        icon: undefined,
-        url: undefined,
-        query: undefined,
-        menuType: "C",
-        sort: 1,
-        isFrame: 1,
-        isCache: 1,
-        isDefault: 0,
-        hidden: 0,
-        status: 1
-      };
-      this.resetForm("form");
-    },
-    /** 搜索按钮操作 */
-    handleQuery() {
+    created() {
+      // 获取字典项数据
+      this.$store.dispatch('fetchDictionary', { items: ['IS_OR_NOT', 'MENU_TYPE'] });
       this.getList();
     },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.resetForm("queryForm");
-      this.handleQuery();
-    },
-    /** 新增按钮操作 */
-    handleAdd(row) {
-      this.reset();
-      this.getTreeselect();
-      if (row != null && row.menuId) {
-        this.form.parentId = row.menuId;
-        this.form.parentName = row.menuName;
-        this.form.parentUrl = row.url;
-      } else {
-        this.form.parentId = 0;
-        this.form.parentName = "根菜单";
+    watch: {
+      'form.icon': function (newVlaue, oldVlaue) {
       }
-      this.open = true;
-      this.$nextTick(() => {
-        this.$refs.iconSelectRef.clear();
-      })
-      this.title = "添加菜单";
     },
-    /** 展开/折叠操作 */
-    toggleExpandAll() {
-      this.refreshTable = false;
-      this.isExpandAll = !this.isExpandAll;
-      this.$nextTick(() => {
-        this.refreshTable = true;
-      });
-    },
-    /** 修改按钮操作 */
-    handleUpdate(row) {
-      this.reset();
-      this.getTreeselect();
-      getMenu(row.menuId).then(response => {
-        this.form = response.data.data;
-        this.form.parentUrl = response.data.data.parentUrl
-        this.form.url = response.data.data.curUrl
-        this.open = true;
-        this.title = "修改菜单";
-      });
-    },
-    /** 提交按钮 */
-    submitForm: function () {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.parentUrl != undefined && this.form.parentUrl != "") {
-            this.form.url = this.form.parentUrl + "/" + this.form.url
-          }
-          if (this.form.menuId != undefined) {
-            updateMenu(this.form).then(response => {
-              this.$message.success("修改成功");
-              this.open = false;
-              this.getList();
-            });
-          } else {
-            addMenu(this.form).then(
-              (response) => {
-                if (response.status == 200 && response.data.code == 1000) {
-                  this.$message.success("添加成功");
-                  this.open = false;
-                  this.getList();
-                }
-              }
-            );
-          }
+    methods: {
+      menuNameQueryChange() {
+        if (this.queryParams.menuName == "") {
+          this.queryParams.menuName = undefined
         }
-      });
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      this.$confirm('是否确认删除名称为"' + row.menuName + '"的数据项？').then(function () {
-        return delMenu(row.id);
-      }).then(() => {
+      },
+      selectable(row, index) {
+        return true;
+      },
+      // 选择图标
+      iconChange(name) {
+        debugger
+        this.form.icon = name;
+      },
+      /** 查询菜单列表 */
+      getList() {
+        this.loading = true;
+        listMenu(this.queryParams).then(response => {
+          this.menuList = response.data.data;
+          this.loading = false;
+        });
+      },
+      /** 转换菜单数据结构 */
+      normalizer(node) {
+        if (node.children && !node.children.length) {
+          delete node.children;
+        }
+        return {
+          id: node.menuId,
+          label: node.menuName,
+          children: node.children
+        };
+      },
+      /** 查询菜单下拉树结构 */
+      getTreeselect() {
+        listMenu({}).then(response => {
+          this.menuOptions = [];
+          const menu = { menuId: 0, menuName: '主类目', children: [] };
+          menu.children = response.data.data;
+          this.menuOptions.push(menu);
+        });
+      },
+      // 取消按钮
+      cancel() {
+        this.open = false;
+        this.reset();
+      },
+      // 表单重置
+      reset() {
+        this.form = {
+          menuId: undefined,
+          parentId: 0,
+          parentName: undefined,
+          parentUrl: undefined,
+          menuName: undefined,
+          menuCode: undefined,
+          icon: undefined,
+          url: undefined,
+          query: undefined,
+          menuType: "C",
+          sort: 1,
+          isFrame: 1,
+          isCache: 1,
+          isDefault: 0,
+          hidden: 0,
+          status: 1
+        };
+        this.resetForm("form");
+      },
+      /** 搜索按钮操作 */
+      handleQuery() {
         this.getList();
-        this.$message.success("删除成功");
-      }).catch(() => { });
+      },
+      /** 重置按钮操作 */
+      resetQuery() {
+        this.resetForm("queryForm");
+        this.handleQuery();
+      },
+      /** 新增按钮操作 */
+      handleAdd(row) {
+        this.reset();
+        this.getTreeselect();
+        if (row != null && row.menuId) {
+          this.form.parentId = row.menuId;
+          this.form.parentName = row.menuName;
+          this.form.parentUrl = row.url;
+        } else {
+          this.form.parentId = 0;
+          this.form.parentName = "根菜单";
+        }
+        this.open = true;
+        this.$nextTick(() => {
+          this.$refs.iconSelectRef.clear();
+        })
+        this.title = "添加菜单";
+      },
+      /** 展开/折叠操作 */
+      toggleExpandAll() {
+        this.refreshTable = false;
+        this.isExpandAll = !this.isExpandAll;
+        this.$nextTick(() => {
+          this.refreshTable = true;
+        });
+      },
+      /** 修改按钮操作 */
+      handleUpdate(row) {
+        this.reset();
+        this.getTreeselect();
+        getMenu(row.menuId).then(response => {
+          this.form = response.data.data;
+          this.form.parentUrl = response.data.data.parentUrl
+          this.form.url = response.data.data.curUrl
+          this.open = true;
+          this.title = "修改菜单";
+        });
+      },
+      /** 提交按钮 */
+      submitForm: function () {
+        this.$refs["form"].validate(valid => {
+          if (valid) {
+            if (this.form.parentUrl != undefined && this.form.parentUrl != "") {
+              this.form.url = this.form.parentUrl + "/" + this.form.url
+            }
+            if (this.form.menuId != undefined) {
+              updateMenu(this.form).then(response => {
+                this.$message.success("修改成功");
+                this.open = false;
+                this.getList();
+              });
+            } else {
+              addMenu(this.form).then(
+                (response) => {
+                  if (response.status == 200 && response.data.code == 1000) {
+                    this.$message.success("添加成功");
+                    this.open = false;
+                    this.getList();
+                  }
+                }
+              );
+            }
+          }
+        });
+      },
+      /** 删除按钮操作 */
+      handleDelete(row) {
+        this.$confirm('是否确认删除名称为"' + row.menuName + '"的数据项？').then(function () {
+          return delMenu(row.id);
+        }).then(() => {
+          this.getList();
+          this.$message.success("删除成功");
+        }).catch(() => { });
+      }
     }
-  }
-};
+  };
 </script>

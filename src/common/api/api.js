@@ -115,6 +115,22 @@ export const roleList = params => {
 export const userGetRoleList = (params,arg) => {
   return postRequest("/role", params);
 };
+// 新建角色
+export const addRole = params => {
+  return postBodyRequest("/role/add", params);
+};
+// 删除角色
+export const deleteRole = params => {
+  return deleteRequest("/role", params);
+};
+// 获取角色详情
+export const getRole = params => {
+  return getRequest("/role/getById", params);
+};
+// 修改角色
+export const updateRole = params => {
+  return postJsonRequest("/role/update", params);
+};
 // 获取消息列表
 export const messageList = params => {
   return postJsonRequest("/message", params, true, "#message");

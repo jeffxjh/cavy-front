@@ -61,7 +61,7 @@
       <el-table-column prop="roleName" label="角色名称"> </el-table-column>
       <el-table-column prop="addUser" label="添加人" width="180">
       </el-table-column>
-      <el-table-column prop="addTime" label="添加日期" width="180">
+      <el-table-column prop="addTime" label="添加日期" width="200">
       </el-table-column>
       <el-table-column label="操作" width="255">
         <template slot-scope="scope">
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-  import { roleList, exportUser, deleteUser } from "@/common/api/api";
+  import { roleList, exportUser, deleteRole } from "@/common/api/api";
   import uploadFile from "../view/home/uploadExcelFile";
   export default {
     components: {
@@ -163,60 +163,55 @@
           });
       },
       handleCreate() {
-        this.$router.push(`/form/roleform`).catch((error) => error);
-        // this.$router.push({name:'RoleForm',params:{}}).catch((error) => {
-        //   debugger
-        //   console.error(error)
-        // });
+        // this.$router.push(`/form/roleform`).catch((error) => error);
+        this.$router.push({name:'RoleForm',params:{operate:"add"}}).catch((error) => {
+          console.error(error)
+        });
       },
       handleRowEdit(index, row) {
         let that = this;
-        let id = this.$router
-          .push({ name: "Roleform", params: { id: row.id } })
-          .catch((error) => error);
+        let id = this.$router.push({ name: "RoleForm", params: { id: row.id ,operate:"edit" } }).catch((error) => error);
       },
       handleRowDetail(index, row) {
         let that = this;
-        let id = this.$router
-          .push({ name: "Roleform", params: { id: row.id, view: "view" } })
-          .catch((error) => error);
+        let id = this.$router.push({ name: "RoleForm", params: { id: row.id, view: "view"  ,operate:"view"} }).catch((error) => error);
       },
-      handleEdit() {
-        let that = this;
-        if (this.multipleSelection.length == 0) {
-          that.$message.error("请勾选一条需要修改的数据");
-        }
-        if (this.multipleSelection.length > 1) {
-          that.$message.error("请只选择一条数据");
-        }
-        let id = this.$router
-          .push({
-            name: "Roleform",
-            params: { id: this.multipleSelection[0].id },
-          })
-          .catch((error) => error);
-      },
+      // handleEdit() {
+      //   let that = this;
+      //   if (this.multipleSelection.length == 0) {
+      //     that.$message.error("请勾选一条需要修改的数据");
+      //   }
+      //   if (this.multipleSelection.length > 1) {
+      //     that.$message.error("请只选择一条数据");
+      //   }
+      //   let id = this.$router
+      //     .push({
+      //       name: "RoleForm",
+      //       params: { id: this.multipleSelection[0].id ,operate:"edit"},
+      //     })
+      //     .catch((error) => error);
+      // },
       dbSelected(row) {
         let that = this;
         let id = this.$router
-          .push({ name: "Roleform", params: { id: row.id, view: "view" } })
+          .push({ name: "RoleForm", params: { id: row.id, view: "view" } })
           .catch((error) => error);
       },
-      handleDetail() {
-        let that = this;
-        if (this.multipleSelection.length == 0) {
-          that.$message.error("请勾选一条需要查看的数据");
-        }
-        if (this.multipleSelection.length > 1) {
-          that.$message.error("请只选择一条数据");
-        }
-        let id = this.$router
-          .push({
-            name: "Roleform",
-            params: { id: this.multipleSelection[0].id, view: "view" },
-          })
-          .catch((error) => error);
-      },
+      // handleDetail() {
+      //   let that = this;
+      //   if (this.multipleSelection.length == 0) {
+      //     that.$message.error("请勾选一条需要查看的数据");
+      //   }
+      //   if (this.multipleSelection.length > 1) {
+      //     that.$message.error("请只选择一条数据");
+      //   }
+      //   let id = this.$router
+      //     .push({
+      //       name: "RoleForm",
+      //       params: { id: this.multipleSelection[0].id, view: "view",operateType:"view" },
+      //     })
+      //     .catch((error) => error);
+      // },
       handleDelete(index, row) {
         this.$confirm("此操作将永久删除角色, 是否继续?", "提示", {
           confirmButtonText: "确定",
@@ -224,7 +219,7 @@
           type: "warning",
         })
           .then(() => {
-            deleteUser({ ids: [row.id] })
+            deleteRole({ ids: [row.id] })
               .then((response) => {
                 if (response.status == 200 && response.data.code == 1000) {
                   this.$message.success("删除成功");
@@ -262,7 +257,7 @@
           type: "warning",
         })
           .then(() => {
-            deleteUser({ ids: ids })
+            deleteRole({ ids: ids })
               .then((response) => {
                 if (response.status == 200 && response.data.code == 1000) {
                   that.$message.success("删除成功");

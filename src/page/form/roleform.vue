@@ -4,8 +4,9 @@
       <el-breadcrumb-item :to="{ path: '/main' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/power/role' }">角色管理</el-breadcrumb-item>
-      <el-breadcrumb-item v-if="this.$route.params.id == undefined">新增角色</el-breadcrumb-item>
-      <el-breadcrumb-item v-if="this.$route.params.id != undefined">编辑角色</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="this.$route.params.operate == 'add'">新增角色</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="this.$route.params.operate == 'edit'">编辑角色</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="this.$route.params.operate == 'view'">查看角色</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
       <el-form
@@ -16,38 +17,34 @@
                :disabled="disabled">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="角色名称" style="width: 80%" prop="userName">
-              <span v-if="disabled">{{ form.userName }}</span>
+            <el-form-item label="角色名称" style="width: 50%" prop="roleName">
+              <span v-if="disabled">{{ form.roleName }}</span>
               <el-input
                         v-else
-                        v-model="form.userName"
+                        v-model="form.roleName"
                         placeholder="请输入角色名称"
                         clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">
-            <el-form-item label="角色菜单资源">
-              <div v-if="disabled">
-                <el-tag
-                        :key="role.id"
-                        v-for="role in form.roleList"
-                        :disable-transitions="true">
-                  {{ role.roleName }}
-                </el-tag>
+          <el-col :span="12">
+            <el-form-item label="角色菜单资源" prop="menuTreeList">
+              <div class="edit_dev">
+                <el-tree
+                         :data="menuTree"
+                         show-checkbox
+                         default-expand-all
+                         node-key="id"
+                         ref="tree"
+                         @check-change="menuTreeChange"
+                         :highlight-current="true"
+                         :expand-on-click-node="false"
+                         :check-on-click-node="true"
+                         :props="defaultProps">
+                </el-tree>
+                </el-transfer>
               </div>
-              <div  v-else class="edit_dev">
-                <el-transfer
-                             
-                filterable
-                filter-placeholder="请输入菜单名称"
-                :titles="['可选', '已选']"
-                v-model="form.roleList"
-                :data="roleOptions">
-   </el-transfer>
-              </div>
-               
             </el-form-item>
           </el-col>
         </el-row>
@@ -65,64 +62,96 @@
 </template>
 
 <script>
-  import { menuList } from "@/common/api/api";
+  import { listMenu, addRole, updateRole, getRole } from "@/common/api/api";
 
   export default {
     components: {
     },
     data() {
+      var validatePass = (rule, value, callback) => {
+      let arr = this.$refs.tree.getCheckedKeys()
+      if (arr.length == 0 || !arr) {
+        callback(new Error("请选择菜单"));
+      } else {
+        callback();
+      }
+    };
       return {
-        value: [],
+        selectKeys: [],
         disabled: false,
         isClear: false,
         form: {},
         rules: {
-          userName: [
-            { required: true, message: "请输入账号", trigger: "blur" },
+          roleName: [
+            { required: true, message: "请输入角色名称", trigger: "blur" },
             { min: 1, max: 20, message: "长度不超过20个字符", trigger: "blur" },
           ],
+          menuTreeList: [{ required: true, validator: validatePass, trigger: "change" }]
+        },
+        menuTree: [],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        },
+        // 查询参数
+        queryParams: {
+          menuName: undefined,
+          status: undefined,
+          disabled: false,
         },
       };
     },
     mounted() {
+      if (this.$route.params.operate == 'view') {
+        this.queryParams.disabled = true
+      }
+
+      listMenu(this.queryParams).then(response => {
+        this.menuTree = response.data.data;
+      });
+
       if (this.$route.params.id) {
         if (this.$route.params.view != undefined) {
           this.disabled = true;
         }
-        getUser({ id: this.$route.params.id })
+        getRole({ id: this.$route.params.id })
           .then((response) => {
             if (response.status == 200 && response.data.code == 1000) {
               this.form = response.data.data;
-              if (!this.disabled) {
-                // 穿梭框在右侧只需要赋值id就可以显示
-                const initSelectRoleList = [];
-                this.form.roleList.map((item) => {
-                  initSelectRoleList.push(item.id);
-                });
-                this.form.roleList = initSelectRoleList;
-              }
+              this.selectKeys = response.data.data.selectKeys;
+              this.$refs.tree.setCheckedKeys(this.selectKeys);
+              //       this.$refs.tree.setCheckedNodes([{
+              //   id: 5,
+              //   label: '二级 2-1'
+              // }, {
+              //   id: 9,
+              //   label: '三级 1-1-1'
+              // }]);
             }
           })
           .catch(function (error) { });
       }
     },
     computed: {
-     
+
     },
     methods: {
       async onSubmit(type) {
+        // console.log(this.$refs.tree.getCheckedNodes());
+        // console.log(this.$refs.tree.getCheckedKeys());
         const valid = await this.$refs.form.validate().catch((err) => {
           console.info(err);
         });
         if (valid === true) {
           let form = null;
           form = this.form;
+          form.menuTreeList = this.$refs.tree.getCheckedNodes();
           const params = form;
           let res = {};
           if (this.form.id == undefined) {
-            res = await addUser(params);
+            res = await addRole(params);
           } else {
-            res = await updateUser(params);
+            res = await updateRole(params);
           }
           if (res.status == "200" && res.data.code == "1000") {
             this.$message({
@@ -130,16 +159,15 @@
               message: "保存成功",
             });
             if (type === 0) {
-              this.$router.push(`/power/user`).catch((error) => error);
+              this.$router.push(`/power/role`).catch((error) => error);
             }
             return;
           }
-          this.$message({
-            type: "error",
-            message: "保存失败",
-          });
         }
       },
+      menuTreeChange() {
+      // this.form.menuTreeList = this.$refs.tree.getCheckedNodes();
+    },
       cancel() {
         this.$router.push(`/power/role`).catch((error) => error);
       },
