@@ -39,6 +39,7 @@
     </el-form>
 
     <el-table
+              @cell-click="getOpenDetail"
               :header-cell-style="{background:'#eee',color:'black'}"
               v-if="refreshTable"
               v-loading="loading"
@@ -51,29 +52,29 @@
                        width="55"
                        :selectable="selectable"></el-table-column>
       <!-- <el-table-column type="" prop="id" label="id" width="160"></el-table-column> -->
-      <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" align="left"
+      <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" align="right"
                        width="160"></el-table-column>
-      <el-table-column prop="icon" label="图标" align="center" width="100">
+      <el-table-column prop="icon" label="图标" align="center" width="150">
         <template slot-scope="scope">
           <!-- <svg-icon :icon-class="scope.row.icon" /> -->
           <i slot="prefix" :class="scope.row.icon"></i>
         </template>
       </el-table-column>
-      <el-table-column prop="code" label="菜单编号" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="url" label="路由地址" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="menuType" label="菜单类型" :show-overflow-tooltip="true">
+      <el-table-column prop="code" label="菜单编号" align="center" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="url" label="路由地址" align="center" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="menuType" label="菜单类型"  align="center"  :show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ fmtDic('MENU_TYPE', scope.row.menuType) }}
         </template>
       </el-table-column>
-      <el-table-column prop="sort" label="排序" width="60"></el-table-column>
-      <el-table-column prop="weight" label="权重" width="80"></el-table-column>
-      <el-table-column prop="isDefault" label="是否默认" width="80">
+      <el-table-column prop="sort" label="排序" align="center" width="60"></el-table-column>
+      <el-table-column prop="weight" label="权重" align="center" width="80"></el-table-column>
+      <el-table-column prop="isDefault" label="是否默认" align="center" width="80">
         <template slot-scope="scope">
           {{ fmtDic('IS_OR_NOT', scope.row.isDefault) }}
         </template>
       </el-table-column>
-      <el-table-column prop="hidden" label="是否隐藏" width="80">
+      <el-table-column prop="hidden" label="是否隐藏" align="center" width="80">
         <template slot-scope="scope">
           {{ fmtDic('IS_OR_NOT', scope.row.hidden) }}
         </template>
@@ -155,23 +156,15 @@
               <el-input v-model="form.menuName" placeholder="请输入菜单名称" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="显示排序" prop="sort">
-              <el-input-number v-model="form.sort" controls-position="right" :min="0" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12" v-if="form.menuType != 'F'">
-            <el-form-item prop="isFrame">
+          <el-col :span="12" v-if="form.menuType != 'M'">
+            <el-form-item prop="menuCode">
+              <el-input v-model="form.menuCode" placeholder="请输入菜单编码" maxlength="100" />
               <span slot="label">
-                <el-tooltip content="选择是外链则路由地址需要以`http(s)://`开头" placement="top">
+                <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasPermi('system:user:list')`)" placement="top">
                   <i class="el-icon-question"></i>
                 </el-tooltip>
-                是否外链
+                菜单编码
               </span>
-              <el-radio-group v-model="form.isFrame">
-                <el-radio :label="0">是</el-radio>
-                <el-radio :label="1">否</el-radio>
-              </el-radio-group>
             </el-form-item>
           </el-col>
           <el-col :span="24" v-if="form.menuType != 'F'">
@@ -187,6 +180,16 @@
               </el-input>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="显示排序" prop="sort">
+              <el-input-number v-model="form.sort" controls-position="right" :min="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="显示权重" prop="weight">
+              <el-input-number v-model="form.weight" controls-position="right" :min="0" />
+            </el-form-item>
+          </el-col>
           <!-- <el-col :span="12" v-if="form.menuType == 'C'">
             <el-form-item prop="url">
               <span slot="label">
@@ -198,17 +201,7 @@
               <el-input v-model="form.component" placeholder="请输入组件路径" />
             </el-form-item>
           </el-col> -->
-          <el-col :span="12" v-if="form.menuType != 'M'">
-            <el-form-item prop="menuCode">
-              <el-input v-model="form.menuCode" placeholder="请输入菜单编码" maxlength="100" />
-              <span slot="label">
-                <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasPermi('system:user:list')`)" placement="top">
-                  <i class="el-icon-question"></i>
-                </el-tooltip>
-                菜单编码
-              </span>
-            </el-form-item>
-          </el-col>
+
           <el-col :span="12" v-if="form.menuType == 'C'">
             <el-form-item prop="query">
               <el-input v-model="form.query" placeholder="请输入路由参数" maxlength="255" />
@@ -218,6 +211,20 @@
                 </el-tooltip>
                 路由参数
               </span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" v-if="form.menuType != 'F'">
+            <el-form-item prop="isFrame">
+              <span slot="label">
+                <el-tooltip content="选择是外链则路由地址需要以`http(s)://`开头" placement="top">
+                  <i class="el-icon-question"></i>
+                </el-tooltip>
+                是否外链
+              </span>
+              <el-radio-group v-model="form.isFrame">
+                <el-radio :label="0">是</el-radio>
+                <el-radio :label="1">否</el-radio>
+              </el-radio-group>
             </el-form-item>
           </el-col>
           <el-col :span="12" v-if="form.menuType == 'C'">
@@ -281,6 +288,7 @@
     components: { iconSelect },
     data() {
       return {
+        indents: 200,
         // 遮罩层
         loading: false,
         // 显示搜索条件
@@ -318,6 +326,9 @@
           sort: [
             { required: true, message: "菜单顺序不能为空", trigger: "blur" }
           ],
+          weight: [
+            { required: true, message: "菜单权重不能为空", trigger: "blur" }
+          ],
           url: [
             { required: true, message: "路由地址不能为空", trigger: "blur" }
           ]
@@ -337,6 +348,13 @@
       }
     },
     methods: {
+      getOpenDetail(row, column, cell, event) {
+        if (column.label === '菜单名称') {
+          if (event.currentTarget.querySelector(".el-table__expand-icon")) {
+            event.currentTarget.querySelector(".el-table__expand-icon").click()
+          }
+        }
+      },
       menuNameQueryChange() {
         if (this.queryParams.menuName == "") {
           this.queryParams.menuName = undefined
@@ -397,6 +415,7 @@
           query: undefined,
           menuType: "C",
           sort: 1,
+          weight: 1,
           isFrame: 1,
           isCache: 1,
           isDefault: 0,
