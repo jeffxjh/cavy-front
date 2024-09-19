@@ -7,31 +7,31 @@
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
       <el-form ref="form" :model="form" label-width="auto">
-        <el-form-item label="任务名" style="width: 80%">
+        <el-form-item label="任务名:" style="width: 80%">
           <el-input v-model="form.jobName"></el-input>
         </el-form-item>
-        <el-form-item label="表达式" style="width: 80%">
+        <el-form-item label="表达式:" style="width: 80%">
           <el-input v-model="form.cronExpression"></el-input>
         </el-form-item>
-        <el-form-item label="任务调用的方法名" style="width: 80%">
+        <el-form-item label="任务调用的方法名:" style="width: 80%">
           <el-input v-model="form.methodName"></el-input>
         </el-form-item>
-        <el-form-item label="任务是否有状态" style="width: 80%">
+        <el-form-item label="任务是否有状态:" style="width: 80%">
           <el-input v-model="form.isConcurrent"></el-input>
         </el-form-item>
-        <el-form-item label="完全限定名" style="width: 80%">
+        <el-form-item label="完全限定名:" style="width: 80%">
           <el-input v-model="form.beanName"></el-input>
         </el-form-item>
-        <el-form-item label="触发器名称" style="width: 80%">
+        <el-form-item label="触发器名称:" style="width: 80%">
           <el-input v-model="form.triggerName"></el-input>
         </el-form-item>
-        <el-form-item label="任务状态" style="width: 80%">
+        <el-form-item label="任务状态:" style="width: 80%">
           <el-input v-model="form.jobStatus"></el-input>
         </el-form-item>
-        <el-form-item label="bean名称" style="width: 80%">
+        <el-form-item label="bean名称:" style="width: 80%">
           <el-input v-model="form.springBean"></el-input>
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item label="描述:">
           <editor v-model="form.description"></editor>
         </el-form-item>
         <el-form-item>

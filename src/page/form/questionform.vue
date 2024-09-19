@@ -7,10 +7,10 @@
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
       <el-form ref="form" :model="form" label-width="auto">
-        <el-form-item label="问题标题" style="width: 80%">
+        <el-form-item label="问题标题:" style="width: 80%">
           <el-input v-model="form.title"></el-input>
         </el-form-item>
-        <el-form-item label="问题内容">
+        <el-form-item label="问题内容:">
           <editor v-model="form.content"></editor>
         </el-form-item>
         <el-form-item>

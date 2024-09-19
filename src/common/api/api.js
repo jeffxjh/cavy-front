@@ -6,6 +6,7 @@ import {
   postBodyRequest,
   postRequest,
   putRequest,
+  putJsonRequest,
   deleteRequest,
   getBlobRequest,
   postBlobRequest,
@@ -105,7 +106,7 @@ export const getUser = params => {
 };
 // 修改用户
 export const updateUser = params => {
-  return putRequest("/user", params);
+  return putJsonRequest("/user", params);
 };
 // 获取角色列表
 export const roleList = params => {

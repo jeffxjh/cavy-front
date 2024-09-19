@@ -17,7 +17,7 @@
                :disabled="disabled">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="角色名称" style="width: 50%" prop="roleName">
+            <el-form-item label="角色名称:" style="width: 50%" prop="roleName">
               <span v-if="disabled">{{ form.roleName }}</span>
               <el-input
                         v-else
@@ -29,7 +29,7 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="角色菜单资源" prop="menuTreeList">
+            <el-form-item label="角色菜单资源:" prop="menuTreeList">
               <div class="edit_dev">
                 <el-tree
                          :data="menuTree"

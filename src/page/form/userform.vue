@@ -16,7 +16,7 @@
                :disabled="disabled">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="用户账号" style="width: 80%" prop="userName">
+            <el-form-item label="用户账号:" style="width: 80%" prop="userName">
               <span v-if="disabled">{{ form.userName }}</span>
               <el-input
                         v-else
@@ -26,7 +26,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="登录密码" style="width: 80%" prop="password">
+            <el-form-item label="登录密码:" style="width: 80%" prop="password">
               <span v-if="disabled">{{ form.password }}</span>
               <el-input
                         v-else
@@ -39,7 +39,7 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="真实姓名" style="width: 80%" prop="realName">
+            <el-form-item label="真实姓名:" style="width: 80%" prop="realName">
               <span v-if="disabled">{{ form.realName }}</span>
               <el-input
                         v-else
@@ -49,7 +49,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="性别" style="width: 80%" prop="gender">
+            <el-form-item label="性别:" style="width: 80%" prop="gender">
               <span v-if="disabled">{{ genderName }}</span>
               <!-- :label=“1”，表示label的值应为数字1-->
               <!-- label=“1”，表示label的值应为字符串1 -->
@@ -62,7 +62,7 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="手机号" style="width: 80%" prop="phone">
+            <el-form-item label="手机号:" style="width: 80%" prop="phone">
               <span v-if="disabled">{{ form.phone }}</span>
               <el-input
                         v-else
@@ -72,7 +72,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="邮箱" style="width: 80%" prop="email">
+            <el-form-item label="邮箱:" style="width: 80%" prop="email">
               <span v-if="disabled">{{ form.email }}</span>
               <el-input
                         v-else
@@ -85,7 +85,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item
-                          label="默认用户"
+                          label="默认用户:"
                           style="width: 80%"
                           prop="defaultUser">
               <span v-if="disabled">{{ defaultUserName }}</span>
@@ -102,7 +102,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="用户状态" style="width: 30%" prop="status">
+            <el-form-item label="用户状态:" style="width: 30%" prop="status">
               <span v-if="disabled">
                 {{ statusName }}
               </span>
@@ -122,7 +122,7 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item label="用户角色">
+            <el-form-item label="用户角色:">
               <div v-if="disabled">
                 <el-tag
                         :key="role.id"
@@ -133,7 +133,8 @@
               </div>
               <div  v-else class="edit_dev">
                 <el-transfer
-                             
+                prop="roleList"
+                @change="handleChange"     
                 filterable
                 filter-placeholder="请输入角色名称"
                 :titles="['可选', '已选']"
@@ -213,7 +214,7 @@
               response.data.data.forEach((role, index) => {
                 data.push({
                   label: role.roleName,
-                  key: role.menuId,
+                  key: role.id,
                 });
               });
             }
@@ -247,7 +248,8 @@
           info: "",
         },
         isClear: false,
-        form: {},
+        form: {
+        },
         rules: {
           userName: [
             { required: true, message: "请输入账号", trigger: "blur" },
@@ -357,7 +359,8 @@
       //       that.$message.error("加载失败");
       //     });
       // },
-      //添加增加题目
+      handleChange(value, direction, movedKeys){
+      },
       async onSubmit(type) {
         const valid = await this.$refs.form.validate().catch((err) => {
           console.info(err);
