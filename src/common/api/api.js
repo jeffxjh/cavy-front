@@ -196,3 +196,20 @@ export const updateDict = params => {
 export const addDictItem = params => {
   return postJsonRequest("/dict/item/add", params);
 };
+// 分页查询亲友
+export const pageFavourRelate = params => {
+  return postJsonRequest("/favour/relate", params);
+};
+// 删除亲友
+export const delFavourRelate = params => {
+  return deleteRequest("/favour/relate/"+params, params);
+};
+
+// 添加亲友
+export const addFavourRelate = params => {
+  return postJsonRequest("/favour/relate/add", params);
+}; 
+// 修改亲友
+export const updateFavourRelate = params => {
+  return postJsonRequest("/favour/relate/update", params);
+};

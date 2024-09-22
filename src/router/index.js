@@ -136,6 +136,24 @@ const routes = [
       }
       ,
       {
+        path: "/favour",
+        name: "Favour",
+        component: () => import('@/page/favour/favour.vue'),
+        children: [
+          {
+            path: "/favour/relative",
+            name: "Relative",
+            component: () => import('@/page/favour/relative.vue'),
+          },
+          {
+            path: "/favour/record",
+            name: "Record",
+            component: () => import('@/page/favour/record.vue'),
+          }
+        ]
+      }
+      ,
+      {
         path: "/message/websocket",
         name: "Websocket",
         component: Websocket

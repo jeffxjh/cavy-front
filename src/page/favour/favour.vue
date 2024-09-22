@@ -1,12 +1,12 @@
 <style></style>
 <template>
-  <div id="system">
+  <div id="favour">
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'System'
+  name: 'Favour'
 }
 </script>
