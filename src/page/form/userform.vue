@@ -26,11 +26,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="登录密码:" style="width: 80%" prop="password">
-              <span v-if="disabled">{{ form.password }}</span>
+            <el-form-item label="登录密码:" style="width: 80%" prop="pwd">
+              <span v-if="disabled">{{ form.pwd }}</span>
               <el-input
                         v-else
-                        v-model="form.password"
+                        v-model="form.pwd"
                         placeholder="请输入登录密码"
                         show-password
                         clearable></el-input>
@@ -255,7 +255,7 @@
             { required: true, message: "请输入账号", trigger: "blur" },
             { min: 1, max: 20, message: "长度不超过20个字符", trigger: "blur" },
           ],
-          password: [
+          pwd: [
             {
               required: true,
               trigger: "blur",

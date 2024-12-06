@@ -23,11 +23,11 @@
                     placeholder="账号"></el-input>
         </el-form-item>
 
-        <el-form-item prop="password">
+        <el-form-item prop="pwd">
           <el-input
                     class="login-el-input"
                     type="password"
-                    v-model="loginForm.password"
+                    v-model="loginForm.pwd"
                     auto-complete="off"
                     placeholder="密码"></el-input>
           <!--  @keyup.enter.native="login" -->
@@ -59,7 +59,7 @@ export default {
       // loading:false,
       loginForm: {
         username: "",
-        password: ""
+        pwd: ""
       },
       remenber: false,
       responseResult: [],
@@ -73,7 +73,7 @@ export default {
             trigger: "blur",
           },
         ],
-        password: [
+        pwd: [
           { required: true, message: "请输入密码", trigger: "blur" },
           {
             min: 6,
@@ -98,7 +98,7 @@ export default {
         //在密码框监听了回车事件，这里可以不用了
         if (
           this.loginForm.username != undefined &&
-          this.loginForm.password != undefined
+          this.loginForm.pwd != undefined
         ) {
           this.login();
         }
@@ -113,7 +113,7 @@ export default {
       }
       login({
         username: this.loginForm.username,
-        password: this.loginForm.password,
+        pwd: this.loginForm.pwd,
       })
         .then((res) => {
           console.info(res, "登录接口返回值");
@@ -135,19 +135,19 @@ export default {
     },
     stroeInfo() {
       if (this.remenber) {
-        let password = Base64.encode(this.loginForm.password); // base64加密
+        let pwd = Base64.encode(this.loginForm.pwd); // base64加密
         window.localStorage.setItem('username', this.loginForm.username);
-        window.localStorage.setItem('password', password);
+        window.localStorage.setItem('pwd', pwd);
       } else {
         window.localStorage.removeItem('username');
-        window.localStorage.removeItem('password');
+        window.localStorage.removeItem('pwd');
       }
     },
     loadStore() {
       let username = localStorage.getItem('username')
       if (username) {
         this.loginForm.username = localStorage.getItem('username')
-        this.loginForm.password = Base64.decode(localStorage.getItem('password'))// base64解密
+        this.loginForm.pwd = Base64.decode(localStorage.getItem('pwd'))// base64解密
         this.remenber = true
       }
     }
