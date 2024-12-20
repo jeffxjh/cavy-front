@@ -95,3 +95,9 @@ export default {
     }
 }
 </script>
+<style>
+.el-tabs--card>.el-tabs__header .el-tabs__item.is-active {
+    border-bottom-color: #409EFF !important;
+    border-bottom-width: 2px !important;
+}
+</style>
