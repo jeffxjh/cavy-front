@@ -36,28 +36,31 @@ const routes = [
       {
         path: "/",
         name: "Centre",
-        component: Centre
+        component: Centre,
+        meta: {
+          title: "Centre",
+        }
       },
       {
         path: "/order",
         name: "Order",
-        component: Order
+        component: Order, meta: { title: "订单", }
       },
       {
         path: "/main",
         name: "Main",
-        component: Main
+        component: Main, meta: { title: "主页", }
       },
       {
         path: "/task",
         name: "Task",
-        component: Task
+        component: Task, meta: { title: "任务管理", }
       },
       ,
       {
         path: "/form/taskform",
         name: "Taskform",
-        component: Taskform
+        component: Taskform, meta: { title: "任务表单", }
       },
       {
         path: "/power",
@@ -67,19 +70,19 @@ const routes = [
           {
             path: "/power/menu",
             name: "Menu",
-            component: Menu
+            component: Menu, meta: { title: "菜单管理", }
           },
           {
             path: "/power/user",
             name: "User",
-            component: User
+            component: User, meta: { title: "用户管理", }
           },
         ]
       },
       {
         path: "/power/role",
         name: "Role",
-        component: Role
+        component: Role, meta: { title: "角色管理", }
       },
       // {
       //   path: "/power/menu",
@@ -95,22 +98,22 @@ const routes = [
         path: "/knowledge",
         name: "Knowledge",
         component: Knowledge,
-        children: []
+        children: [], meta: { title: "知识管理", }
       },
       {
         path: "/knowledge/category",
         name: "Category",
-        component: Category
+        component: Category, meta: { title: "知识类型", }
       },
       {
         path: "/knowledge/article",
         name: "Article",
-        component: Article
+        component: Article, meta: { title: "知识文章", }
       },
       {
         path: "/knowledge/label",
         name: "LabelLabel",
-        component: Label
+        component: Label, meta: { title: "知识标签", }
       },
       {
         path: "/system",
@@ -120,19 +123,19 @@ const routes = [
           {
             path: "/system/dict",
             name: "Dict",
-            component: Dict
+            component: Dict, meta: { title: "字典列表", }
           },
           {
             path: "/system/file",
             name: "File",
-            component: File
+            component: File, meta: { title: "文件表单", }
           },
           {
             path: "/form/dictform",
             name: "Dictform",
-            component: Dictform
+            component: Dictform, meta: { title: "字典表单", }
           },
-        ]
+        ], meta: { title: "系统管理", }
       }
       ,
       {
@@ -156,34 +159,34 @@ const routes = [
       {
         path: "/message/websocket",
         name: "Websocket",
-        component: Websocket
+        component: Websocket, meta: { title: "websocket", }
       },
       {
         path: "/questionanswer",
         name: "Questionanswer",
-        component: Questionanswer
+        component: Questionanswer, meta: { title: "问答", }
       },
       {
         path: "/form/questionform",
         name: "Questionform",
-        component: Questionform
+        component: Questionform, meta: { title: "问题表单", }
       },
       {
         path: "/form/userform",
         name: "Userform",
-        component: Userform
+        component: Userform, meta: { title: "用户表单", }
       },
       {
         path: "/form/roleform",
         name: "RoleForm",
-        component: () => import('@/page/form/roleform.vue')
+        component: () => import('@/page/form/roleform.vue'), meta: { title: "角色表单", }
       }
     ]
   },
   {
     path: "/login",
     name: "Login",
-    component: Login
+    component: Login, meta: { title: "登录", }
   }
   ,
   // {
@@ -196,7 +199,7 @@ const routes = [
   {
     path: "/home",
     name: "Home",
-    component: Home
+    component: Home, meta: { title: "home", }
   }
 ];
 

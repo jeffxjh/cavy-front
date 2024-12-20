@@ -1,18 +1,19 @@
-
 /* 当表格没有子节点时隐藏展开图标 */
 .el-table .row-expand-cover .cell .el-table__expand-icon {
-    display: none;
+  display: none;
 }
 
 .row-expand-cover .el-table__expand-column {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 /* 当表格没有子节点时隐藏展开图标 */
 
-.el-aside{
-    -webkit-user-select: none!important; /* Safari */
-    -moz-user-select: none!important;    /* Firefox */
-    -ms-user-select: none!important;     /* Internet Explorer/Edge */
-    user-select: none!important;
+.el-aside,
+.el-table__expand-icon,
+.el-tabs__item {
+  -webkit-user-select: none !important; /* Safari */
+  -moz-user-select: none !important; /* Firefox */
+  -ms-user-select: none !important; /* Internet Explorer/Edge */
+  user-select: none !important;
 }

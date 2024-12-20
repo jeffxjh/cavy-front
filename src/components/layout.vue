@@ -8,6 +8,8 @@
       <!-- aside部分 -->
       <leftNav></leftNav>
       <el-main>
+        <!-- tab标签部分 -->
+        <tabsView />
         <!-- main部分 -->
         <router-view />
       </el-main>
@@ -18,10 +20,12 @@
 <script>
 import navtop from "@/components/nav-top.vue";
 import leftNav from "@/components/nav.vue";
+import tabsView from "@/components/tabs-view.vue";
 export default {
   components: {
     navtop,
-    leftNav
+    leftNav,
+    tabsView
   },
   data() {
     return {};
@@ -34,6 +38,7 @@ export default {
 .el-main {
   background-color: #f5f7f9;
 }
+
 .el-header {
   background-color: #ECECEC;
 }
@@ -43,6 +48,7 @@ export default {
   box-sizing: border-box;
   border-bottom: 1px solid #f5f1f1;
 }
+
 .el-container {
   height: 100%;
 }
