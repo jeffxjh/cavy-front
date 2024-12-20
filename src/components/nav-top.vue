@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-aside width="auto" class="header-logo tap">
-      <img class="logo" src="@/assets/icons/logo.png" alt="Logo"  @click="toIndex"/>
+      <img draggable="false" class="logo" src="@/assets/icons/logo.png" alt="Logo"  @click="toIndex"/>
     </el-aside>
     <el-aside width="auto" class="header-logo tap">
       <!-- :value="messageNum" :is-dot="hasMessage"  -->
@@ -28,7 +28,7 @@
           src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
           @error="errorHandler"
         >
-          <img
+          <img draggable="false"
             src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
           />
         </el-avatar>
