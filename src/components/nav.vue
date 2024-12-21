@@ -171,6 +171,10 @@ export default {
 </script>
 
 <style scoped>
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+  display: none;
+}
 .el-row {
   height: 100%;
 }

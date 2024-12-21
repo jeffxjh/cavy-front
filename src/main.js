@@ -8,6 +8,17 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './assets/global.css'
 import store from './store/index';
 
+// bpmn 相关依赖
+import 'bpmn-js/dist/assets/diagram-js.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
+
+// 左边工具栏以及编辑节点的样式
+import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css'
+import Highlight from "@/components/highlight/highlight";
+
+
 import axios from "axios";
 // import TreeTable from 'vue-table-with-tree-grid'
 // Vue.component('tree-table', TreeTable)
@@ -27,6 +38,7 @@ Object.keys(filters).forEach(key => {
 Vue.component('tree-table', TreeTable)
 Vue.use(TreeTable )
 Vue.use(ElementUI);
+Vue.use(Highlight);
 axios.defaults.timeout = 6000;
 axios.defaults.baseURL = process.env.BASE_API;
 

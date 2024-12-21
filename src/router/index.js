@@ -24,6 +24,8 @@ import Websocket from "@/page/websocket";
 import Layout from "@/components/layout";
 import Centre from "@/components/centre";
 import Home from "@/view/home/home";
+import Workflow from "@/page/workflow/workflow";
+import WorkflowModel from "@/page/workflow/model";
 
 Vue.use(Router);
 
@@ -33,6 +35,19 @@ const routes = [
     name: "Layout",
     component: Layout,
     children: [
+      {
+        path: "/workflow",
+        name: "Workflow",
+        component: Workflow,
+        children: [
+          {
+            path: "/workflow/model",
+            name: "WorkflowModel",
+            component: WorkflowModel, meta: { title: "流程模型", }
+          },
+        
+        ]
+      },
       {
         path: "/",
         name: "Centre",
@@ -200,7 +215,8 @@ const routes = [
     path: "/home",
     name: "Home",
     component: Home, meta: { title: "home", }
-  }
+  },
+  
 ];
 
 const router = new Router({
