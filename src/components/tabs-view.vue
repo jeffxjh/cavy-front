@@ -31,6 +31,15 @@ export default {
             }],
         }
     },
+    mounted() {
+        let openTab = sessionStorage.getItem('openTab')
+        this.openTab = openTab ? JSON.parse(openTab) : this.openTab
+        let currentTabName = sessionStorage.getItem('currentTabName')
+        // 判断是否存在currentTabName，即tab页之前是否被点击切换到别的页面
+        if (currentTabName) {
+            this.currentTabName = currentTabName
+        }
+    },
     methods: {
         removeTab(target) {
             // 删除的是当前选中的页面
@@ -52,12 +61,14 @@ export default {
                 }
             });
             this.openTab.splice(i, 1);
+            sessionStorage.setItem('openTab', JSON.stringify(this.openTab))
             // 更新路由
             if (this.currentTabName === target) {
                 this.$router.push({ path: this.openTab[this.openTab.length - 1].name });
             }
         },
         clickTab(target) {
+            sessionStorage.setItem('currentTabName', target.name)
             this.$router.push(`${target.name}`).catch(error => error);
         }
     },
@@ -91,6 +102,8 @@ export default {
                 this.openTab.push(obj);
                 this.currentTabName = to.path
             }
+            sessionStorage.setItem('openTab', JSON.stringify(this.openTab))
+            sessionStorage.setItem('currentTabName', this.currentTabName)
         },
     }
 }

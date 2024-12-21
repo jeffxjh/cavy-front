@@ -11,7 +11,7 @@ export default {
     compomentName:{
       typeof: String,
       default: '默认主键',
-      required: true
+      required: false
     }
   },
   data() {
