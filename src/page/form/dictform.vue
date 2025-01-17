@@ -6,11 +6,11 @@
       <el-breadcrumb-item>新增字典</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="form-container" shadow="never">
-      <el-form ref="form" :model="form" label-width="auto">
-        <el-form-item label="字典名称:" style="width: 80%">
+      <el-form ref="form" :model="form" label-width="auto" :rules="rules">
+        <el-form-item label="字典名称:" style="width: 80%" prop="name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
-        <el-form-item label="字典编码:">
+        <el-form-item label="字典编码:" prop="code">
           <el-input v-model="form.code"></el-input>
         </el-form-item>
         <el-form-item>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import {addDict,updateDict} from "@/common/api/api";
+import { addDict, updateDict } from "@/common/api/api";
 
 export default {
   components: {
@@ -35,22 +35,35 @@ export default {
   data() {
     return {
       isClear: false,
-      action:"创建",
+      action: "创建",
       form: {
-        id:'',
+        id: '',
         name: '',
         code: '',
+
+      },
+      rules: {
+        name: [{
+          required: true,
+          message: '字典名称必须填写',
+          trigger: 'blur'
+        }],
+        code: [{
+          required: true,
+          message: '字典编码必须填写',
+          trigger: 'blur'
+        }],
 
       }
     }
   },
   mounted() {
-   this.form.id= this.$route.params.id
-   this.form.code= this.$route.params.code
-   this.form.name= this.$route.params.name
-   if(this.$route.params.action!=undefined){
-    this.action= this.$route.params.action
-   }
+    this.form.id = this.$route.params.id
+    this.form.code = this.$route.params.code
+    this.form.name = this.$route.params.name
+    if (this.$route.params.action != undefined) {
+      this.action = this.$route.params.action
+    }
   },
   methods: {
     async onSubmit(type) {
@@ -58,17 +71,17 @@ export default {
       form = this.form;
       const params = form;
       let res;
-      if(this.action==="创建"){
-         res = await addDict(params);
-      }else{
-         res = await updateDict(params);
+      if (this.action === "创建") {
+        res = await addDict(params);
+      } else {
+        res = await updateDict(params);
       }
-      if (res.status=='200'&&res.data.code=='1000') {
+      if (res.status == '200' && res.data.code == '1000') {
         this.$message({
           type: "success",
           message: "保存成功",
         });
-        if (type===0){
+        if (type === 0) {
           this.$router.push(`/system/dict`).catch(error => error);
         }
         return;
