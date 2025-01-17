@@ -50,6 +50,19 @@
                 <template slot="header" slot-scope="{}">
                     <el-button type="text" @click="change">{{ isExpand ? '收起' : '展开' }}</el-button>
                 </template>
+                <!-- 
+                
+               <el-table>
+         <el-table-column label="是否检测" align="center" prop="is_nucleic" min-width="70px" 
+            :show-overflow-tooltip="true">
+            <template slot-scope="scope">
+              <div :style="{ color: scope.row.is_nucleic ==='未检测'?'red':'black'}">
+                {
+  { scope.row.is_nucleic }}
+              </div>
+            </template>
+          </el-table-column>
+                -->
                 <template slot-scope="props">
                     <el-table
                               v-if="props.row.childrenData.length > 0"

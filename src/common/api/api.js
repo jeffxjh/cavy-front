@@ -116,6 +116,10 @@ export const roleList = params => {
 export const userGetRoleList = (params,arg) => {
   return postRequest("/role", params);
 };
+//根据用户名称获取角色列表
+export const getRoleByUserName = (params,arg) => {
+  return getRequest("/role/getRoleByUserName", params);
+};
 // 新建角色
 export const addRole = params => {
   return postBodyRequest("/role/add", params);
