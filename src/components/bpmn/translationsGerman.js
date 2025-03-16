@@ -30,6 +30,7 @@ export default {
   'Ad-hoc': '即席',
   'Create {type}': '创建 {type}',
   'Create Task':'创建任务',
+  'Create UserTask':'创建用户任务',
   'Create StartEvent':'创建开始事件',
   'Create EndEvent':'创建结束事件',
   'Create Group':'创建组',
