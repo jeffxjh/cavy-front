@@ -280,11 +280,25 @@ export default {
         },
         async createNewDiagram(bpmn) {
             // 将字符串转换成图显示出来;
-            this.bpmnModeler.importXML(bpmn, err => {
+            // this.bpmnModeler.importXML(bpmn, err => {
+            //     if (err) {
+            //         this.$Message.error("打开模型出错,请确认该模型符合Bpmn2.0规范");
+            //     }
+            // });
+            try {
+                const result = await this.bpmnModeler.importXML(bpmn);
+                const { warnings } = result;
+                console.log(warnings);
+            } catch (err) {
                 if (err) {
                     this.$Message.error("打开模型出错,请确认该模型符合Bpmn2.0规范");
                 }
-            });
+                console.log(err.message, err.warnings);
+            }
+
+            // 自动缩放到适应屏幕大小
+            // this.bpmnModeler.get("canvas").zoom("fit-viewport");
+            // this.scale = this.bpmnModeler.get("canvas").zoom();
         }
     },
     mounted() {
