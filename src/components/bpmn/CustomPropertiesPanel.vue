@@ -107,13 +107,13 @@
                         <div class="gateway-tips">
                             <el-alert
                                       title="排他网关配置"
-                                      description="为每个流向设置条件表达式，流程将根据条件选择执行路径"
+                                      description="为每个流出线设置条件表达式，流程将根据条件选择执行路径"
                                       type="info"
                                       show-icon
                                       :closable="false" />
                         </div>
 
-                        <div v-for="flow in outgoingFlows" :key="flow.id" class="flow-condition">
+                        <div v-for="flow in outgoingSequenceFlows" :key="flow.id" class="flow-condition">
                             <div class="flow-header">
                                 <span class="flow-label">流向 {{ getTargetName(flow) }}</span>
                                 <el-tag v-if="isDefaultFlow(flow)" type="success" size="small">默认</el-tag>
@@ -153,7 +153,7 @@
                             </div>
                         </div>
 
-                        <div v-if="outgoingFlows.length === 0" class="no-flows">
+                        <div v-if="outgoingSequenceFlows.length === 0" class="no-flows">
                             <el-alert
                                       title="提示"
                                       description="请先连接网关到其他节点"
@@ -185,7 +185,7 @@
                                       :closable="false" />
                         </div>
 
-                        <div v-for="flow in outgoingFlows" :key="flow.id" class="flow-condition">
+                        <div v-for="flow in outgoingSequenceFlows" :key="flow.id" class="flow-condition">
                             <div class="flow-header">
                                 <span class="flow-label">流向 {{ getTargetName(flow) }}</span>
                             </div>
@@ -214,7 +214,7 @@
                             </div>
                         </div>
 
-                        <div v-if="outgoingFlows.length === 0" class="no-flows">
+                        <div v-if="outgoingSequenceFlows.length === 0" class="no-flows">
                             <el-alert
                                       title="提示"
                                       description="请先连接网关到其他节点"
@@ -364,6 +364,14 @@ export default {
         isInclusiveGateway() {
             return this.element && this.element.type === 'bpmn:InclusiveGateway';
         },
+        // 只获取序列流，排除其他类型的连接
+        outgoingSequenceFlows() {
+            if (!this.element || !this.element.outgoing) return [];
+            return this.element.outgoing.filter(flow => 
+                flow.type === 'bpmn:SequenceFlow'
+            );
+        },
+        // 保留原有的 outgoingFlows 用于其他用途
         outgoingFlows() {
             if (!this.element || !this.element.outgoing) return [];
             return this.element.outgoing;
@@ -423,7 +431,8 @@ export default {
         loadGatewayProperties() {
             if (!this.element) return;
 
-            this.outgoingFlows.forEach(flow => {
+            // 只处理序列流
+            this.outgoingSequenceFlows.forEach(flow => {
                 const condition = flow.businessObject.conditionExpression;
                 this.$set(this.flowConditions, flow.id,
                     condition ? condition.body : ''
