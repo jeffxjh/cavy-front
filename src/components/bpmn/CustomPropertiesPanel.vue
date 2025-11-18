@@ -6,9 +6,9 @@
         </div>
 
         <div class="panel-content">
-            <el-collapse v-model="activeNames">
+            <el-collapse v-if="!element"  v-model="activeNames" :accordion="false">
                 <!-- 流程基本属性（无元素选中时显示） -->
-                <el-collapse-item v-if="!element" title="流程基本属性" name="processBasic">
+                <el-collapse-item v-show="!element" title="流程基本属性" name="processBasic">
                     <div class="form-group">
                         <div class="form-item">
                             <label class="form-label">流程ID</label>
@@ -72,8 +72,12 @@
                         </div>
                     </div>
                 </el-collapse-item>
-
-                <!-- 元素基本属性（有元素选中时显示） -->
+            </el-collapse>
+             <el-collapse 
+                v-else 
+                v-model="activeNames" 
+                class="no-transition-collapse">
+                 <!-- 元素基本属性（有元素选中时显示） -->
                 <el-collapse-item v-if="element" title="基本属性" name="basic">
                     <div class="form-group">
                         <div class="form-item">
@@ -184,10 +188,6 @@
                         </div>
                     </div>
                 </el-collapse-item>
-
-                <!-- 其他元素类型配置保持不变 -->
-                <!-- ... -->
-
             </el-collapse>
         </div>
     </div>
@@ -211,6 +211,7 @@ export default {
                 isExecutable: true
             },
             activeNames: ['basic', 'processBasic'],
+            // activeNames: ['basic', 'processBasic','elementCustom','processCustom','userTask'],
             flowConditions: {},
             flowNames: {},
             defaultFlow: '',
@@ -270,7 +271,7 @@ export default {
                 flow.type === 'bpmn:SequenceFlow'
             );
         },
-           outgoingFlows() {
+        outgoingFlows() {
             if (!this.element || !this.element.outgoing) return [];
             return this.element.outgoing;
         }
@@ -278,7 +279,13 @@ export default {
     watch: {
         element: {
             immediate: true,
-            handler(newElement) {
+            handler(newElement, oldElement) {
+                // 元素切换时重置激活状态
+                if (newElement !== oldElement) {
+                    this.$nextTick(() => {
+                        this.resetActiveNames();
+                    });
+                }
                 if (newElement) {
                     this.loadProperties();
                     this.loadElementCustomProperties();
@@ -305,6 +312,18 @@ export default {
         }
     },
     methods: {
+        resetActiveNames() {
+            // 根据当前选中元素类型设置合适的默认展开项
+            // if (this.element) {
+            // this.activeNames = ['basic', 'elementCustom'];
+            // 根据元素类型添加对应的配置项
+            // if (this.isUserTask) this.activeNames.push('userTask');
+            // if (this.isServiceTask) this.activeNames.push('serviceTask');
+            // if (this.isExclusiveGateway) this.activeNames.push('gateway');
+            // } else {
+            //     this.activeNames = ['processBasic', 'processCustom'];
+            // }
+        },
         loadGatewayProperties() {
             if (!this.element) return;
 
@@ -757,5 +776,33 @@ export default {
 
 .el-collapse-item__content {
     padding: 16px 0;
+}
+
+/* 完全禁用折叠动画 */
+.no-transition-collapse ::v-deep .el-collapse-item__wrap {
+    transition: none !important;
+    -webkit-transition: none !important;
+    will-change: unset !important;
+}
+
+.no-transition-collapse ::v-deep .el-collapse-item__content {
+    transition: none !important;
+    -webkit-transition: none !important;
+    animation: none !important;
+    -webkit-animation: none !important;
+    padding-bottom: 0 !important;
+}
+
+.no-transition-collapse ::v-deep .el-collapse-item__header {
+    transition: none !important;
+    -webkit-transition: none !important;
+}
+
+/* 禁用所有过渡效果 */
+.no-transition-collapse ::v-deep * {
+    transition: none !important;
+    -webkit-transition: none !important;
+    animation: none !important;
+    -webkit-animation: none !important;
 }
 </style>
