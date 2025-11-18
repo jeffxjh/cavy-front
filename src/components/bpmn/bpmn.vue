@@ -3,8 +3,23 @@
         <!-- 创建一个canvas画布 npmn-js是通过canvas实现绘图的，并设置ref让vue获取到element -->
         <div class="bpmn-container" :style="{ height: scrollerHeight }">
             <div class="bpmn-canvas" ref="canvas"></div>
+            <!-- 自定义属性面板 -->
+            <!-- <el-drawer
+                       title="属性配置"
+                       :visible.sync="propertyDrawer"
+                       size="400px"
+                       direction="rtl"
+                       :before-close="handleDrawerClose">
+
+            </el-drawer> -->
+
             <!-- 工具栏显示的地方 -->
-            <div class="bpmn-js-properties-panel" id="js-properties-panel"></div>
+            <!-- <div class="bpmn-js-properties-panel" id="js-properties-panel"></div> -->
+            <div class="bpmn-js-properties-panel" id="js-properties-panel"><custom-properties-panel
+                                         :process-element="processElement"
+                                         :element="selectedElement"
+                                         :bpmn-modeler="bpmnModeler"
+                                         @close="propertyDrawer = false" /></div>
         </div>
 
         <!-- 把操作按钮写在这里面 -->
@@ -63,6 +78,7 @@ import camundaModdleDescriptor from "camunda-bpmn-moddle/resources/camunda";
 import CustomPaletteProvider from './CustomPaletteProvider'
 import CustomContextPadProvider from './CustomContextPadProvider'
 import flowableModdle from './flowable.json'
+import CustomPropertiesPanel from './CustomPropertiesPanel.vue';
 
 
 // 汉化
@@ -70,11 +86,17 @@ import customTranslate from "./customTranslate";
 
 export default {
     name: "bpmn",
+    components: {
+        CustomPropertiesPanel
+    },
     data() {
         return {
             bpmnModeler: null,
             scale: 1,
             canvas: null,
+            selectedElement: null,
+            processElement: null,
+            propertyDrawer: false,
             perviewXMLStr: null,
             perviewSVGData: null,
             perviewXMLShow: false,
@@ -243,6 +265,24 @@ export default {
                 this.toast.error('预览失败，请重试')
             }
         },
+        handleDrawerClose(done) {
+            this.propertyDrawer = false;
+            done();
+        },
+        loadProcessElement() {
+            if (!this.bpmnModeler) return;
+
+            try {
+                const canvas = this.bpmnModeler.get('canvas');
+                const rootElement = canvas.getRootElement();
+
+                if (rootElement && rootElement.type === 'bpmn:Process') {
+                    this.processElement = rootElement;
+                }
+            } catch (error) {
+                console.error('加载流程元素失败:', error);
+            }
+        },
         async init() {
             // 获取画布 element
             this.canvas = this.$refs.canvas;
@@ -264,15 +304,33 @@ export default {
                 additionalModules: [
                     // 工具栏模块
                     propertiesProviderModule,
-                    propertiesPanelModule,
+                    // propertiesPanelModule,
                     // 汉化模块
                     customTranslateModule,
                     { paletteProvider: ['type', CustomPaletteProvider] },
                     { contextPadProvider: ['type', CustomContextPadProvider] },
                 ],
                 moddleExtensions: {
-                    camunda: camundaModdleDescriptor
+                    // camunda: camundaModdleDescriptor,
+                    flowable: camundaModdleDescriptor 
                     // flowable: flowableModdle 
+                }
+            });
+
+            // 监听元素选择
+            this.bpmnModeler.on('selection.changed', (e) => {
+                console.log('选择变化', e);
+                console.log('选择变化', e.newSelection[0]);
+                this.selectedElement = e.newSelection[0] || null;
+                // this.propertyDrawer = !!this.selectedElement;
+            });
+            // 监听画布点击
+            this.bpmnModeler.on('element.click', (e) => {
+                // 如果点击的是画布背景（流程元素）
+                if (e.element.type === 'bpmn:Process') {
+                    this.selectedElement = null;
+                    this.processElement = e.element;
+                    this.propertyDrawer = true;
                 }
             });
 
@@ -295,7 +353,7 @@ export default {
                 }
                 console.log(err.message, err.warnings);
             }
-
+            this.loadProcessElement();
             // 自动缩放到适应屏幕大小
             // this.bpmnModeler.get("canvas").zoom("fit-viewport");
             // this.scale = this.bpmnModeler.get("canvas").zoom();
