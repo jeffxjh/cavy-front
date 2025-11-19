@@ -331,7 +331,7 @@ export default {
             }
         },
         handleCreate() {
-            this.$router.push(`/form/dictform`).catch((error) => error);
+            this.$router.push(`/workflow/definitionForm`).catch((error) => error);
         },
         sortChange(data) {
             const { prop, order } = data;

@@ -6,30 +6,40 @@
         </div>
 
         <div class="panel-content">
-            <el-collapse v-if="!element"  v-model="activeNames" :accordion="false">
+            <el-collapse v-if="!element" v-model="activeNames" :accordion="false">
                 <!-- 流程基本属性（无元素选中时显示） -->
                 <el-collapse-item v-show="!element" title="流程基本属性" name="processBasic">
                     <div class="form-group">
                         <div class="form-item">
                             <label class="form-label">流程ID</label>
-                            <el-input v-model="processProperties.id" @change="updateProcessProperties" />
+                            <el-input
+                                v-model="processProperties.id"
+                                @change="updateProcessProperties"
+                            />
                         </div>
                         <div class="form-item">
                             <label class="form-label">流程名称</label>
-                            <el-input v-model="processProperties.name" @change="updateProcessProperties" />
+                            <el-input
+                                v-model="processProperties.name"
+                                @change="updateProcessProperties"
+                            />
                         </div>
                         <div class="form-item">
                             <label class="form-label">版本标签</label>
-                            <el-input v-model="processProperties.versionTag" @change="updateProcessProperties" />
+                            <el-input
+                                v-model="processProperties.versionTag"
+                                @change="updateProcessProperties"
+                            />
                         </div>
                         <div class="form-item">
                             <label class="form-label">是否可执行</label>
                             <div style="padding: 8px 0;">
                                 <el-switch
-                                           v-model="processProperties.isExecutable"
-                                           @change="updateProcessProperties"
-                                           active-text="是"
-                                           inactive-text="否" />
+                                    v-model="processProperties.isExecutable"
+                                    @change="updateProcessProperties"
+                                    active-text="是"
+                                    inactive-text="否"
+                                />
                             </div>
                         </div>
                     </div>
@@ -41,29 +51,37 @@
                         <div class="custom-props-header">
                             <span>自定义属性</span>
                             <el-button type="text" size="mini" @click="addCustomProperty">
-                                <i class="el-icon-plus"></i> 添加属性
+                                <i class="el-icon-plus"></i>
+                                添加属性
                             </el-button>
                         </div>
 
-                        <div v-for="(prop, index) in processCustomProperties" :key="index" class="custom-prop-item">
+                        <div
+                            v-for="(prop, index) in processCustomProperties"
+                            :key="index"
+                            class="custom-prop-item"
+                        >
                             <div class="prop-row">
                                 <el-input
-                                          v-model="prop.name"
-                                          placeholder="属性名"
-                                          size="small"
-                                          style="width: 120px; margin-right: 8px;"
-                                          @change="updateProcessCustomProperties" />
+                                    v-model="prop.name"
+                                    placeholder="属性名"
+                                    size="small"
+                                    style="width: 120px; margin-right: 8px;"
+                                    @change="updateProcessCustomProperties"
+                                />
                                 <el-input
-                                          v-model="prop.value"
-                                          placeholder="属性值"
-                                          size="small"
-                                          style="flex: 1; margin-right: 8px;"
-                                          @change="updateProcessCustomProperties" />
+                                    v-model="prop.value"
+                                    placeholder="属性值"
+                                    size="small"
+                                    style="flex: 1; margin-right: 8px;"
+                                    @change="updateProcessCustomProperties"
+                                />
                                 <el-button
-                                           type="text"
-                                           size="mini"
-                                           icon="el-icon-delete"
-                                           @click="removeCustomProperty(index)" />
+                                    type="text"
+                                    size="mini"
+                                    icon="el-icon-delete"
+                                    @click="removeCustomProperty(index)"
+                                />
                             </div>
                         </div>
 
@@ -73,11 +91,8 @@
                     </div>
                 </el-collapse-item>
             </el-collapse>
-             <el-collapse 
-                v-else 
-                v-model="activeNames" 
-                class="no-transition-collapse">
-                 <!-- 元素基本属性（有元素选中时显示） -->
+            <el-collapse v-else v-model="activeNames" class="no-transition-collapse">
+                <!-- 元素基本属性（有元素选中时显示） -->
                 <el-collapse-item v-if="element" title="基本属性" name="basic">
                     <div class="form-group">
                         <div class="form-item">
@@ -91,10 +106,11 @@
                         <div class="form-item">
                             <label class="form-label">描述</label>
                             <el-input
-                                      type="textarea"
-                                      v-model="properties.documentation"
-                                      @change="updateProperties"
-                                      :rows="3" />
+                                type="textarea"
+                                v-model="properties.documentation"
+                                @change="updateProperties"
+                                :rows="3"
+                            />
                         </div>
                     </div>
                 </el-collapse-item>
@@ -105,29 +121,37 @@
                         <div class="custom-props-header">
                             <span>自定义属性</span>
                             <el-button type="text" size="mini" @click="addElementCustomProperty">
-                                <i class="el-icon-plus"></i> 添加属性
+                                <i class="el-icon-plus"></i>
+                                添加属性
                             </el-button>
                         </div>
 
-                        <div v-for="(prop, index) in elementCustomProperties" :key="index" class="custom-prop-item">
+                        <div
+                            v-for="(prop, index) in elementCustomProperties"
+                            :key="index"
+                            class="custom-prop-item"
+                        >
                             <div class="prop-row">
                                 <el-input
-                                          v-model="prop.name"
-                                          placeholder="属性名"
-                                          size="small"
-                                          style="width: 120px; margin-right: 8px;"
-                                          @change="updateElementCustomProperties" />
+                                    v-model="prop.name"
+                                    placeholder="属性名"
+                                    size="small"
+                                    style="width: 120px; margin-right: 8px;"
+                                    @change="updateElementCustomProperties"
+                                />
                                 <el-input
-                                          v-model="prop.value"
-                                          placeholder="属性值"
-                                          size="small"
-                                          style="flex: 1; margin-right: 8px;"
-                                          @change="updateElementCustomProperties" />
+                                    v-model="prop.value"
+                                    placeholder="属性值"
+                                    size="small"
+                                    style="flex: 1; margin-right: 8px;"
+                                    @change="updateElementCustomProperties"
+                                />
                                 <el-button
-                                           type="text"
-                                           size="mini"
-                                           icon="el-icon-delete"
-                                           @click="removeElementCustomProperty(index)" />
+                                    type="text"
+                                    size="mini"
+                                    icon="el-icon-delete"
+                                    @click="removeElementCustomProperty(index)"
+                                />
                             </div>
                         </div>
 
@@ -143,35 +167,43 @@
                         <div class="form-item">
                             <label class="form-label">负责人</label>
                             <el-select
-                                       v-model="properties.assignee"
-                                       @change="updateProperties"
-                                       filterable
-                                       placeholder="选择用户"
-                                       style="width: 100%">
+                                v-model="properties.assignee"
+                                @change="updateProperties"
+                                filterable
+                                placeholder="选择用户"
+                                style="width: 100%"
+                            >
                                 <el-option
-                                           v-for="user in userList"
-                                           :key="user.id"
-                                           :label="user.name"
-                                           :value="user.id" />
+                                    v-for="user in userList"
+                                    :key="user.id"
+                                    :label="user.name"
+                                    :value="user.id"
+                                />
                             </el-select>
                         </div>
                         <div class="form-item">
                             <label class="form-label">候选用户</label>
                             <el-input
-                                      v-model="properties.candidateUsers"
-                                      @change="updateProperties"
-                                      placeholder="多个用户用逗号分隔" />
+                                v-model="properties.candidateUsers"
+                                @change="updateProperties"
+                                placeholder="多个用户用逗号分隔"
+                            />
                         </div>
                         <div class="form-item">
                             <label class="form-label">候选组</label>
                             <el-input
-                                      v-model="properties.candidateGroups"
-                                      @change="updateProperties"
-                                      placeholder="例如: managers" />
+                                v-model="properties.candidateGroups"
+                                @change="updateProperties"
+                                placeholder="例如: managers"
+                            />
                         </div>
                         <div class="form-item">
                             <label class="form-label">优先级</label>
-                            <el-select v-model="properties.priority" @change="updateProperties" style="width: 100%">
+                            <el-select
+                                v-model="properties.priority"
+                                @change="updateProperties"
+                                style="width: 100%"
+                            >
                                 <el-option label="最高" value="100" />
                                 <el-option label="高" value="75" />
                                 <el-option label="普通" value="50" />
@@ -182,9 +214,10 @@
                         <div class="form-item">
                             <label class="form-label">到期时间</label>
                             <el-input
-                                      v-model="properties.dueDate"
-                                      @change="updateProperties"
-                                      placeholder="例如: P3D (3天)" />
+                                v-model="properties.dueDate"
+                                @change="updateProperties"
+                                placeholder="例如: P3D (3天)"
+                            />
                         </div>
                     </div>
                 </el-collapse-item>
@@ -199,7 +232,7 @@ export default {
     props: {
         element: Object,
         bpmnModeler: Object,
-        processElement: Object // 新增：流程元素
+        processElement: Object, // 新增：流程元素
     },
     data() {
         return {
@@ -208,7 +241,7 @@ export default {
                 id: '',
                 name: '',
                 versionTag: '',
-                isExecutable: true
+                isExecutable: true,
             },
             activeNames: ['basic', 'processBasic'],
             // activeNames: ['basic', 'processBasic','elementCustom','processCustom','userTask'],
@@ -225,8 +258,8 @@ export default {
                 { id: 'wangwu', name: '王五' },
                 { id: 'zhaoliu', name: '赵六' },
                 { id: '${manager}', name: '部门经理' },
-                { id: '${director}', name: '总监' }
-            ]
+                { id: '${director}', name: '总监' },
+            ],
         };
     },
     computed: {
@@ -267,14 +300,12 @@ export default {
         },
         outgoingSequenceFlows() {
             if (!this.element || !this.element.outgoing) return [];
-            return this.element.outgoing.filter(flow =>
-                flow.type === 'bpmn:SequenceFlow'
-            );
+            return this.element.outgoing.filter((flow) => flow.type === 'bpmn:SequenceFlow');
         },
         outgoingFlows() {
             if (!this.element || !this.element.outgoing) return [];
             return this.element.outgoing;
-        }
+        },
     },
     watch: {
         element: {
@@ -299,7 +330,7 @@ export default {
                     this.defaultFlow = '';
                     this.elementCustomProperties = [];
                 }
-            }
+            },
         },
         processElement: {
             immediate: true,
@@ -308,8 +339,8 @@ export default {
                     this.loadProcessProperties();
                     this.loadProcessCustomProperties();
                 }
-            }
-        }
+            },
+        },
     },
     methods: {
         resetActiveNames() {
@@ -328,11 +359,9 @@ export default {
             if (!this.element) return;
 
             // 加载各流向的条件
-            this.outgoingFlows.forEach(flow => {
+            this.outgoingFlows.forEach((flow) => {
                 const condition = flow.businessObject.conditionExpression;
-                this.$set(this.flowConditions, flow.id,
-                    condition ? condition.body : ''
-                );
+                this.$set(this.flowConditions, flow.id, condition ? condition.body : '');
             });
 
             // 加载默认流向（仅排他网关）
@@ -348,7 +377,7 @@ export default {
                     id: '',
                     name: '',
                     versionTag: '',
-                    isExecutable: true
+                    isExecutable: true,
                 };
                 return;
             }
@@ -358,7 +387,7 @@ export default {
                 id: businessObject.id || '',
                 name: businessObject.name || '',
                 versionTag: businessObject.versionTag || '',
-                isExecutable: businessObject.isExecutable !== false
+                isExecutable: businessObject.isExecutable !== false,
             };
         },
 
@@ -399,11 +428,11 @@ export default {
             try {
                 const extensionElements = this.createExtensionElements(
                     this.processCustomProperties,
-                    moddle
+                    moddle,
                 );
 
                 modeling.updateProperties(this.processElement, {
-                    extensionElements: extensionElements
+                    extensionElements: extensionElements,
                 });
 
                 this.$message.success('流程自定义属性更新成功');
@@ -417,7 +446,7 @@ export default {
         addCustomProperty() {
             this.processCustomProperties.push({
                 name: '',
-                value: ''
+                value: '',
             });
         },
 
@@ -450,11 +479,11 @@ export default {
             try {
                 const extensionElements = this.createExtensionElements(
                     this.elementCustomProperties,
-                    moddle
+                    moddle,
                 );
 
                 modeling.updateProperties(this.element, {
-                    extensionElements: extensionElements
+                    extensionElements: extensionElements,
                 });
 
                 this.$message.success('元素自定义属性更新成功');
@@ -468,7 +497,7 @@ export default {
         addElementCustomProperty() {
             this.elementCustomProperties.push({
                 name: '',
-                value: ''
+                value: '',
             });
         },
 
@@ -485,25 +514,25 @@ export default {
             }
 
             const properties = [];
-            extensionElements.values.forEach(value => {
+            extensionElements.values.forEach((value) => {
                 // 检查 camunda:Properties
                 if (value.$type === 'camunda:Properties') {
-                    value.values.forEach(prop => {
+                    value.values.forEach((prop) => {
                         if (prop.$type === 'camunda:Property') {
                             properties.push({
                                 name: prop.name || '',
-                                value: prop.value || ''
+                                value: prop.value || '',
                             });
                         }
                     });
                 }
                 // 也可以检查其他命名空间的属性
                 if (value.$type === 'flowable:Properties') {
-                    value.values.forEach(prop => {
+                    value.values.forEach((prop) => {
                         if (prop.$type === 'flowable:Property') {
                             properties.push({
                                 name: prop.name || '',
-                                value: prop.value || ''
+                                value: prop.value || '',
                             });
                         }
                     });
@@ -520,18 +549,22 @@ export default {
             }
 
             const properties = customProperties
-                .filter(prop => prop.name && prop.value)
-                .map(prop => moddle.create('camunda:Property', { // 使用 camunda:Property
-                    name: prop.name,
-                    value: prop.value
-                }));
+                .filter((prop) => prop.name && prop.value)
+                .map((prop) =>
+                    moddle.create('camunda:Property', {
+                        // 使用 camunda:Property
+                        name: prop.name,
+                        value: prop.value,
+                    }),
+                );
 
             if (properties.length === 0) {
                 return null;
             }
 
-            return moddle.create('camunda:Properties', { // 使用 camunda:Properties
-                values: properties
+            return moddle.create('camunda:Properties', {
+                // 使用 camunda:Properties
+                values: properties,
             });
         },
 
@@ -544,7 +577,7 @@ export default {
             }
 
             return moddle.create('bpmn:ExtensionElements', {
-                values: [propertiesElement]
+                values: [propertiesElement],
             });
         },
 
@@ -570,9 +603,15 @@ export default {
                 versionTag: businessObject.versionTag || '',
                 isExecutable: businessObject.isExecutable !== false,
                 implementation: this.getImplementationType(businessObject),
-                'flowable:class': businessObject.get ? businessObject.get('flowable:class') || '' : '',
-                'flowable:delegateExpression': businessObject.get ? businessObject.get('flowable:delegateExpression') || '' : '',
-                'flowable:expression': businessObject.get ? businessObject.get('flowable:expression') || '' : ''
+                'flowable:class': businessObject.get
+                    ? businessObject.get('flowable:class') || ''
+                    : '',
+                'flowable:delegateExpression': businessObject.get
+                    ? businessObject.get('flowable:delegateExpression') || ''
+                    : '',
+                'flowable:expression': businessObject.get
+                    ? businessObject.get('flowable:expression') || ''
+                    : '',
             };
         },
 
@@ -603,8 +642,8 @@ export default {
                     const moddle = this.bpmnModeler.get('moddle');
                     propertiesToUpdate.documentation = [
                         moddle.create('bpmn:Documentation', {
-                            text: propertiesToUpdate.documentation
-                        })
+                            text: propertiesToUpdate.documentation,
+                        }),
                     ];
                 }
 
@@ -615,13 +654,19 @@ export default {
 
                     switch (propertiesToUpdate.implementation) {
                         case '##JavaClass':
-                            propertiesToUpdate['flowable:class'] = this.properties['flowable:class'];
+                            propertiesToUpdate['flowable:class'] = this.properties[
+                                'flowable:class'
+                            ];
                             break;
                         case '##DelegateExpression':
-                            propertiesToUpdate['flowable:delegateExpression'] = this.properties['flowable:delegateExpression'];
+                            propertiesToUpdate['flowable:delegateExpression'] = this.properties[
+                                'flowable:delegateExpression'
+                            ];
                             break;
                         case '##Expression':
-                            propertiesToUpdate['flowable:expression'] = this.properties['flowable:expression'];
+                            propertiesToUpdate['flowable:expression'] = this.properties[
+                                'flowable:expression'
+                            ];
                             break;
                     }
                     delete propertiesToUpdate.implementation;
@@ -629,7 +674,6 @@ export default {
 
                 modeling.updateProperties(this.element, propertiesToUpdate);
                 this.$message.success('属性更新成功');
-
             } catch (error) {
                 console.error('更新属性失败:', error);
                 this.$message.error('更新属性失败: ' + error.message);
@@ -649,12 +693,12 @@ export default {
                 'bpmn:ParallelGateway': '并行网关',
                 'bpmn:InclusiveGateway': '包容网关',
                 'bpmn:SequenceFlow': '连接线',
-                'bpmn:Process': '流程定义'
+                'bpmn:Process': '流程定义',
             };
 
             return typeMap[this.element.type] || this.element.type;
-        }
-    }
+        },
+    },
 };
 </script>
 

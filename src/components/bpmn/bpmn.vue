@@ -5,21 +5,24 @@
             <div class="bpmn-canvas" ref="canvas"></div>
             <!-- 自定义属性面板 -->
             <!-- <el-drawer
-                       title="属性配置"
-                       :visible.sync="propertyDrawer"
-                       size="400px"
-                       direction="rtl"
-                       :before-close="handleDrawerClose">
+                        title="属性配置"
+                        :visible.sync="propertyDrawer"
+                        size="400px"
+                        direction="rtl"
+                        :before-close="handleDrawerClose">
 
             </el-drawer> -->
 
             <!-- 工具栏显示的地方 -->
             <!-- <div class="bpmn-js-properties-panel" id="js-properties-panel"></div> -->
-            <div class="bpmn-js-properties-panel" id="js-properties-panel"><custom-properties-panel
-                                         :process-element="processElement"
-                                         :element="selectedElement"
-                                         :bpmn-modeler="bpmnModeler"
-                                         @close="propertyDrawer = false" /></div>
+            <div class="bpmn-js-properties-panel" id="js-properties-panel">
+                <custom-properties-panel
+                    :process-element="processElement"
+                    :element="selectedElement"
+                    :bpmn-modeler="bpmnModeler"
+                    @close="propertyDrawer = false"
+                />
+            </div>
         </div>
 
         <!-- 把操作按钮写在这里面 -->
@@ -52,7 +55,11 @@
                 <el-button @click="perviewXML">xml预览</el-button>
                 <el-button @click="perviewSVG">svg预览</el-button>
             </el-button-group>
-
+            <create-definition
+                :submitMethod="submit"
+                :submitBackMethod="submitBack"
+                :backMethod="back"
+            />
             <!-- 预览弹出 -->
             <el-dialog title="XML预览" append-to-body width="80%" :visible.sync="perviewXMLShow">
                 <div style="max-height: 65vh;overflow: auto;">
@@ -69,25 +76,27 @@
 </template>
 
 <script>
-import BpmnModeler from "bpmn-js/lib/Modeler";
+import { addDefinition, updateDict } from '@/common/api/api';
+import BpmnModeler from 'bpmn-js/lib/Modeler';
 // 左边工具栏以及节点
-import propertiesProviderModule from "bpmn-js-properties-panel/lib/provider/camunda";
+import propertiesProviderModule from 'bpmn-js-properties-panel/lib/provider/camunda';
 // 右边的工具栏
-import propertiesPanelModule from "bpmn-js-properties-panel";
-import camundaModdleDescriptor from "camunda-bpmn-moddle/resources/camunda";
-import CustomPaletteProvider from './CustomPaletteProvider'
-import CustomContextPadProvider from './CustomContextPadProvider'
-import flowableModdle from './flowable.json'
+import propertiesPanelModule from 'bpmn-js-properties-panel';
+import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
+import CustomPaletteProvider from './CustomPaletteProvider';
+import CustomContextPadProvider from './CustomContextPadProvider';
+import flowableModdle from './flowable.json';
 import CustomPropertiesPanel from './CustomPropertiesPanel.vue';
-
+import CreateDefinition from '../../page/workflow/components/form-button-group.vue';
 
 // 汉化
-import customTranslate from "./customTranslate";
+import customTranslate from './customTranslate';
 
 export default {
-    name: "bpmn",
+    name: 'bpmn',
     components: {
-        CustomPropertiesPanel
+        CustomPropertiesPanel,
+        CreateDefinition,
     },
     data() {
         return {
@@ -104,64 +113,74 @@ export default {
             bpmnTemplate: `
             <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="sid-38422fae-e03e-43a3-bef4-bd33b32041b2" targetNamespace="http://bpmn.io/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="5.1.2">
-  <process id="Process_1" isExecutable="false">
+    <process id="Process_1" isExecutable="false">
     <startEvent id="StartEvent_1y45yut" name="开始">
-      <outgoing>SequenceFlow_0h21x7r</outgoing>
+        <outgoing>SequenceFlow_0h21x7r</outgoing>
     </startEvent>
     <sequenceFlow id="SequenceFlow_0h21x7r" sourceRef="StartEvent_1y45yut" targetRef="Activity_0x06wtw" />
     <userTask id="Activity_0x06wtw">
-      <incoming>SequenceFlow_0h21x7r</incoming>
-      <outgoing>Flow_0qiynkn</outgoing>
+        <incoming>SequenceFlow_0h21x7r</incoming>
+        <outgoing>Flow_0qiynkn</outgoing>
     </userTask>
     <endEvent id="Event_0sevwlp" name="结束">
-      <incoming>Flow_0qiynkn</incoming>
+        <incoming>Flow_0qiynkn</incoming>
     </endEvent>
     <sequenceFlow id="Flow_0qiynkn" sourceRef="Activity_0x06wtw" targetRef="Event_0sevwlp" />
-  </process>
-  <bpmndi:BPMNDiagram id="BpmnDiagram_1">
+    </process>
+    <bpmndi:BPMNDiagram id="BpmnDiagram_1">
     <bpmndi:BPMNPlane id="BpmnPlane_1" bpmnElement="Process_1">
-      <bpmndi:BPMNEdge id="Flow_0qiynkn_di" bpmnElement="Flow_0qiynkn">
+    <bpmndi:BPMNEdge id="Flow_0qiynkn_di" bpmnElement="Flow_0qiynkn">
         <omgdi:waypoint x="370" y="120" />
         <omgdi:waypoint x="452" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0h21x7r_di" bpmnElement="SequenceFlow_0h21x7r">
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="SequenceFlow_0h21x7r_di" bpmnElement="SequenceFlow_0h21x7r">
         <omgdi:waypoint x="188" y="120" />
         <omgdi:waypoint x="270" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="StartEvent_1y45yut_di" bpmnElement="StartEvent_1y45yut">
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="StartEvent_1y45yut_di" bpmnElement="StartEvent_1y45yut">
         <omgdc:Bounds x="152" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds x="160" y="145" width="22" height="14" />
+            <omgdc:Bounds x="160" y="145" width="22" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0x06wtw_di" bpmnElement="Activity_0x06wtw">
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Activity_0x06wtw_di" bpmnElement="Activity_0x06wtw">
         <omgdc:Bounds x="270" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0sevwlp_di" bpmnElement="Event_0sevwlp">
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Event_0sevwlp_di" bpmnElement="Event_0sevwlp">
         <omgdc:Bounds x="452" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds x="459" y="145" width="22" height="14" />
+            <omgdc:Bounds x="459" y="145" width="22" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
+    </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
+    </bpmndi:BPMNDiagram>
 </definitions>
-        `
+        `,
         };
     },
     methods: {
-        newDiagram() {
-            this.createNewDiagram(this.bpmnTemplate);
+        async newDiagram() {
+            await this.$confirm('此操作将永久删除当前模型, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+            });
+            // 用户点击确定后执行
+            this.$message({
+                type: 'success',
+                message: '新建成功!',
+            });
+            await this.createNewDiagram(this.bpmnTemplate);
         },
         handlerRedo() {
-            this.bpmnModeler.get("commandStack").redo();
+            this.bpmnModeler.get('commandStack').redo();
         },
         handlerUndo() {
-            this.bpmnModeler.get("commandStack").undo();
+            this.bpmnModeler.get('commandStack').undo();
         },
         handlerZoom(radio) {
             const newScale = !radio ? 1.0 : this.scale + radio;
-            this.bpmnModeler.get("canvas").zoom(newScale);
+            this.bpmnModeler.get('canvas').zoom(newScale);
             this.scale = newScale;
         },
         downloadBpmn() {
@@ -181,19 +200,17 @@ export default {
                     const name = `${this.getFilename(xml)}.svg`;
 
                     // 从建模器画布中提取svg图形标签
-                    let context = "";
-                    const djsGroupAll = this.$refs.canvas.querySelectorAll(".djs-group");
+                    let context = '';
+                    const djsGroupAll = this.$refs.canvas.querySelectorAll('.djs-group');
                     for (let item of djsGroupAll) {
                         context += item.innerHTML;
                     }
                     // 获取svg的基本数据，长宽高
-                    const viewport = this.$refs.canvas
-                        .querySelector(".viewport")
-                        .getBBox();
+                    const viewport = this.$refs.canvas.querySelector('.viewport').getBBox();
 
                     // 将标签和数据拼接成一个完整正常的svg图形
                     const svg = `
-              <svg
+            <svg
                 xmlns="http://www.w3.org/2000/svg"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 width="${viewport.width}"
@@ -202,7 +219,7 @@ export default {
                 version="1.1"
                 >
                 ${context}
-              </svg>
+            </svg>
             `;
                     // 将文件名以及数据交给下载方法
                     this.download({ name: name, data: svg });
@@ -213,7 +230,7 @@ export default {
         openBpmn(file) {
             const reader = new FileReader();
             // 读取File对象中的文本信息，编码格式为UTF-8
-            reader.readAsText(file, "utf-8");
+            reader.readAsText(file, 'utf-8');
             reader.onload = () => {
                 //读取完毕后将文本信息导入到Bpmn建模器
                 this.createNewDiagram(reader.result);
@@ -222,14 +239,14 @@ export default {
         },
 
         getFilename(xml) {
-            let start = xml.indexOf("process");
-            let filename = xml.substr(start, xml.indexOf(">"));
-            filename = filename.substr(filename.indexOf("id") + 4);
+            let start = xml.indexOf('process');
+            let filename = xml.substr(start, xml.indexOf('>'));
+            filename = filename.substr(filename.indexOf('id') + 4);
             filename = filename.substr(0, filename.indexOf('"'));
             return filename;
         },
 
-        download({ name = "diagram.bpmn", data }) {
+        download({ name = 'diagram.bpmn', data }) {
             // 这里就获取到了之前设置的隐藏链接
             const downloadLink = this.$refs.downloadLink;
             // 把数据转换为URI，下载要用到的
@@ -237,8 +254,7 @@ export default {
 
             if (data) {
                 // 将数据给到链接
-                downloadLink.href =
-                    "data:application/bpmn20-xml;charset=UTF-8," + encodedData;
+                downloadLink.href = 'data:application/bpmn20-xml;charset=UTF-8,' + encodedData;
                 // 设置文件名
                 downloadLink.download = name;
                 // 触发点击事件开始下载
@@ -249,21 +265,58 @@ export default {
         async perviewXML() {
             try {
                 const { xml } = await this.bpmnModeler.saveXML({ format: true });
-                this.perviewXMLStr = xml
-                this.perviewXMLShow = true
+                this.perviewXMLStr = xml;
+                this.perviewXMLShow = true;
             } catch (error) {
-                this.toast.error('预览失败，请重试')
+                this.toast.error('预览失败，请重试');
             }
         },
         // SVG预览
         async perviewSVG() {
             try {
                 const { svg } = await this.bpmnModeler.saveSVG();
-                this.perviewSVGData = svg
-                this.perviewSVGShow = true
+                this.perviewSVGData = svg;
+                this.perviewSVGShow = true;
             } catch (error) {
-                this.toast.error('预览失败，请重试')
+                this.toast.error('预览失败，请重试');
             }
+        },
+        async submit() {
+            try {
+                const { xml } = await this.bpmnModeler.saveXML({ format: true });
+                console.log('提交的xml数据', xml);
+                console.log('processElement', this.processElement);
+                const params = {
+                    bpmnXml: xml,
+                    name: this.processElement.businessObject.name || '未命名流程',
+                    processId: this.processElement.businessObject.id || 'undefined_key',
+                    version: 1,
+                    status: 'active',
+                };
+                let res = await addDefinition(params);
+                if (res.data.code == '1000') {
+                    this.$message({
+                        type: 'success',
+                        message: '提交成功!',
+                    });
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: '保存失败',
+                    });
+                }
+            } catch (error) {
+                console.error('提交失败', error);
+                this.$message.error('提交失败，请重试');
+            }
+        },
+        async submitBack() {
+            await this.submit();
+            //  this.$router.push(`/system/dict`).catch((error) => error);
+            this.back();
+        },
+        back() {
+            this.$router.back();
         },
         handleDrawerClose(done) {
             this.propertyDrawer = false;
@@ -289,7 +342,7 @@ export default {
 
             // 将汉化包装成一个模块
             const customTranslateModule = {
-                translate: ["value", customTranslate]
+                translate: ['value', customTranslate],
             };
 
             // 创建Bpmn对象
@@ -299,7 +352,7 @@ export default {
 
                 // 加入工具栏支持
                 propertiesPanel: {
-                    parent: "#js-properties-panel"
+                    parent: '#js-properties-panel',
                 },
                 additionalModules: [
                     // 工具栏模块
@@ -312,9 +365,9 @@ export default {
                 ],
                 moddleExtensions: {
                     // camunda: camundaModdleDescriptor,
-                    flowable: camundaModdleDescriptor 
-                    // flowable: flowableModdle 
-                }
+                    flowable: camundaModdleDescriptor,
+                    // flowable: flowableModdle
+                },
             });
 
             // 监听元素选择
@@ -349,7 +402,7 @@ export default {
                 console.log(warnings);
             } catch (err) {
                 if (err) {
-                    this.$Message.error("打开模型出错,请确认该模型符合Bpmn2.0规范");
+                    this.$Message.error('打开模型出错,请确认该模型符合Bpmn2.0规范');
                 }
                 console.log(err.message, err.warnings);
             }
@@ -357,19 +410,18 @@ export default {
             // 自动缩放到适应屏幕大小
             // this.bpmnModeler.get("canvas").zoom("fit-viewport");
             // this.scale = this.bpmnModeler.get("canvas").zoom();
-        }
+        },
     },
     mounted() {
         this.init();
-
     },
     computed: {
         // 滚动区高度
         // (业务需求：手机屏幕高度减去头部标题和底部tabbar的高度，当然这2个高度也是可以动态获取的)
-        scrollerHeight: function () {
-            return (window.innerHeight - 200) + 'px';
-        }
-    }
+        scrollerHeight: function() {
+            return window.innerHeight - 200 + 'px';
+        },
+    },
 };
 </script>
 
@@ -388,7 +440,8 @@ export default {
 .bpmn-canvas {
     width: 100%;
     /* height: 100vh; */
-    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+') repeat !important;
+    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+')
+        repeat !important;
 }
 
 .bpmn-js-properties-panel {

@@ -1,246 +1,192 @@
 <template>
-  <div id="centre">
-    <el-row :gutter="20" class="el-row">
-      <el-col :span="2">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <img class="checkbox" src="@/assets/main/checkbox.png" alt="checkbox" />
+  <div id="centre" ref="myElement">
+    <el-calendar>
+      <template slot="dateCell" slot-scope="{date, data}">
+        <el-popover
+                    :open-delay="500"
+                    v-if="reversedMessage(data.day)"
+                    placement="top-start"
+                    :width="tipesWidth"
+                    trigger="hover">
+          <div class="el-popover__title day-title">今日提醒</div>
+          <div class="el-popover__title" style="text-align: center">{{ data.day }}</div>
+          <div v-for="(item, index) in reversedMessage(data.day).data" :key="index">
+            <el-row>
+              <el-col :span="6">时间：</el-col>
+              <el-col :span="18">{{ item.startDate.substring(11) }} - {{ item.endDate.substring(11) }}</el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="6">标题：</el-col>
+              <el-col :span="18">{{ item.title }}</el-col>
+            </el-row>
+            <br v-if="index != reversedMessage(data.day).data.length - 1" />
           </div>
-          <div><span style="color: grey;">Task</span></div>
-          <div><span style="color: grey;">Completed</span></div>
-          <div><span style="font-size:xx-large ;font-weight: bolder;">24</span></div>
-          <div><span style="color: red;">-9%</span></div>
-        </el-card></el-col>
-      <el-col :span="6">
-        <el-card class="box-card" body-style="padding: 0;">
-          <el-row align="bottom">
-            <el-col :span="12">
-              <div style="width: 100%;height:32%;align-content: end;"><span style="color: grey;">Total User</span>
-              </div>
-              <div style="width: 100%;height:32%;align-content: center;"><span
-                      style="font-size:xxx-large ;font-weight: bolder;">{{ userChange.total }}</span>
-              </div>
-              <div style="width: 100%;height:32%;">
-                <span style="color: grey;font-size: large;"><img class="curves" src="@/assets/main/curves.png"
-                       alt="curves" />
-                  <span v-if="userChangeNum > 0" style="color: green;font-size: large;">+{{ userChangeNum }}% Inc</span>
-                  <span v-else style="color: red;font-size: large;">{{ userChangeNum }}% Red</span>
-                </span>
-              </div>
-            </el-col>
-            <el-col :span="12">
-              <div id="drawUserPic" :style="{ width: '198px', height: '198px' }"></div>
-            </el-col>
-          </el-row>
-        </el-card></el-col>
-      <el-col :span="6"><el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>卡片名称</span>
-            <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+          <div slot="reference" class="test" @click="dayClick(data.day)">
+            <div class="jcs-day">{{ data.day.split('-').slice(2).join('-') }}</div>
+            <div :class="[reversedMessage(data.day) && !data.isSelected ? 'jcs' : 'done']">{{ data.isSelected ? '✔️' :
+              '' }}
+            </div>
           </div>
-          <div v-for="o in 4" :key="o" class="text item">
-            {{ "列表内容 " + o }}
+        </el-popover>
+        <div v-else class="test" @click="dayClick(data.day)">
+          <div class="jcs-day">{{ data.day.split('-').slice(2).join('-') }}</div>
+          <div :class="[reversedMessage(data.day) && !data.isSelected ? 'jcs' : 'done']">{{ data.isSelected ? '✔️' : ''
+            }}
           </div>
-        </el-card></el-col>
-      <el-col :span="6"><el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>卡片名称</span>
-            <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
-          </div>
-          <div v-for="o in 4" :key="o" class="text item">
-            {{ "列表内容 " + o }}
-          </div>
-        </el-card></el-col>
-    </el-row>
+        </div>
+      </template>
+    </el-calendar>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'centre',
+  name: "CalendarDemo",
   data() {
     return {
-      tableData: {
-        data1: [
-          { buss: "结婚", cast: 12, income: 21, sum: 2 },
-          { buss: "过年", cast: 21, income: 12, sum: 2 },
-        ],
-        data2: [
-          { name: "张三", cast: 12, income: 21, sum: 2 },
-          { name: "李四", cast: 21, income: 12, sum: 2 },
-        ],
-        data3: [{ buss: "结婚", name: "张三", amt: 1233, type: "收入" }],
-        data4: [{ date: "asd", name: "jj", address: "长沙" }],
-      },
-      userChange: {
-        add: 10,
-        total: 100,
-        delete: 2
-      }
-    };
-  },
-  methods: {
-    drawLine() {
-      let myChart = this.$echarts.init(document.getElementById("myChart"));
-      // 绘制图表
-      myChart.setOption({
-        title: { text: "在Vue中使用echarts" },
-        tooltip: {},
-        xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+      tipesWidth: 0,
+      cData: [
+        {
+          "data": [
+            {
+              "content": "测试01",
+              "createDate": "2021-02-01 10:00:27",
+              "createUser": "EB3764DA0D4B0A42A7C2EE176116748F",
+              "endDate": "2021-02-02 11:59:59",
+              "id": "c0423050ea6352d295e995a2d5e40b94",
+              "isDelete": 0,
+              "startDate": "2021-02-02 01:00:00",
+              "title": "测试01"
+            },
+            {
+              "content": "测试02",
+              "createDate": "2021-02-01 12:00:27",
+              "createUser": "EB3764DA0D4B0A42A7C2EE176116748F",
+              "endDate": "2021-02-02 22:59:59",
+              "id": "c0423050ea6352d295e995a2d5e40b94",
+              "isDelete": 0,
+              "startDate": "2021-02-02 09:00:00",
+              "title": "测试02"
+            }
+          ],
+          "date": "2025-01-25"
         },
-        yAxis: {},
-        series: [
-          {
-            name: "销量",
-            type: "bar",
-            data: [5, 20, 36, 10, 10, 20],
-          },
-        ],
-      });
-    },
-    drawUserPic() {
-      // 初始化ECharts实例
-      this.drawUserPic = this.$echarts.init(document.getElementById("drawUserPic"));
-
-      // 绘制图表
-      this.drawUserPic.setOption({
-        tooltip: {
-          trigger: 'item'
+        {
+          "data": [
+            {
+              "content": "测试测试测试",
+              "createDate": "2021-02-01 10:00:27",
+              "createUser": "EB3764DA0D4B0A42A7C2EE176116748F",
+              "endDate": "2021-02-03 23:59:59",
+              "id": "c0423050ea6352d295e995a2d5e40b94",
+              "isDelete": 0,
+              "startDate": "2021-02-03 00:00:00",
+              "title": "测试"
+            }
+          ],
+          "date": "2025-01-24"
         },
-        //铭文
-        legend: {
-          show: false,
-          top: '5%',
-          left: 'center'
-        },
-        series: [
-          {
-            name: 'Access From',
-            type: 'pie',
-            //圆弧内半径和外半径
-            radius: ['55%', '70%'],
-            avoidLabelOverlap: false,
-            padAngle: 2,
-            itemStyle: {
-              borderRadius: 10
-            },
-            label: {
-              normal: {
-                show: true,
-                position: 'center',
-                color: '#4c4a4a',
-                formatter: '{total|' + '+1位' + '}' + '\n\r' + '{active|活跃用户}',
-                rich: {
-                  total: {
-                    fontSize: 20,
-                    fontFamily: "微软雅黑",
-                    color: '#454c5c'
-                  },
-                  active: {
-                    fontFamily: "微软雅黑",
-                    fontSize: 12,
-                    color: '#6c7a89',
-                    lineHeight: 30,
-                  },
-                }
-              },
-              emphasis: {//中间文字显示
-                show: true,
-              }
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 40,
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: false
-            },
-            data: [
-              // { value: 1048, name: '全部', itemStyle : {normal : {color :'#76d1fa'}} },
-              // { value: 110, name: '新增', itemStyle : {normal : {color :'#31cc88'}} },
-              // { value: 20, name: '删除', itemStyle : {normal : {color :'#f84d20'}} }, 
-              { value: this.userChange.total, name: '全部' },
-              { value: this.userChange.add, name: '新增' },
-              { value: this.userChange.delete, name: '删除' },
-            ]
-          },
-        ]
-      });
-    },
-  },
-  computed:{
-    userChangeNum() {
-      return this.userChange.add-this.userChange.delete
+        {
+          "data": [
+            {
+              "content": "测试01测试01测试01测试01测试01",
+              "createDate": "2021-02-01 10:25:27",
+              "createUser": "EB3764DA0D4B0A42A7C2EE176116748F",
+              "endDate": "2021-02-18 21:00:00",
+              "id": "ee0851a0696089665e7c6c92c98185a7",
+              "isDelete": 0,
+              "startDate": "2021-02-18 00:00:00",
+              "title": "测试01测试01测试01测试01"
+            }
+          ],
+          "date": "2025-01-23"
+        }
+      ],
+      count: 0
     }
   },
   mounted() {
-    // 新建一个promise对象
-    let newPromise = new Promise((resolve) => {
-      resolve();
-    });
-    //然后异步执行echarts的初始化函数
-    newPromise.then(() => {
-      // this.drawLine();
-    });
+    window.addEventListener('resize', this.handleWindow, true)
 
-    // 使用箭头函数保持this上下文
-    setTimeout(() => {
-      this.drawUserPic();
-    }, 0);
-
-    // 使用箭头函数保持this上下文
-    window.addEventListener('resize', () => {
-      if (this.drawUserPic) {
-        this.drawUserPic.resize();
-      }
+    // 当组件挂载完成后执行    
+    this.$nextTick(() => {
+      this.conputeTitpsWidth();
     });
-
   },
+
+  methods: {
+  
+    // 滚动对应高亮
+    handleWindow(e) {
+      this.conputeTitpsWidth();
+      console.log(e)
+    },
+    conputeTitpsWidth() {
+      const elementWidth = this.$refs.myElement.offsetWidth;
+      this.tipesWidth = elementWidth / 7 - 30;
+    },
+    reversedMessage: function (val) {
+      return this.cData.find(function (data) {
+        return data.date === val;
+      })
+    },
+    dayClick(val) {
+      alert(val)
+    }
+  }
 }
 </script>
 <style scoped>
-.el-card span .font2 {
-  color: gainsboro !important;
-  font-size: large;
-  font-weight: bolder;
-}
-
-.checkbox {
-  cursor: pointer;
-  height: 40px;
-  margin-left: 0;
-}
-
-.curves {
-  cursor: pointer;
+.jcs {
+  background: #fb8c8c;
+  position: absolute;
+  top: 10%;
+  right: 5%;
+  width: 10px;
   height: 10px;
-  margin-left: 0;
-  padding-right: 5px;
+  border-radius: 10px;
 }
 
-.el-row {
-  margin-left: 50px !important;
-  margin-right: 50px !important;
-  margin-bottom: 20px;
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
+.done {
+  position: absolute;
+  bottom: 10%;
+  right: 5%;
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
 }
 
-.el-row:last-child {
-  margin-bottom: 0;
+.test {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
-.el-col {
-  border-radius: 4px;
+.el-calendar-day {}
+
+.jcs-day {
+  position: absolute;
+  top: 35%;
+  left: 40%;
+
 }
 
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
+.day-title {
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: #1aae50;
+  text-align: center;
+  border-bottom: 1px solid #e6e6e6;
+  padding: 0 0 6px 0;
+  margin: 0 0 10px 0;
+}
+
+.test01 {
+  width: 640px;
+  margin-left: 200px;
+}
+
+.is-selected {
+  color: #1989FA;
 }
 </style>

@@ -26,6 +26,11 @@ import Centre from "@/components/centre";
 import Home from "@/view/home/home";
 import Workflow from "@/page/workflow/workflow";
 import WorkflowModel from "@/page/workflow/model";
+// import WorkflowModel2 from "@/page/workflow/model2";
+import taskList from "@/page/workflow/taskList";
+import DefinitionList from "@/page/workflow/definitionList";
+import DefinitionForm from "@/page/workflow/definitionForm";
+import workflowDashboard from "@/page/workflow/workflowDashboard";
 
 Vue.use(Router);
 
@@ -41,11 +46,35 @@ const routes = [
         component: Workflow,
         children: [
           {
+            path: "/workflow/workflowDashboard",
+            name: "workflowDashboard",
+            component: workflowDashboard, meta: { title: "工作台", }
+          },
+          {
+            path: "/workflow/taskList",
+            name: "taskList",
+            component: taskList, meta: { title: "代办任务", }
+          },
+          {
             path: "/workflow/model",
             name: "WorkflowModel",
             component: WorkflowModel, meta: { title: "流程模型", }
           },
-        
+          // {
+          //   path: "/workflow/model2",
+          //   name: "WorkflowModel2",
+          //   component: WorkflowModel2, meta: { title: "流程模型", }
+          // },
+          {
+            path: "/workflow/definitionList",
+            name: "DefinitionList",
+            component: DefinitionList, meta: { title: "流程模型列表", }
+          }, {
+            path: "/workflow/definitionForm",
+            name: "DefinitionForm",
+            component: DefinitionForm, meta: { title: "流程模型表单", }
+          },
+
         ]
       },
       {
@@ -216,7 +245,7 @@ const routes = [
     name: "Home",
     component: Home, meta: { title: "home", }
   },
-  
+
 ];
 
 const router = new Router({

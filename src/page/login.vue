@@ -13,7 +13,16 @@
         element-loading-text="登录中"
         element-loading-spinner="el-icon-loading" 
       element-loading-background="rgba(0, 0, 0, 0.8)" -->
-        <h3 class="login_title">Cavy</h3>
+        <h3 class="login_title">
+          <div style="width: 100%">
+            <div class="logintitlecontainer">
+              <div class="logintitlecontent">
+                Cavy
+              </div>
+            </div>
+          </div>
+
+        </h3>
         <el-form-item prop="username">
           <el-input
                     class="login-el-input"
@@ -154,15 +163,37 @@ export default {
   },
 };
 </script>
-<style >
+<style>
 #poster {
-  background-image: linear-gradient(to left, #fd79a8, #a29bfe);
+  /* background-image: linear-gradient(to left, #fd79a8, #a29bfe); */
+  background: linear-gradient(-45deg, #fd79a8, #a29bfe, #a18cd1 0%, #fbc2eb 100%);
+  animation: posterBG 10s ease infinite;
+  -webkit-animation: posterBG 10s ease infinite;
+  -moz-animation: posterBG 10s ease infinite;
   /*background: url("../assets/imgs/backgroud.jpg") no-repeat;*/
   background-position: center;
   height: 100%;
   width: 100%;
   background-size: cover;
   position: fixed;
+  /* 背景尺寸 - 原理3 */
+  background-size: 1400% 300%;
+  /* 循环动画 - 原理4 */
+  /* animation: posterBG 5s ease infinite; */
+}
+
+@keyframes posterBG {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 body {
@@ -172,7 +203,7 @@ body {
 
 .loginbutton {
   display: block;
-  margin: 0 auto;
+  margin: 15px auto;
   text-align: center;
   /*height: 24px;*/
   padding: 12px;
@@ -182,18 +213,20 @@ body {
   border: none;
   justify-content: center;
   border-radius: 10px;
-  background-image: linear-gradient(to left, #fd79a8, #a29bfe);
+  background-image: linear-gradient(to left, #a18cd1 0%, #fbc2eb 100%);
 }
 
 .login-container {
   border-radius: 10px;
   background-clip: padding-box;
-  margin: 90px auto;
+  margin: calc(30vh) auto;
   width: 350px;
   padding: 35px 35px 15px 35px;
-  background: #fff;
   /*border: 1px solid #eaeaea;*/
-  /*box-shadow: 0 0 25px #cac6c6;*/
+  box-shadow: 0 0 25px #cac6c6;
+  background: #fff;
+  backdrop-filter: blur(2px);
+  border-radius: 15px;
 }
 
 .login-el-input {
@@ -208,7 +241,45 @@ body {
   font: 900 40px "";
   letter-spacing: 2px;
 }
+
+.logintitlecontainer {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #eff0f4;
+}
+
+.logintitlecontainer .logintitlecontent {
+  color: #2e5c76;
+  font-size: 80px;
+  font-family: "SourceHanSansCN-Bold" !important;
+  font-weight: 600;
+  position: relative;
+  z-index: 2;
+}
+
+.logintitlecontainer .logintitlecontent::after {
+  content: attr(data-text);
+  color: #000;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: translate(-26px, 16px) skew(50deg) scaleY(0.6);
+  z-index: 1;
+  filter: blur(3px);
+  mask-image: linear-gradient(transparent, #000);
+}
 </style>
+
+
+
+
+
+
+
+
 <style scoped>
 .el-input__inner {
   border: 0;

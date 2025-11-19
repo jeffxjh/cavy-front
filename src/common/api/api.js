@@ -113,11 +113,11 @@ export const roleList = params => {
   return postRequest("/role", params, true, "#role");
 };
 //todo 获取角色列表
-export const userGetRoleList = (params,arg) => {
+export const userGetRoleList = (params, arg) => {
   return postRequest("/role", params);
 };
 //根据用户名称获取角色列表
-export const getRoleByUserName = (params,arg) => {
+export const getRoleByUserName = (params, arg) => {
   return getRequest("/role/getRoleByUserName", params);
 };
 // 新建角色
@@ -155,16 +155,16 @@ export const listMenu = params => {
 };
 // 菜单详情
 export const getMenu = params => {
-  return getRequest("/menu/"+params, params);
+  return getRequest("/menu/" + params, params);
 };
-// 菜单删除 
+// 菜单删除
 export const delMenu = params => {
-  return deleteRequest("/menu/"+params, params);
-}; 
+  return deleteRequest("/menu/" + params, params);
+};
 // 添加菜单
 export const addMenu = params => {
   return postJsonRequest("/menu/add", params);
-}; 
+};
 // 修改菜单
 export const updateMenu = params => {
   return postJsonRequest("/menu/update", params);
@@ -178,20 +178,20 @@ export const pageDict = params => {
 };
 // 详情数据字典
 export const getDict = params => {
-  return getRequest("/dict/"+params, params);
+  return getRequest("/dict/" + params, params);
 };
-// 删除数据字典 
+// 删除数据字典
 export const delDict = params => {
-  return deleteRequest("/dict/del/"+params, params);
+  return deleteRequest("/dict/del/" + params, params);
 };
-// 删除数据字典项 
+// 删除数据字典项
 export const delDictItem = params => {
-  return deleteRequest("/dict/item/del/"+params, params);
-}; 
+  return deleteRequest("/dict/item/del/" + params, params);
+};
 // 添加数据字典
 export const addDict = params => {
   return postJsonRequest("/dict/add", params);
-}; 
+};
 // 修改数据字典
 export const updateDict = params => {
   return postJsonRequest("/dict/update", params);
@@ -206,14 +206,18 @@ export const pageFavourRelate = params => {
 };
 // 删除亲友
 export const delFavourRelate = params => {
-  return deleteRequest("/favour/relate/"+params, params);
+  return deleteRequest("/favour/relate/" + params, params);
 };
 
 // 添加亲友
 export const addFavourRelate = params => {
   return postJsonRequest("/favour/relate/add", params);
-}; 
+};
 // 修改亲友
 export const updateFavourRelate = params => {
   return postJsonRequest("/favour/relate/update", params);
+};
+// 新增模型定义
+export const addDefinition = params => {
+  return postJsonRequest("/workflow/definition", params);
 };
