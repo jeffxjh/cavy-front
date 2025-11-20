@@ -332,9 +332,9 @@ export default {
         // 判断表格是否有子项，无子项不显示展开按钮
         getRowClass(row, rowIndex) {
             // children 是你子项的数组 key
-            // if (row.row.childrenData.length === 0) {
-            //     return 'row-expand-cover';
-            // }
+            if (row.row?.childrenData?.length === 0) {
+                return 'row-expand-cover';
+            }
         },
         handleCreate() {
             this.$router.push(`/workflow/definitionForm`).catch((error) => error);
