@@ -217,7 +217,23 @@ export const addFavourRelate = params => {
 export const updateFavourRelate = params => {
   return postJsonRequest("/favour/relate/update", params);
 };
+// 分页查询数据字典
+export const pageDefinition = params => {
+  return postJsonRequest("/workflow/definition/queryPage", params);
+};
 // 新增模型定义
 export const addDefinition = params => {
   return postJsonRequest("/workflow/definition", params);
+};
+// 详情数据字典
+export const getDefinition = params => {
+  return getRequest("/workflow/definition" + params, params);
+};
+// 修改数据字典
+export const updateDefinition = params => {
+  return postJsonRequest("/workflow/definition", params);
+};
+// 删除数据字典
+export const delDefinition = params => {
+  return deleteRequest("/workflow/definition" + params, params);
 };

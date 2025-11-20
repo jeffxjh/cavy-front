@@ -1,11 +1,11 @@
 <template>
-    <div id="user">
+    <div id="definitionList" class="definition-list">
         <el-breadcrumb separator="/" style="margin-bottom: 10px; font-size: 15px">
             <el-breadcrumb-item :to="{ path: '/main' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item :to="{ path: '/system' }">
-                系统管理
+                流程管理
             </el-breadcrumb-item>
-            <el-breadcrumb-item>字典管理</el-breadcrumb-item>
+            <el-breadcrumb-item>流程模型</el-breadcrumb-item>
         </el-breadcrumb>
         <div style="margin-bottom: 18px">
             <el-input
@@ -98,18 +98,24 @@
                     ></el-pagination>
                 </template>
             </el-table-column>
-            <el-table-column
-                prop="name"
-                label="字典名称"
-                :render-header="addRedStar"
-            ></el-table-column>
-            <el-table-column
-                prop="code"
-                label="字典编码"
-                :render-header="addRedStar"
-            ></el-table-column>
-            <el-table-column prop="addUser" label="添加人" width="180"></el-table-column>
-            <el-table-column prop="addTime" label="添加日期" width="200"></el-table-column>
+            <el-table-column prop="name" label="模型名称"></el-table-column>
+            <el-table-column prop="processId" label="定义编码"></el-table-column>
+            <el-table-column prop="defKey" label="部署编码"></el-table-column>
+            <el-table-column prop="version" label="版本"></el-table-column>
+            <el-table-column prop="defStatus" label="部署状态">
+                <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">
+                        <el-tag size="medium">{{ scope.row.defStatus }}</el-tag>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column prop="status" label="启用状态">
+                <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">
+                        <el-tag size="medium">{{ scope.row.status }}</el-tag>
+                    </div>
+                </template>
+            </el-table-column>
             <el-table-column label="操作" width="280">
                 <template slot-scope="scope">
                     <el-button
@@ -185,7 +191,7 @@
 </template>
 
 <script>
-import { pageDict, getDict, addDictItem, delDict, delDictItem } from '@/common/api/api';
+import { pageDefinition, getDefinition, addDefinition, delDefinition } from '@/common/api/api';
 
 export default {
     name: 'Dict',
@@ -264,7 +270,7 @@ export default {
         },
         getList() {
             this.listLoading = true;
-            pageDict(this.params)
+            pageDefinition(this.params)
                 .then((response) => {
                     //   that.tableData = response.data.data.data.map((item, index) => {
                     //     // item.id = index;
@@ -326,9 +332,9 @@ export default {
         // 判断表格是否有子项，无子项不显示展开按钮
         getRowClass(row, rowIndex) {
             // children 是你子项的数组 key
-            if (row.row.childrenData.length === 0) {
-                return 'row-expand-cover';
-            }
+            // if (row.row.childrenData.length === 0) {
+            //     return 'row-expand-cover';
+            // }
         },
         handleCreate() {
             this.$router.push(`/workflow/definitionForm`).catch((error) => error);
