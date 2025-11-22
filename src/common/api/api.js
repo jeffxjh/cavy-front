@@ -237,3 +237,41 @@ export const updateDefinition = params => {
 export const delDefinition = params => {
   return deleteRequest("/workflow/definition" + params, params);
 };
+
+// api/dashboard.js
+export default {
+  // 获取统计数据
+  getStats() {
+    return request({
+      url: '/dashboard/stats',
+      method: 'get'
+    })
+  },
+
+  // 获取趋势数据
+  getTrendData(params) {
+    return request({
+      url: '/dashboard/trend',
+      method: 'get',
+      params
+    })
+  },
+
+  // 获取待办任务
+  getPendingTasks(params) {
+    return request({
+      url: '/dashboard/pending-tasks',
+      method: 'get',
+      params
+    })
+  },
+
+  // 获取最近任务
+  getRecentTasks(params) {
+    return request({
+      url: '/dashboard/recent-tasks',
+      method: 'get',
+      params
+    })
+  }
+}

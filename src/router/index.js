@@ -31,7 +31,7 @@ import Demo from "@/page/workflow/bussiness/demo";
 import taskList from "@/page/workflow/taskList";
 import DefinitionList from "@/page/workflow/definitionList";
 import DefinitionForm from "@/page/workflow/definitionForm";
-import workflowDashboard from "@/page/workflow/workflowDashboard";
+import WorkflowDashboard from "@/page/workflow/dashboard";
 
 Vue.use(Router);
 
@@ -47,9 +47,9 @@ const routes = [
         component: Workflow,
         children: [
           {
-            path: "/workflow/workflowDashboard",
-            name: "workflowDashboard",
-            component: workflowDashboard, meta: { title: "工作台", }
+            path: "/workflow/dashboard",
+            name: "WorkflowDashboard",
+            component: WorkflowDashboard, meta: { title: "工作台", }
           },
           {
             path: "/workflow/taskList",
