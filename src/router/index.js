@@ -25,8 +25,9 @@ import Layout from "@/components/layout";
 import Centre from "@/components/centre";
 import Home from "@/view/home/home";
 import Workflow from "@/page/workflow/workflow";
+import Bussiness from "@/page/workflow/bussiness/bussiness";
 import WorkflowModel from "@/page/workflow/model";
-// import WorkflowModel2 from "@/page/workflow/model2";
+import Demo from "@/page/workflow/bussiness/demo";
 import taskList from "@/page/workflow/taskList";
 import DefinitionList from "@/page/workflow/definitionList";
 import DefinitionForm from "@/page/workflow/definitionForm";
@@ -60,11 +61,6 @@ const routes = [
             name: "WorkflowModel",
             component: WorkflowModel, meta: { title: "流程模型", }
           },
-          // {
-          //   path: "/workflow/model2",
-          //   name: "WorkflowModel2",
-          //   component: WorkflowModel2, meta: { title: "流程模型", }
-          // },
           {
             path: "/workflow/definitionList",
             name: "DefinitionList",
@@ -74,7 +70,19 @@ const routes = [
             name: "DefinitionForm",
             component: DefinitionForm, meta: { title: "流程模型表单", }
           },
+          {
+            path: "/workflow/bussiness",
+            name: "Bussiness",
+            component: Bussiness,
+            children: [
+              {
+                path: "/workflow/bussiness/demo",
+                name: "Demo",
+                component: Demo, meta: { title: "业务流程示例",name:"DEMO" }
+              },
 
+            ]
+          },
         ]
       },
       {
@@ -254,6 +262,15 @@ const router = new Router({
 
 // 挂载路由导航守卫,to表示将要访问的路径，from表示从哪里来，next是下一个要做的操作 next('/login')强制跳转login
 router.beforeEach((to, from, next) => {
+  // 如果路由没有定义 meta，默认设置为需要认证
+  if (to.meta === undefined) {
+    to.meta = {}
+  }
+
+  // 如果 requiresAuth 未定义，默认设为 true
+  if (to.meta.requiresAuth === undefined) {
+    to.meta.requiresAuth = true
+  }
   // 访问登录页，放行
   if (to.path === "/login") {
     if (window.localStorage.getItem("token")) {
@@ -261,8 +278,17 @@ router.beforeEach((to, from, next) => {
     }
     return next();
   }
+  // 检查登录状态
+  if (to.meta.requiresAuth && window.localStorage.getItem("token") == null) {
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    })
+  } else {
+    next()
+  }
   //默认访问页 推到首页或者登录页
-  if (to.path === "/") {
+  if (to.path === "/" || to.path === "/index") {
     if (window.localStorage.getItem("token")) {
       next("/index");
     }
