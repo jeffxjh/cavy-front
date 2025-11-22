@@ -65,7 +65,7 @@
                                 <!-- 二级菜单没有子菜单 -->
                                 <el-menu-item
                                     v-else
-                                    :key="child.id"
+                                    :key="`child-${child.id}`"
                                     :index="child.url"
                                     @click="goPage(child)"
                                 >
@@ -78,7 +78,7 @@
                         <!-- 二级菜单：有子菜单但没有孙子菜单 -->
                         <el-submenu
                             v-else-if="item.children && item.children.length > 0"
-                            :key="item.id"
+                            :key="`item-${item.id}`"
                             :index="item.url || item.id"
                         >
                             <template slot="title">
@@ -98,7 +98,7 @@
                         </el-submenu>
 
                         <!-- 一级菜单：没有子菜单 -->
-                        <el-menu-item v-else :key="item.id" :index="item.url" @click="goPage(item)">
+                        <el-menu-item v-else :key="`main-${item.id}`" :index="item.url" @click="goPage(item)">
                             <i v-if="item.icon" :class="item.icon"></i>
                             <span slot="title">{{ item.menuName }}</span>
                         </el-menu-item>
@@ -217,10 +217,11 @@ export default {
 
 /* 三级菜单缩进样式 */
 .el-submenu .el-menu-item {
-    padding-left: 50px !important;
+    padding-left: 40px !important;
 }
 
 .el-submenu .el-submenu .el-menu-item {
-    padding-left: 70px !important;
+    padding-left: 60px !important;
 }
+
 </style>
