@@ -3,7 +3,11 @@
         <workflow-process
             :process-instance-id="'123456'"
             :business-id="'BUS001'"
+            :step-no="'N0000'"
+            :operate-type="'load'"
+            :business-action="'create'"
             :api-methods="apiMethods"
+            :initial-form-data.sync="formData"
             @load-success="handleLoadSuccess"
             @commit-success="handleCommitSuccess"
             @error="handleError"
@@ -35,6 +39,7 @@ export default {
     },
     data() {
         return {
+            formData: {},
             apiMethods: {
                 load: this.loadData,
                 commit: this.commitData,

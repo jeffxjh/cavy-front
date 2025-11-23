@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { loadTask } from '@/common/api/api';
 export default {
     name: 'WorkflowProcess',
     props: {
@@ -79,10 +80,25 @@ export default {
             type: String,
             default: '',
         },
+        // 步骤节点
+        stepNo: {
+            type: String,
+            default: 'N0000',
+        },
+        // 操作类型
+        operateType: {
+            type: String,
+            default: 'load',
+        },
+        // 动作类型
+        businessAction: {
+            type: String,
+            default: 'create',
+        },
         // 返回路径
         backPath: {
             type: String,
-            default: '/workflow/workflowDashboard',
+            default: '/workflow/dashboard',
         },
         // 是否显示按钮
         showButtons: {
@@ -108,6 +124,7 @@ export default {
     },
     data() {
         return {
+            tradeData: {},
             formData: { ...this.initialFormData },
             loading: false,
             submitting: false,
@@ -117,28 +134,56 @@ export default {
         };
     },
     mounted() {
-        this.loadFormData();
+        this.$nextTick(() => {
+            this.loadFormData();
+        });
     },
     methods: {
         // 加载表单数据
         async loadFormData() {
             try {
                 this.loading = true;
-
-                // 如果没有提供API方法，则不调用
-                if (!this.apiMethods.load) {
-                    console.warn('未提供 load API 方法');
-                    return;
-                }
-
-                const response = await this.apiMethods.load({
-                    processInstanceId: this.processInstanceId,
-                    businessId: this.businessId,
+                // this.$router.params
+                const loadRes = await loadTask({
+                    txnType: this.processInstanceId,
+                    stepNo: this.stepNo,
+                    operateType: this.operateType,
+                    businessAction: this.businessAction,
+                    flowData: {
+                        flowInstanceId: this.processInstanceId,
+                        currentNodeId: this.stepNo,
+                        previousNodeId: '1',
+                        flowStatus: '1',
+                        approveComment: '1',
+                        extFlowData: {},
+                    },
+                    formData: {
+                        businessKey: '1',
+                        formType: '1',
+                        formJson: {},
+                        formFields: {},
+                        attachments: [],
+                    },
+                    extParams: {},
                 });
 
-                // 更新表单数据
-                this.formData = { ...response.data };
+                // 如果没有提供API方法，则不调用
+                // if (!this.apiMethods.load) {
+                //     console.warn('未提供 load API 方法');
+                //     return;
+                // }
 
+                // const response = await this.apiMethods.load({
+                //     processInstanceId: this.processInstanceId,
+                //     businessId: this.businessId,
+                // });
+                // 更新表单数据
+                this.tradeData = { ...loadRes.data.data.data };
+                this.formData = { ...this.tradeData.formData };
+                // 对于对象，需要创建新对象来触发更新
+                this.$emit('update:initialFormData', {
+                    ...this.formData,
+                });
                 this.$emit('load-success', this.formData);
             } catch (error) {
                 console.error('加载表单数据失败:', error);
@@ -230,7 +275,7 @@ export default {
                 case 'approve':
                     // 可以跳转到列表页或其他页面
                     setTimeout(() => {
-                        this.$router.push(this.backPath);
+                        // this.$router.push(this.backPath);
                     }, 1500);
                     break;
                 case 'reject':
