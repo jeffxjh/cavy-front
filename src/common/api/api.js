@@ -241,3 +241,9 @@ export const delDefinition = params => {
 export const loadTask = params => {
   return postJsonRequest("/workflow/loadTask", params);
 };
+export const commitTask = params => {
+  return postJsonRequest("/workflow/commitTask", params);
+};
+export const todoTaskPageList = params => {
+  return postJsonRequest("/workflow/todoTaskPageList", params);
+};

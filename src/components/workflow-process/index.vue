@@ -11,8 +11,8 @@
             <el-button
                 type="primary"
                 :loading="submitting"
-                @click="handleSubmit('submit')"
-                v-if="showButtons.submit"
+                @click="handleSubmit('commit')"
+                v-if="showButtons.commit"
             >
                 提交
             </el-button>
@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { loadTask } from '@/common/api/api';
+import { loadTask ,commitTask} from '@/common/api/api';
 export default {
     name: 'WorkflowProcess',
     props: {
@@ -104,7 +104,7 @@ export default {
         showButtons: {
             type: Object,
             default: () => ({
-                submit: true,
+                commit: true,
                 revoke: true,
                 reject: true,
                 approve: true,
@@ -199,20 +199,35 @@ export default {
             try {
                 this.submitting = true;
 
-                const commitData = {
-                    processInstanceId: this.processInstanceId,
-                    businessId: this.businessId,
-                    action: actionType,
-                    formData: { ...this.formData },
-                    ...extraData,
-                };
+                const commitRes = await commitTask({
+                    txnType: this.processInstanceId,
+                    stepNo: this.stepNo,
+                    operateType: actionType,
+                    businessAction: this.businessAction,
+                    flowData: {
+                        flowInstanceId: this.processInstanceId,
+                        currentNodeId: this.stepNo,
+                        previousNodeId: '1',
+                        flowStatus: '1',
+                        approveComment: '1',
+                        extFlowData: {},
+                    },
+                    formData: {
+                        businessKey: '1',
+                        formType: '1',
+                        formJson: this.formData,
+                        formFields: {},
+                        attachments: [],
+                    },
+                    extParams: {},
+                });
 
-                const response = await this.apiMethods.commit(commitData);
+                // const response = await this.apiMethods.commit(commitData);
 
                 this.$message.success(this.getSuccessMessage(actionType));
                 this.$emit('commit-success', {
                     action: actionType,
-                    data: response.data,
+                    data: commitRes.data,
                 });
 
                 // 提交成功后处理
@@ -271,7 +286,7 @@ export default {
         handleAfterCommit(actionType) {
             // 根据业务需求处理提交后的逻辑
             switch (actionType) {
-                case 'submit':
+                case 'commit':
                 case 'approve':
                     // 可以跳转到列表页或其他页面
                     setTimeout(() => {
@@ -289,7 +304,7 @@ export default {
         // 获取成功消息
         getSuccessMessage(actionType) {
             const messages = {
-                submit: '提交成功',
+                commit: '提交成功',
                 revoke: '撤销成功',
                 reject: '驳回成功',
                 approve: '同意成功',
@@ -300,7 +315,7 @@ export default {
         // 获取错误消息
         getErrorMessage(actionType) {
             const messages = {
-                submit: '提交失败',
+                commit: '提交失败',
                 revoke: '撤销失败',
                 reject: '驳回失败',
                 approve: '同意失败',
