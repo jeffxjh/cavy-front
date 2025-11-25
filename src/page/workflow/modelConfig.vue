@@ -445,105 +445,355 @@ export default {
             const baseX = 50;
             const baseY = 150;
             const horizontalSpacing = 150;
+            const verticalSpacing = 100;
 
-            // 解析开始事件
-            const startEvents = xmlDoc.getElementsByTagName('startEvent');
-            Array.from(startEvents).forEach((event) => {
-                const id = event.getAttribute('id');
-                const name = event.getAttribute('name') || '开始';
-                this.bpmnNodes.push({
-                    id: id,
-                    name: name,
-                    type: 'start',
-                    x: baseX,
-                    y: baseY,
-                });
-                nodeCounter++;
+            // 节点类型映射
+            const nodeTypeMap = {
+                // 事件类型
+                startEvent: 'start',
+                endEvent: 'end',
+                terminateEvent: 'end',
+                errorEvent: 'event',
+                messageEvent: 'event',
+                timerEvent: 'event',
+                escalationEvent: 'event',
+                conditionalEvent: 'event',
+                signalEvent: 'event',
+
+                // 任务类型
+                userTask: 'task',
+                serviceTask: 'task',
+                scriptTask: 'task',
+                businessRuleTask: 'task',
+                sendTask: 'task',
+                receiveTask: 'task',
+                manualTask: 'task',
+                callActivity: 'subprocess',
+
+                // 网关类型
+                exclusiveGateway: 'gateway',
+                parallelGateway: 'gateway',
+                inclusiveGateway: 'gateway',
+                eventBasedGateway: 'gateway',
+                complexGateway: 'gateway',
+
+                // 子流程
+                subProcess: 'subprocess',
+                adHocSubProcess: 'subprocess',
+                transaction: 'subprocess',
+
+                // 其他元素
+                intermediateCatchEvent: 'event',
+                intermediateThrowEvent: 'event',
+                boundaryEvent: 'event',
+            };
+
+            // 节点图标映射
+            const nodeIconMap = {
+                start: 'el-icon-caret-right',
+                end: 'el-icon-check',
+                task: 'el-icon-document',
+                gateway: 'el-icon-share',
+                event: 'el-icon-bell',
+                subprocess: 'el-icon-folder-opened',
+                default: 'el-icon-document',
+            };
+
+            // 收集所有BPMN元素
+            const allElements = process.children;
+            const nodeMap = new Map();
+
+            // 第一遍：创建所有节点
+            Array.from(allElements).forEach((element) => {
+                const tagName = element.tagName;
+                const id = element.getAttribute('id');
+                const name = element.getAttribute('name') || this.getDefaultName(tagName);
+
+                if (nodeTypeMap[tagName]) {
+                    const type = nodeTypeMap[tagName];
+                    const icon = nodeIconMap[type] || nodeIconMap.default;
+
+                    const node = {
+                        id: id,
+                        name: name,
+                        type: type,
+                        icon: icon,
+                        x: baseX + nodeCounter * horizontalSpacing,
+                        y: baseY + (nodeCounter % 3) * verticalSpacing, // 交错排列
+                        originalType: tagName, // 保存原始类型
+                        attributes: this.extractAttributes(element),
+                    };
+
+                    this.bpmnNodes.push(node);
+                    nodeMap.set(id, node);
+                    nodeCounter++;
+                }
             });
 
-            // 解析用户任务
-            const userTasks = xmlDoc.getElementsByTagName('userTask');
-            Array.from(userTasks).forEach((task) => {
-                const id = task.getAttribute('id');
-                const name = task.getAttribute('name') || '用户任务';
-                this.bpmnNodes.push({
-                    id: id,
-                    name: name,
-                    type: 'task',
-                    x: baseX + nodeCounter * horizontalSpacing,
-                    y: baseY,
-                });
-                nodeCounter++;
-            });
+            // 第二遍：解析连接关系
+            Array.from(allElements).forEach((element) => {
+                const tagName = element.tagName;
 
-            // 解析网关
-            const gateways = xmlDoc.getElementsByTagName('exclusiveGateway');
-            Array.from(gateways).forEach((gateway) => {
-                const id = gateway.getAttribute('id');
-                const name = gateway.getAttribute('name') || '网关';
-                this.bpmnNodes.push({
-                    id: id,
-                    name: name,
-                    type: 'gateway',
-                    x: baseX + nodeCounter * horizontalSpacing,
-                    y: baseY,
-                });
-                nodeCounter++;
-            });
-            // 也解析其他类型的网关
-            const parallelGateways = xmlDoc.getElementsByTagName('parallelGateway');
-            Array.from(parallelGateways).forEach((gateway) => {
-                const id = gateway.getAttribute('id');
-                const name = gateway.getAttribute('name') || '并行网关';
-                this.bpmnNodes.push({
-                    id: id,
-                    name: name,
-                    type: 'gateway',
-                    x: baseX + nodeCounter * horizontalSpacing,
-                    y: baseY,
-                });
-                nodeCounter++;
-            });
+                if (tagName === 'sequenceFlow') {
+                    const id = element.getAttribute('id');
+                    const source = element.getAttribute('sourceRef');
+                    const target = element.getAttribute('targetRef');
+                    const name = element.getAttribute('name') || '';
 
-            // 解析结束事件
-            const endEvents = xmlDoc.getElementsByTagName('endEvent');
-            Array.from(endEvents).forEach((event) => {
-                const id = event.getAttribute('id');
-                const name = event.getAttribute('name') || '结束';
-                this.bpmnNodes.push({
-                    id: id,
-                    name: name,
-                    type: 'end',
-                    x: baseX + nodeCounter * horizontalSpacing,
-                    y: baseY,
-                });
-                nodeCounter++;
-            });
+                    // 检查源和目标节点是否存在
+                    const sourceNode = nodeMap.get(source);
+                    const targetNode = nodeMap.get(target);
 
-            // 解析顺序流
-            const sequenceFlows = xmlDoc.getElementsByTagName('sequenceFlow');
-            Array.from(sequenceFlows).forEach((flow) => {
-                const id = flow.getAttribute('id');
-                const source = flow.getAttribute('sourceRef');
-                const target = flow.getAttribute('targetRef');
-                const name = flow.getAttribute('name') || '';
+                    if (sourceNode && targetNode) {
+                        this.connections.push({
+                            id: id,
+                            source: source,
+                            target: target,
+                            configured: false,
+                            condition: name,
+                            type: 'sequence',
+                        });
+                    }
+                }
 
-                this.connections.push({
-                    id: id,
-                    source: source,
-                    target: target,
-                    configured: false,
-                    condition: name,
-                });
+                // 解析消息流
+                if (tagName === 'messageFlow') {
+                    const id = element.getAttribute('id');
+                    const source = element.getAttribute('sourceRef');
+                    const target = element.getAttribute('targetRef');
+
+                    const sourceNode = nodeMap.get(source);
+                    const targetNode = nodeMap.get(target);
+
+                    if (sourceNode && targetNode) {
+                        this.connections.push({
+                            id: id,
+                            source: source,
+                            target: target,
+                            configured: false,
+                            condition: '消息',
+                            type: 'message',
+                        });
+                    }
+                }
+
+                // 解析关联
+                if (tagName === 'association') {
+                    const id = element.getAttribute('id');
+                    const source = element.getAttribute('sourceRef');
+                    const target = element.getAttribute('targetRef');
+
+                    const sourceNode = nodeMap.get(source);
+                    const targetNode = nodeMap.get(target);
+
+                    if (sourceNode && targetNode) {
+                        this.connections.push({
+                            id: id,
+                            source: source,
+                            target: target,
+                            configured: false,
+                            condition: '关联',
+                            type: 'association',
+                        });
+                    }
+                }
             });
 
             // 解析BPMN图形布局
-            this.parseBpmnLayout(xmlDoc);
+            this.parseBpmnLayout(xmlDoc, nodeMap);
 
             // 确保连接线计算
             this.$nextTick(() => {
                 this.calculateConnections();
             });
+        },
+
+        // 获取节点默认名称
+        getDefaultName(tagName) {
+            const nameMap = {
+                startEvent: '开始',
+                endEvent: '结束',
+                terminateEvent: '终止',
+                userTask: '用户任务',
+                serviceTask: '服务任务',
+                scriptTask: '脚本任务',
+                businessRuleTask: '业务规则',
+                sendTask: '发送任务',
+                receiveTask: '接收任务',
+                manualTask: '手工任务',
+                callActivity: '调用活动',
+                exclusiveGateway: '排他网关',
+                parallelGateway: '并行网关',
+                inclusiveGateway: '包容网关',
+                eventBasedGateway: '事件网关',
+                complexGateway: '复杂网关',
+                subProcess: '子流程',
+                adHocSubProcess: '特殊子流程',
+                transaction: '事务',
+                intermediateCatchEvent: '中间捕获事件',
+                intermediateThrowEvent: '中间抛出事件',
+                boundaryEvent: '边界事件',
+                errorEvent: '错误事件',
+                messageEvent: '消息事件',
+                timerEvent: '定时器事件',
+                escalationEvent: '升级事件',
+                conditionalEvent: '条件事件',
+                signalEvent: '信号事件',
+            };
+
+            return nameMap[tagName] || '未命名节点';
+        },
+
+        // 提取节点属性
+        extractAttributes(element) {
+            const attributes = {};
+            const tagName = element.tagName;
+
+            // 通用属性
+            attributes.id = element.getAttribute('id');
+            attributes.name = element.getAttribute('name');
+
+            // 特定类型属性
+            switch (tagName) {
+                case 'userTask':
+                    attributes.assignee = element.getAttribute('assignee');
+                    attributes.candidateUsers = element.getAttribute('candidateUsers');
+                    attributes.candidateGroups = element.getAttribute('candidateGroups');
+                    break;
+
+                case 'serviceTask':
+                    attributes.service = element.getAttribute('service');
+                    attributes.operation = element.getAttribute('operation');
+                    break;
+
+                case 'scriptTask':
+                    attributes.scriptFormat = element.getAttribute('scriptFormat');
+                    break;
+
+                case 'timerEvent':
+                    attributes.timerDefinition = element.getAttribute('timerDefinition');
+                    break;
+
+                case 'messageEvent':
+                    attributes.messageRef = element.getAttribute('messageRef');
+                    break;
+
+                case 'callActivity':
+                    attributes.calledElement = element.getAttribute('calledElement');
+                    break;
+
+                case 'subProcess':
+                    attributes.triggeredByEvent = element.getAttribute('triggeredByEvent');
+                    break;
+            }
+
+            return attributes;
+        },
+
+        // 增强的BPMN图形布局解析
+        parseBpmnLayout(xmlDoc, nodeMap) {
+            const shapes = xmlDoc.getElementsByTagName('bpmndi:BPMNShape');
+            Array.from(shapes).forEach((shape) => {
+                const elementId = shape.getAttribute('bpmnElement');
+                const bounds = shape.getElementsByTagName('omgdc:Bounds')[0];
+
+                if (bounds) {
+                    const x = parseInt(bounds.getAttribute('x')) || 0;
+                    const y = parseInt(bounds.getAttribute('y')) || 0;
+                    const width = parseInt(bounds.getAttribute('width')) || 100;
+                    const height = parseInt(bounds.getAttribute('height')) || 80;
+
+                    const node = nodeMap.get(elementId);
+                    if (node) {
+                        // 将BPMN坐标转换为画布坐标
+                        node.x = x / 2;
+                        node.y = y / 2;
+                        node.width = width / 2;
+                        node.height = height / 2;
+                    }
+                }
+            });
+
+            // 解析连线布局
+            const edges = xmlDoc.getElementsByTagName('bpmndi:BPMNEdge');
+            Array.from(edges).forEach((edge) => {
+                const elementId = edge.getAttribute('bpmnElement');
+                const waypoints = edge.getElementsByTagName('omgdi:waypoint');
+
+                if (waypoints.length > 0) {
+                    const connection = this.connections.find((conn) => conn.id === elementId);
+                    if (connection) {
+                        connection.waypoints = Array.from(waypoints).map((wp) => ({
+                            x: parseInt(wp.getAttribute('x')) / 2,
+                            y: parseInt(wp.getAttribute('y')) / 2,
+                        }));
+                    }
+                }
+            });
+        },
+
+        // 增强的节点图标获取
+        getNodeIcon(node) {
+            // 如果有自定义图标则使用，否则根据类型返回
+            if (node.icon) {
+                return node.icon;
+            }
+
+            const icons = {
+                start: 'el-icon-caret-right',
+                end: 'el-icon-check',
+                task: 'el-icon-document',
+                gateway: 'el-icon-share',
+                event: 'el-icon-bell',
+                subprocess: 'el-icon-folder-opened',
+                default: 'el-icon-document',
+            };
+
+            return icons[node.type] || icons.default;
+        },
+
+        // 增强的节点类型文本
+        getNodeTypeText(node) {
+            const typeMap = {
+                start: '开始节点',
+                end: '结束节点',
+                task: '任务节点',
+                gateway: '网关节点',
+                event: '事件节点',
+                subprocess: '子流程',
+                default: '未知节点',
+            };
+
+            // 如果有原始类型，显示更详细的类型信息
+            if (node.originalType) {
+                const detailMap = {
+                    userTask: '用户任务',
+                    serviceTask: '服务任务',
+                    scriptTask: '脚本任务',
+                    businessRuleTask: '业务规则任务',
+                    sendTask: '发送任务',
+                    receiveTask: '接收任务',
+                    manualTask: '手工任务',
+                    callActivity: '调用活动',
+                    exclusiveGateway: '排他网关',
+                    parallelGateway: '并行网关',
+                    inclusiveGateway: '包容网关',
+                    eventBasedGateway: '事件网关',
+                    subProcess: '嵌入子流程',
+                    adHocSubProcess: '特殊子流程',
+                    transaction: '事务子流程',
+                    startEvent: '开始事件',
+                    endEvent: '结束事件',
+                    terminateEvent: '终止事件',
+                    intermediateCatchEvent: '中间捕获事件',
+                    intermediateThrowEvent: '中间抛出事件',
+                    boundaryEvent: '边界事件',
+                };
+
+                return detailMap[node.originalType] || typeMap[node.type] || typeMap.default;
+            }
+
+            return typeMap[node.type] || typeMap.default;
         },
 
         // 解析BPMN图形布局
@@ -1184,5 +1434,60 @@ export default {
     .config-container {
         min-height: 500px;
     }
+}
+/* 连接线类型样式 */
+.connection-line.sequence {
+    stroke: #409eff;
+}
+
+.connection-line.message {
+    stroke: #e6a23c;
+    stroke-dasharray: 5, 5;
+}
+
+.connection-line.association {
+    stroke: #909399;
+    stroke-dasharray: 3, 3;
+}
+
+.connection-line.data {
+    stroke: #67c23a;
+    stroke-dasharray: 8, 3;
+}
+/* 事件节点样式 */
+.node-event {
+    border-color: #f56c6c;
+    background: linear-gradient(135deg, #fef0f0, #fde2e2);
+}
+
+.node-event .node-icon {
+    background: #f56c6c;
+}
+
+/* 子流程节点样式 */
+.node-subprocess {
+    border-color: #8e44ad;
+    background: linear-gradient(135deg, #f9f0ff, #efdbff);
+    border-style: dashed;
+}
+
+.node-subprocess .node-icon {
+    background: #8e44ad;
+}
+
+/* 不同类型任务的样式 */
+.node-task[data-original-type='serviceTask'] {
+    border-color: #3498db;
+    background: linear-gradient(135deg, #e6f7ff, #d1eaff);
+}
+
+.node-task[data-original-type='scriptTask'] {
+    border-color: #9b59b6;
+    background: linear-gradient(135deg, #f9f0ff, #f2e6ff);
+}
+
+.node-task[data-original-type='businessRuleTask'] {
+    border-color: #e74c3c;
+    background: linear-gradient(135deg, #fff2e8, #ffe7d9);
 }
 </style>
