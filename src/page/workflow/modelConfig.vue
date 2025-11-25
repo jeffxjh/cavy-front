@@ -1,0 +1,899 @@
+<template>
+    <div class="model">
+        <div class="header">
+            <h1>BPMN流程配置器</h1>
+            <el-button type="primary" @click="exportConfig">导出配置</el-button>
+        </div>
+
+        <div class="content">
+            <!-- 左侧流程画布 -->
+            <div class="canvas-container">
+                <h3>流程画布</h3>
+                <p class="step-tip">点击节点进行配置，可拖动节点位置</p>
+
+                <div class="process-canvas" ref="canvas">
+                    <!-- 流程节点 -->
+                    <div
+                        v-for="node in bpmnNodes"
+                        :key="node.id"
+                        :class="[
+                            'process-node',
+                            'node-' + node.type,
+                            {
+                                'node-active': selectedNode && selectedNode.id === node.id,
+                                'node-configured': getNodeStatus(node),
+                            },
+                        ]"
+                        :style="{
+                            left: node.x + 'px',
+                            top: node.y + 'px',
+                        }"
+                        @click="selectNode(node)"
+                        @mousedown="startDrag(node, $event)"
+                    >
+                        <div class="node-icon">
+                            <i :class="getNodeIcon(node.type)"></i>
+                        </div>
+                        <div class="node-content">
+                            <div class="node-title">{{ node.name }}</div>
+                            <div class="node-id">{{ node.id }}</div>
+                        </div>
+                        <div v-if="getNodeStatus(node)" class="node-status">
+                            <i class="el-icon-check"></i>
+                        </div>
+                    </div>
+
+                    <!-- 连接线 -->
+                    <svg
+                        class="connection-layer"
+                        :width="canvasSize.width"
+                        :height="canvasSize.height"
+                    >
+                        <defs>
+                            <marker
+                                id="arrowhead"
+                                markerWidth="10"
+                                markerHeight="7"
+                                refX="9"
+                                refY="3.5"
+                                orient="auto"
+                            >
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#409EFF" />
+                            </marker>
+                            <marker
+                                id="arrowhead-configured"
+                                markerWidth="10"
+                                markerHeight="7"
+                                refX="9"
+                                refY="3.5"
+                                orient="auto"
+                            >
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#67C23A" />
+                            </marker>
+                        </defs>
+
+                        <g v-for="connection in connections" :key="connection.id">
+                            <!-- 主线 -->
+                            <path
+                                :d="connection.path"
+                                :class="[
+                                    'connection-line',
+                                    { 'connection-configured': connection.configured },
+                                ]"
+                                :marker-end="
+                                    connection.configured
+                                        ? 'url(#arrowhead-configured)'
+                                        : 'url(#arrowhead)'
+                                "
+                            />
+
+                            <!-- 分支条件文字 -->
+                            <text
+                                v-if="connection.condition"
+                                :x="connection.textX"
+                                :y="connection.textY"
+                                class="connection-label"
+                                text-anchor="middle"
+                            >
+                                {{ connection.condition }}
+                            </text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 右侧配置容器 -->
+            <div class="config-container">
+                <h3>节点配置</h3>
+
+                <div v-if="selectedNode">
+                    <div class="config-form">
+                        <el-form :model="currentConfig" label-width="100px">
+                            <el-form-item label="节点ID">
+                                <el-input v-model="selectedNode.id" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="节点名称">
+                                <el-input
+                                    v-model="selectedNode.name"
+                                    @change="updateNodeName"
+                                ></el-input>
+                            </el-form-item>
+                            <el-form-item label="节点类型">
+                                <el-tag :type="getNodeTypeTag(selectedNode.type)">
+                                    {{ getNodeTypeText(selectedNode.type) }}
+                                </el-tag>
+                            </el-form-item>
+
+                            <template
+                                v-if="selectedNode.type !== 'start' && selectedNode.type !== 'end'"
+                            >
+                                <el-form-item label="角色">
+                                    <el-select
+                                        v-model="currentConfig.role"
+                                        placeholder="请选择角色"
+                                    >
+                                        <el-option label="管理员" value="manage"></el-option>
+                                        <el-option label="审核员" value="review"></el-option>
+                                        <el-option label="操作员" value="operate"></el-option>
+                                        <el-option label="查看者" value="view"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="权限">
+                                    <el-checkbox-group v-model="currentConfig.permissions">
+                                        <el-checkbox label="read">读取</el-checkbox>
+                                        <el-checkbox label="write">写入</el-checkbox>
+                                        <el-checkbox label="delete">删除</el-checkbox>
+                                        <el-checkbox label="approve">审批</el-checkbox>
+                                    </el-checkbox-group>
+                                </el-form-item>
+                                <el-form-item label="备注">
+                                    <el-input
+                                        type="textarea"
+                                        v-model="currentConfig.remark"
+                                        placeholder="请输入备注信息"
+                                        :rows="2"
+                                    ></el-input>
+                                </el-form-item>
+                            </template>
+
+                            <el-form-item v-if="selectedNode.type === 'gateway'">
+                                <el-button type="success" @click="showGatewayConfig">
+                                    配置分支
+                                </el-button>
+                            </el-form-item>
+
+                            <el-form-item
+                                v-if="selectedNode.type !== 'start' && selectedNode.type !== 'end'"
+                            >
+                                <el-button type="primary" @click="saveConfig">保存配置</el-button>
+                                <el-button @click="clearConfig">清除配置</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </div>
+                <div v-else>
+                    <p class="no-selection-tip">请选择一个节点进行配置</p>
+                </div>
+
+                <h3 class="config-table-title">配置表</h3>
+                <div class="table-wrapper">
+                    <table class="config-table" v-if="configTable.length > 0">
+                        <thead>
+                            <tr>
+                                <th>节点ID</th>
+                                <th>节点类型</th>
+                                <th>角色</th>
+                                <th>权限</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="config in configTable" :key="config.nodeId">
+                                <td>{{ config.nodeId }}</td>
+                                <td>
+                                    <el-tag
+                                        :type="getNodeTypeTag(getNodeType(config.nodeId))"
+                                        size="small"
+                                    >
+                                        {{ getNodeTypeText(getNodeType(config.nodeId)) }}
+                                    </el-tag>
+                                </td>
+                                <td>{{ config.role }}</td>
+                                <td>{{ config.permissions.join(', ') }}</td>
+                                <td>{{ config.remark }}</td>
+                                <td>
+                                    <el-button type="text" @click="editConfig(config)">
+                                        编辑
+                                    </el-button>
+                                    <el-button
+                                        type="text"
+                                        class="delete-btn"
+                                        @click="deleteConfig(config.nodeId)"
+                                    >
+                                        删除
+                                    </el-button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div v-else class="empty-config">
+                        暂无配置数据
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 网关分支配置弹窗 -->
+        <el-dialog title="网关分支配置" :visible.sync="gatewayDialogVisible" width="700px">
+            <div class="gateway-config">
+                <h4>网关节点: {{ selectedGateway ? selectedGateway.name : '' }}</h4>
+                <p>节点ID: {{ selectedGateway ? selectedGateway.id : '' }}</p>
+
+                <el-table :data="gatewayBranches" style="width: 100%">
+                    <el-table-column prop="id" label="分支ID" width="80"></el-table-column>
+                    <el-table-column prop="name" label="分支名称" width="120"></el-table-column>
+                    <el-table-column prop="condition" label="条件表达式">
+                        <template slot-scope="scope">
+                            <el-input v-model="scope.row.condition" size="small"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="target" label="目标节点" width="100">
+                        <template slot-scope="scope">
+                            <el-select v-model="scope.row.target" size="small">
+                                <el-option
+                                    v-for="node in targetNodes"
+                                    :key="node.id"
+                                    :label="node.name"
+                                    :value="node.id"
+                                ></el-option>
+                            </el-select>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="80">
+                        <template slot-scope="scope">
+                            <el-button type="text" size="small" @click="removeBranch(scope.$index)">
+                                删除
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+
+                <div style="margin-top: 16px;">
+                    <el-button type="primary" size="small" @click="addBranch">添加分支</el-button>
+                </div>
+            </div>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="gatewayDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="saveGatewayConfig">保存</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'ModelConfig',
+    data() {
+        return {
+            selectedNode: null,
+            selectedGateway: null,
+            currentConfig: {
+                role: '',
+                permissions: [],
+                remark: '',
+            },
+            gatewayDialogVisible: false,
+            canvasSize: { width: 800, height: 600 },
+            isDragging: false,
+            dragNode: null,
+            startX: 0,
+            startY: 0,
+
+            bpmnNodes: [
+                { id: 'N0001', name: '开始', type: 'start', x: 50, y: 300 },
+                { id: 'N0002', name: '提交申请', type: 'task', x: 150, y: 300 },
+                { id: 'N0003', name: '审批网关', type: 'gateway', x: 300, y: 300 },
+                { id: 'N0004', name: '初审', type: 'task', x: 450, y: 200 },
+                { id: 'N0005', name: '复审', type: 'task', x: 450, y: 300 },
+                { id: 'N0006', name: '特殊处理', type: 'task', x: 450, y: 400 },
+                { id: 'N0007', name: '结束', type: 'end', x: 600, y: 300 },
+            ],
+
+            connections: [
+                { id: 'c1', source: 'N0001', target: 'N0002', configured: true },
+                { id: 'c2', source: 'N0002', target: 'N0003', configured: true },
+                {
+                    id: 'c3',
+                    source: 'N0003',
+                    target: 'N0004',
+                    configured: false,
+                    condition: '金额≤1000',
+                },
+                {
+                    id: 'c4',
+                    source: 'N0003',
+                    target: 'N0005',
+                    configured: true,
+                    condition: '1000<金额≤5000',
+                },
+                {
+                    id: 'c5',
+                    source: 'N0003',
+                    target: 'N0006',
+                    configured: false,
+                    condition: '金额>5000',
+                },
+                { id: 'c6', source: 'N0004', target: 'N0007', configured: false },
+                { id: 'c7', source: 'N0005', target: 'N0007', configured: false },
+                { id: 'c8', source: 'N0006', target: 'N0007', configured: false },
+            ],
+
+            gatewayBranches: [
+                { id: 'b1', name: '小额审批', condition: 'amount <= 1000', target: 'N0004' },
+                {
+                    id: 'b2',
+                    name: '中额审批',
+                    condition: 'amount > 1000 && amount <= 5000',
+                    target: 'N0005',
+                },
+                { id: 'b3', name: '大额审批', condition: 'amount > 5000', target: 'N0006' },
+            ],
+
+            configTable: [],
+        };
+    },
+
+    computed: {
+        targetNodes() {
+            if (!this.selectedGateway) return [];
+            return this.bpmnNodes.filter(
+                (node) => node.id !== this.selectedGateway.id && node.type !== 'start',
+            );
+        },
+    },
+
+    mounted() {
+        this.calculateConnections();
+        document.addEventListener('mousemove', this.handleDrag);
+        document.addEventListener('mouseup', this.stopDrag);
+    },
+
+    beforeDestroy() {
+        document.removeEventListener('mousemove', this.handleDrag);
+        document.removeEventListener('mouseup', this.stopDrag);
+    },
+
+    methods: {
+        // 节点选择
+        selectNode(node) {
+            this.selectedNode = node;
+            const existingConfig = this.configTable.find((item) => item.nodeId === node.id);
+            if (existingConfig) {
+                this.currentConfig = { ...existingConfig };
+            } else {
+                this.currentConfig = { role: '', permissions: [], remark: '' };
+            }
+        },
+
+        // 节点图标
+        getNodeIcon(type) {
+            const icons = {
+                start: 'el-icon-caret-right',
+                task: 'el-icon-document',
+                gateway: 'el-icon-share',
+                end: 'el-icon-check',
+            };
+            return icons[type] || 'el-icon-document';
+        },
+
+        // 节点状态
+        getNodeStatus(node) {
+            return this.configTable.some((item) => item.nodeId === node.id);
+        },
+
+        // 节点类型标签
+        getNodeTypeTag(type) {
+            const typeMap = {
+                start: 'success',
+                task: '',
+                gateway: 'warning',
+                end: 'info',
+            };
+            return typeMap[type] || '';
+        },
+
+        // 节点类型文本
+        getNodeTypeText(type) {
+            const textMap = {
+                start: '开始节点',
+                task: '任务节点',
+                gateway: '网关节点',
+                end: '结束节点',
+            };
+            return textMap[type] || '未知节点';
+        },
+
+        // 根据节点ID获取节点类型
+        getNodeType(nodeId) {
+            const node = this.bpmnNodes.find((item) => item.id === nodeId);
+            return node ? node.type : 'task';
+        },
+
+        // 拖动功能
+        startDrag(node, event) {
+            this.isDragging = true;
+            this.dragNode = node;
+            this.startX = event.clientX - node.x;
+            this.startY = event.clientY - node.y;
+        },
+
+        handleDrag(event) {
+            if (!this.isDragging || !this.dragNode) return;
+
+            this.dragNode.x = event.clientX - this.startX;
+            this.dragNode.y = event.clientY - this.startY;
+
+            // 限制在画布范围内
+            this.dragNode.x = Math.max(0, Math.min(this.canvasSize.width - 100, this.dragNode.x));
+            this.dragNode.y = Math.max(0, Math.min(this.canvasSize.height - 60, this.dragNode.y));
+
+            this.calculateConnections();
+        },
+
+        stopDrag() {
+            this.isDragging = false;
+            this.dragNode = null;
+        },
+
+        // 计算连接线路径
+        calculateConnections() {
+            this.connections.forEach((conn) => {
+                const source = this.bpmnNodes.find((n) => n.id === conn.source);
+                const target = this.bpmnNodes.find((n) => n.id === conn.target);
+
+                if (source && target) {
+                    const startX = source.x + 80;
+                    const startY = source.y + 30;
+                    const endX = target.x;
+                    const endY = target.y + 30;
+
+                    // 计算控制点，创建平滑曲线
+                    const controlX1 = startX + (endX - startX) * 0.5;
+                    const controlX2 = startX + (endX - startX) * 0.5;
+
+                    conn.path = `M ${startX} ${startY} C ${controlX1} ${startY} ${controlX2} ${endY} ${endX} ${endY}`;
+                    conn.textX = (startX + endX) / 2;
+                    conn.textY = (startY + endY) / 2 - 10;
+                }
+            });
+        },
+
+        // 网关配置
+        showGatewayConfig() {
+            if (this.selectedNode && this.selectedNode.type === 'gateway') {
+                this.selectedGateway = this.selectedNode;
+                this.gatewayDialogVisible = true;
+            }
+        },
+
+        addBranch() {
+            const newId = 'b' + (this.gatewayBranches.length + 1);
+            this.gatewayBranches.push({
+                id: newId,
+                name: '分支' + (this.gatewayBranches.length + 1),
+                condition: '',
+                target: '',
+            });
+        },
+
+        removeBranch(index) {
+            this.gatewayBranches.splice(index, 1);
+        },
+
+        saveGatewayConfig() {
+            // 更新连接线
+            this.connections = this.connections.filter(
+                (conn) => conn.source !== this.selectedGateway.id,
+            );
+
+            this.gatewayBranches.forEach((branch) => {
+                if (branch.target) {
+                    this.connections.push({
+                        id: 'c_' + this.selectedGateway.id + '_' + branch.target,
+                        source: this.selectedGateway.id,
+                        target: branch.target,
+                        configured: true,
+                        condition: branch.condition,
+                    });
+                }
+            });
+
+            this.gatewayDialogVisible = false;
+            this.$message.success('网关分支配置已保存');
+        },
+
+        updateNodeName() {
+            this.calculateConnections();
+        },
+
+        // 配置管理
+        saveConfig() {
+            if (!this.selectedNode) {
+                this.$message.warning('请先选择一个节点');
+                return;
+            }
+
+            if (
+                !this.currentConfig.role &&
+                this.selectedNode.type !== 'start' &&
+                this.selectedNode.type !== 'end'
+            ) {
+                this.$message.warning('请选择角色');
+                return;
+            }
+
+            const index = this.configTable.findIndex(
+                (item) => item.nodeId === this.selectedNode.id,
+            );
+            const configData = {
+                nodeId: this.selectedNode.id,
+                ...this.currentConfig,
+            };
+
+            if (index !== -1) {
+                this.configTable.splice(index, 1, configData);
+                this.$message.success('配置更新成功');
+            } else {
+                this.configTable.push(configData);
+                this.$message.success('配置保存成功');
+            }
+
+            // 更新连接线状态
+            this.updateConnectionStatus();
+        },
+
+        updateConnectionStatus() {
+            this.connections.forEach((conn) => {
+                const sourceConfigured = this.configTable.some(
+                    (item) => item.nodeId === conn.source,
+                );
+                const targetConfigured = this.configTable.some(
+                    (item) => item.nodeId === conn.target,
+                );
+                conn.configured = sourceConfigured && targetConfigured;
+            });
+        },
+
+        clearConfig() {
+            this.currentConfig = { role: '', permissions: [], remark: '' };
+        },
+
+        editConfig(config) {
+            const node = this.bpmnNodes.find((item) => item.id === config.nodeId);
+            if (node) {
+                this.selectNode(node);
+            }
+        },
+
+        deleteConfig(nodeId) {
+            this.$confirm('确定删除此配置吗?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }).then(() => {
+                this.configTable = this.configTable.filter((item) => item.nodeId !== nodeId);
+                this.$message.success('删除成功');
+                this.updateConnectionStatus();
+
+                if (this.selectedNode && this.selectedNode.id === nodeId) {
+                    this.currentConfig = { role: '', permissions: [], remark: '' };
+                }
+            });
+        },
+
+        exportConfig() {
+            if (this.configTable.length === 0) {
+                this.$message.warning('没有配置数据可导出');
+                return;
+            }
+
+            const dataStr = JSON.stringify(this.configTable, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+            const exportFileDefaultName = 'bpmn_config.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+
+            this.$message.success('配置导出成功');
+        },
+    },
+};
+</script>
+
+<style scoped>
+.model {
+    font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', Arial, sans-serif;
+    background-color: #f5f7fa;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    color: #303133;
+    font-weight: 500;
+}
+
+.content {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    min-height: 600px;
+}
+
+.canvas-container {
+    flex: 2;
+    padding: 20px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.process-canvas {
+    flex: 1;
+    position: relative;
+    background: #fafafa;
+    border: 1px solid #e4e7ed;
+    border-radius: 4px;
+    overflow: hidden;
+    min-height: 500px;
+}
+
+/* 流程节点样式 */
+.process-node {
+    position: absolute;
+    min-width: 80px;
+    height: 60px;
+    background: white;
+    border: 2px solid #dcdfe6;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.process-node:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.node-active {
+    border-color: #409eff !important;
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3) !important;
+}
+
+.node-configured {
+    border-color: #67c23a !important;
+}
+
+/* 节点类型特定样式 */
+.node-start {
+    border-color: #67c23a;
+    background: linear-gradient(135deg, #f0f9ff, #e6f7ff);
+}
+
+.node-task {
+    border-color: #409eff;
+    background: linear-gradient(135deg, #f0f6ff, #ecf5ff);
+}
+
+.node-gateway {
+    border-color: #e6a23c;
+    background: linear-gradient(135deg, #fdf6ec, #fef0e0);
+    min-width: 100px;
+}
+
+.node-end {
+    border-color: #909399;
+    background: linear-gradient(135deg, #f4f4f5, #f0f0f1);
+}
+
+.node-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    flex-shrink: 0;
+    color: white;
+    font-size: 16px;
+}
+
+.node-start .node-icon {
+    background: #67c23a;
+}
+
+.node-task .node-icon {
+    background: #409eff;
+}
+
+.node-gateway .node-icon {
+    background: #e6a23c;
+    transform: rotate(45deg);
+}
+
+.node-gateway .node-icon i {
+    transform: rotate(-45deg);
+}
+
+.node-end .node-icon {
+    background: #909399;
+}
+
+.node-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.node-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #303133;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.node-id {
+    font-size: 11px;
+    color: #909399;
+}
+
+.node-status {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    background: #67c23a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+}
+
+/* 连接线样式 */
+.connection-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.connection-line {
+    fill: none;
+    stroke: #c0c4cc;
+    stroke-width: 2;
+    transition: all 0.3s;
+}
+
+.connection-line:hover {
+    stroke-width: 3;
+}
+
+.connection-configured {
+    stroke: #67c23a;
+    stroke-width: 2;
+}
+
+.connection-label {
+    font-size: 12px;
+    fill: #606266;
+    background: white;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.config-container {
+    flex: 1;
+    padding: 20px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+.config-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    min-width: 600px;
+}
+
+.config-table th,
+.config-table td {
+    border: 1px solid #ebeef5;
+    padding: 12px 15px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.config-table th {
+    background-color: #f5f7fa;
+    color: #606266;
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+}
+
+.config-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.empty-config {
+    text-align: center;
+    color: #909399;
+    padding: 40px 0;
+}
+
+.config-form {
+    margin-top: 20px;
+}
+
+.step-tip {
+    margin: 10px 0;
+    color: #606266;
+}
+
+.no-selection-tip {
+    color: #909399;
+    margin-top: 20px;
+}
+
+.config-table-title {
+    margin-top: 30px;
+}
+
+.delete-btn {
+    color: #f56c6c;
+}
+
+/* 网关配置样式 */
+.gateway-config {
+    padding: 10px 0;
+}
+</style>

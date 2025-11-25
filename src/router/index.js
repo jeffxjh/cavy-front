@@ -26,7 +26,7 @@ import Centre from "@/components/centre";
 import Home from "@/view/home/home";
 import Workflow from "@/page/workflow/workflow";
 import Bussiness from "@/page/workflow/bussiness/bussiness";
-import WorkflowModel from "@/page/workflow/model";
+import ModelConfig from "@/page/workflow/modelConfig";
 import Demo from "@/page/workflow/bussiness/demo";
 import taskList from "@/page/workflow/taskList";
 import DefinitionList from "@/page/workflow/definitionList";
@@ -57,9 +57,9 @@ const routes = [
             component: taskList, meta: { title: "代办任务", }
           },
           {
-            path: "/workflow/model",
-            name: "WorkflowModel",
-            component: WorkflowModel, meta: { title: "流程模型", }
+            path: "/workflow/modelConfig",
+            name: "ModelConfig",
+            component: ModelConfig, meta: { title: "流程模型", }
           },
           {
             path: "/workflow/definitionList",
