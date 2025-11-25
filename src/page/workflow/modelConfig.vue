@@ -2,7 +2,17 @@
     <div class="model">
         <div class="header">
             <h1>BPMN流程配置器</h1>
-            <el-button type="primary" @click="exportConfig">导出配置</el-button>
+            <div class="header-actions">
+                <el-upload
+                    action=""
+                    :show-file-list="false"
+                    :before-upload="handleBpmnUpload"
+                    accept=".bpmn,.xml"
+                >
+                    <el-button type="primary">导入BPMN文件</el-button>
+                </el-upload>
+                <el-button type="primary" @click="exportConfig">导出配置</el-button>
+            </div>
         </div>
 
         <div class="content">
@@ -11,7 +21,13 @@
                 <h3>流程画布</h3>
                 <p class="step-tip">点击节点进行配置，可拖动节点位置</p>
 
-                <div class="process-canvas" ref="canvas">
+                <div
+                    class="process-canvas"
+                    ref="canvas"
+                    @mousemove="handleCanvasDrag"
+                    @mouseup="stopDrag"
+                    @mouseleave="stopDrag"
+                >
                     <!-- 流程节点 -->
                     <div
                         v-for="node in bpmnNodes"
@@ -28,7 +44,6 @@
                             left: node.x + 'px',
                             top: node.y + 'px',
                         }"
-                        @click="selectNode(node)"
                         @mousedown="startDrag(node, $event)"
                     >
                         <div class="node-icon">
@@ -290,6 +305,8 @@ export default {
             dragNode: null,
             startX: 0,
             startY: 0,
+            lastDragTime: 0,
+            dragThrottle: 16, // 60fps
 
             bpmnNodes: [
                 { id: 'N0001', name: '开始', type: 'start', x: 50, y: 300 },
@@ -356,16 +373,128 @@ export default {
 
     mounted() {
         this.calculateConnections();
-        document.addEventListener('mousemove', this.handleDrag);
-        document.addEventListener('mouseup', this.stopDrag);
-    },
-
-    beforeDestroy() {
-        document.removeEventListener('mousemove', this.handleDrag);
-        document.removeEventListener('mouseup', this.stopDrag);
     },
 
     methods: {
+        // BPMN文件导入
+        handleBpmnUpload(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        this.parseBpmnFile(e.target.result);
+                        this.$message.success('BPMN文件导入成功');
+                        resolve();
+                    } catch (error) {
+                        this.$message.error('BPMN文件解析失败');
+                        reject(error);
+                    }
+                };
+                reader.onerror = () => {
+                    this.$message.error('文件读取失败');
+                    reject();
+                };
+                reader.readAsText(file);
+            });
+        },
+
+        // 解析BPMN文件
+        parseBpmnFile(xmlContent) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+
+            // 清空现有数据
+            this.bpmnNodes = [];
+            this.connections = [];
+            this.selectedNode = null;
+
+            // 解析流程节点
+            const process = xmlDoc.getElementsByTagName('process')[0];
+            if (!process) return;
+
+            // 解析开始事件
+            const startEvents = xmlDoc.getElementsByTagName('startEvent');
+            Array.from(startEvents).forEach((event) => {
+                const id = event.getAttribute('id');
+                const name = event.getAttribute('name') || '开始';
+                this.bpmnNodes.push({
+                    id: id,
+                    name: name,
+                    type: 'start',
+                    x: 50,
+                    y: 300,
+                });
+            });
+
+            // 解析用户任务
+            const userTasks = xmlDoc.getElementsByTagName('userTask');
+            Array.from(userTasks).forEach((task) => {
+                const id = task.getAttribute('id');
+                const name = task.getAttribute('name') || '用户任务';
+                this.bpmnNodes.push({
+                    id: id,
+                    name: name,
+                    type: 'task',
+                    x: 150 + Math.random() * 100,
+                    y: 200 + Math.random() * 200,
+                });
+            });
+
+            // 解析结束事件
+            const endEvents = xmlDoc.getElementsByTagName('endEvent');
+            Array.from(endEvents).forEach((event) => {
+                const id = event.getAttribute('id');
+                const name = event.getAttribute('name') || '结束';
+                this.bpmnNodes.push({
+                    id: id,
+                    name: name,
+                    type: 'end',
+                    x: 600,
+                    y: 300,
+                });
+            });
+
+            // 解析顺序流
+            const sequenceFlows = xmlDoc.getElementsByTagName('sequenceFlow');
+            Array.from(sequenceFlows).forEach((flow) => {
+                const id = flow.getAttribute('id');
+                const source = flow.getAttribute('sourceRef');
+                const target = flow.getAttribute('targetRef');
+
+                this.connections.push({
+                    id: id,
+                    source: source,
+                    target: target,
+                    configured: false,
+                });
+            });
+
+            // 解析BPMN图形布局
+            this.parseBpmnLayout(xmlDoc);
+
+            this.calculateConnections();
+        },
+
+        // 解析BPMN图形布局
+        parseBpmnLayout(xmlDoc) {
+            const shapes = xmlDoc.getElementsByTagName('bpmndi:BPMNShape');
+            Array.from(shapes).forEach((shape) => {
+                const elementId = shape.getAttribute('bpmnElement');
+                const bounds = shape.getElementsByTagName('omgdc:Bounds')[0];
+                if (bounds) {
+                    const x = parseInt(bounds.getAttribute('x')) || 0;
+                    const y = parseInt(bounds.getAttribute('y')) || 0;
+
+                    const node = this.bpmnNodes.find((n) => n.id === elementId);
+                    if (node) {
+                        // 将BPMN坐标转换为画布坐标
+                        node.x = x / 2;
+                        node.y = y / 2;
+                    }
+                }
+            });
+        },
+
         // 节点选择
         selectNode(node) {
             this.selectedNode = node;
@@ -421,30 +550,58 @@ export default {
             return node ? node.type : 'task';
         },
 
-        // 拖动功能
+        // 优化的拖动功能
         startDrag(node, event) {
+            event.preventDefault();
+            event.stopPropagation();
+
             this.isDragging = true;
             this.dragNode = node;
             this.startX = event.clientX - node.x;
             this.startY = event.clientY - node.y;
+            this.lastDragTime = Date.now();
+
+            // 添加拖动样式
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor = 'grabbing';
         },
 
-        handleDrag(event) {
+        handleCanvasDrag(event) {
             if (!this.isDragging || !this.dragNode) return;
 
-            this.dragNode.x = event.clientX - this.startX;
-            this.dragNode.y = event.clientY - this.startY;
+            // 节流处理，提高性能
+            const now = Date.now();
+            if (now - this.lastDragTime < this.dragThrottle) return;
+            this.lastDragTime = now;
 
-            // 限制在画布范围内
-            this.dragNode.x = Math.max(0, Math.min(this.canvasSize.width - 100, this.dragNode.x));
-            this.dragNode.y = Math.max(0, Math.min(this.canvasSize.height - 60, this.dragNode.y));
+            // 使用requestAnimationFrame优化动画
+            requestAnimationFrame(() => {
+                this.dragNode.x = event.clientX - this.startX;
+                this.dragNode.y = event.clientY - this.startY;
 
-            this.calculateConnections();
+                // 限制在画布范围内
+                this.dragNode.x = Math.max(
+                    0,
+                    Math.min(this.canvasSize.width - 100, this.dragNode.x),
+                );
+                this.dragNode.y = Math.max(
+                    0,
+                    Math.min(this.canvasSize.height - 60, this.dragNode.y),
+                );
+
+                this.calculateConnections();
+            });
         },
 
         stopDrag() {
-            this.isDragging = false;
-            this.dragNode = null;
+            if (this.isDragging) {
+                this.isDragging = false;
+                this.dragNode = null;
+
+                // 恢复样式
+                document.body.style.userSelect = '';
+                document.body.style.cursor = '';
+            }
         },
 
         // 计算连接线路径
@@ -621,6 +778,7 @@ export default {
     background-color: #f5f7fa;
     padding: 20px;
     min-height: 100vh;
+    user-select: none; /* 全局禁止文本选择 */
 }
 
 .header {
@@ -637,6 +795,11 @@ export default {
 .header h1 {
     color: #303133;
     font-weight: 500;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
 }
 
 .content {
@@ -664,6 +827,7 @@ export default {
     border-radius: 4px;
     overflow: hidden;
     min-height: 500px;
+    cursor: default; /* 默认光标 */
 }
 
 /* 流程节点样式 */
@@ -677,15 +841,20 @@ export default {
     display: flex;
     align-items: center;
     padding: 8px;
-    cursor: pointer;
+    cursor: grab; /* 抓取光标 */
     transition: all 0.3s;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 10;
+    user-select: none; /* 禁止节点内文本选择 */
 }
 
 .process-node:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
+}
+
+.process-node:active {
+    cursor: grabbing; /* 抓取中光标 */
 }
 
 .node-active {
@@ -730,6 +899,8 @@ export default {
     flex-shrink: 0;
     color: white;
     font-size: 16px;
+    cursor: inherit; /* 继承父级光标 */
+    user-select: none; /* 禁止图标选择 */
 }
 
 .node-start .node-icon {
@@ -756,6 +927,8 @@ export default {
 .node-content {
     flex: 1;
     min-width: 0;
+    cursor: inherit; /* 继承父级光标 */
+    user-select: none; /* 禁止内容选择 */
 }
 
 .node-title {
@@ -766,11 +939,15 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: inherit;
+    user-select: none;
 }
 
 .node-id {
     font-size: 11px;
     color: #909399;
+    cursor: inherit;
+    user-select: none;
 }
 
 .node-status {
@@ -786,6 +963,8 @@ export default {
     justify-content: center;
     color: white;
     font-size: 10px;
+    cursor: inherit;
+    user-select: none;
 }
 
 /* 连接线样式 */
