@@ -45,6 +45,7 @@
                             top: node.y + 'px',
                         }"
                         @mousedown="startDrag(node, $event)"
+                        @click="selectNode(node)"
                     >
                         <div class="node-icon">
                             <i :class="getNodeIcon(node.type)"></i>
@@ -300,7 +301,6 @@ export default {
                 remark: '',
             },
             gatewayDialogVisible: false,
-            canvasSize: { width: 800, height: 600 },
             isDragging: false,
             dragNode: null,
             startX: 0,
@@ -309,18 +309,18 @@ export default {
             dragThrottle: 16, // 60fps
 
             bpmnNodes: [
-                { id: 'N0001', name: '开始', type: 'start', x: 50, y: 300 },
-                { id: 'N0002', name: '提交申请', type: 'task', x: 150, y: 300 },
-                { id: 'N0003', name: '审批网关', type: 'gateway', x: 300, y: 300 },
-                { id: 'N0004', name: '初审', type: 'task', x: 450, y: 200 },
-                { id: 'N0005', name: '复审', type: 'task', x: 450, y: 300 },
-                { id: 'N0006', name: '特殊处理', type: 'task', x: 450, y: 400 },
-                { id: 'N0007', name: '结束', type: 'end', x: 600, y: 300 },
+                { id: 'N0001', name: '开始', type: 'start', x: 50, y: 150 },
+                { id: 'N0002', name: '提交申请', type: 'task', x: 200, y: 150 },
+                { id: 'N0003', name: '审批网关', type: 'gateway', x: 350, y: 150 },
+                { id: 'N0004', name: '初审', type: 'task', x: 500, y: 80 },
+                { id: 'N0005', name: '复审', type: 'task', x: 500, y: 150 },
+                { id: 'N0006', name: '特殊处理', type: 'task', x: 500, y: 220 },
+                { id: 'N0007', name: '结束', type: 'end', x: 650, y: 150 },
             ],
 
             connections: [
-                { id: 'c1', source: 'N0001', target: 'N0002', configured: true },
-                { id: 'c2', source: 'N0002', target: 'N0003', configured: true },
+                { id: 'c1', source: 'N0001', target: 'N0002', configured: false },
+                { id: 'c2', source: 'N0002', target: 'N0003', configured: false },
                 {
                     id: 'c3',
                     source: 'N0003',
@@ -332,7 +332,7 @@ export default {
                     id: 'c4',
                     source: 'N0003',
                     target: 'N0005',
-                    configured: true,
+                    configured: false,
                     condition: '1000<金额≤5000',
                 },
                 {
@@ -369,13 +369,42 @@ export default {
                 (node) => node.id !== this.selectedGateway.id && node.type !== 'start',
             );
         },
+
+        // 动态计算画布大小
+        canvasSize() {
+            if (this.$refs.canvas) {
+                const rect = this.$refs.canvas.getBoundingClientRect();
+                return {
+                    width: rect.width,
+                    height: rect.height,
+                };
+            }
+            return { width: 1000, height: 500 };
+        },
     },
 
     mounted() {
-        this.calculateConnections();
+        // 确保初始连接线计算
+        this.$nextTick(() => {
+            this.calculateConnections();
+        });
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', this.handleResize);
+    },
+
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
     },
 
     methods: {
+        // 窗口大小变化处理
+        handleResize() {
+            this.$nextTick(() => {
+                this.calculateConnections();
+            });
+        },
+
         // BPMN文件导入
         handleBpmnUpload(file) {
             return new Promise((resolve, reject) => {
@@ -412,6 +441,11 @@ export default {
             const process = xmlDoc.getElementsByTagName('process')[0];
             if (!process) return;
 
+            let nodeCounter = 0;
+            const baseX = 50;
+            const baseY = 150;
+            const horizontalSpacing = 150;
+
             // 解析开始事件
             const startEvents = xmlDoc.getElementsByTagName('startEvent');
             Array.from(startEvents).forEach((event) => {
@@ -421,9 +455,10 @@ export default {
                     id: id,
                     name: name,
                     type: 'start',
-                    x: 50,
-                    y: 300,
+                    x: baseX,
+                    y: baseY,
                 });
+                nodeCounter++;
             });
 
             // 解析用户任务
@@ -435,9 +470,39 @@ export default {
                     id: id,
                     name: name,
                     type: 'task',
-                    x: 150 + Math.random() * 100,
-                    y: 200 + Math.random() * 200,
+                    x: baseX + nodeCounter * horizontalSpacing,
+                    y: baseY,
                 });
+                nodeCounter++;
+            });
+
+            // 解析网关
+            const gateways = xmlDoc.getElementsByTagName('exclusiveGateway');
+            Array.from(gateways).forEach((gateway) => {
+                const id = gateway.getAttribute('id');
+                const name = gateway.getAttribute('name') || '网关';
+                this.bpmnNodes.push({
+                    id: id,
+                    name: name,
+                    type: 'gateway',
+                    x: baseX + nodeCounter * horizontalSpacing,
+                    y: baseY,
+                });
+                nodeCounter++;
+            });
+            // 也解析其他类型的网关
+            const parallelGateways = xmlDoc.getElementsByTagName('parallelGateway');
+            Array.from(parallelGateways).forEach((gateway) => {
+                const id = gateway.getAttribute('id');
+                const name = gateway.getAttribute('name') || '并行网关';
+                this.bpmnNodes.push({
+                    id: id,
+                    name: name,
+                    type: 'gateway',
+                    x: baseX + nodeCounter * horizontalSpacing,
+                    y: baseY,
+                });
+                nodeCounter++;
             });
 
             // 解析结束事件
@@ -449,9 +514,10 @@ export default {
                     id: id,
                     name: name,
                     type: 'end',
-                    x: 600,
-                    y: 300,
+                    x: baseX + nodeCounter * horizontalSpacing,
+                    y: baseY,
                 });
+                nodeCounter++;
             });
 
             // 解析顺序流
@@ -460,19 +526,24 @@ export default {
                 const id = flow.getAttribute('id');
                 const source = flow.getAttribute('sourceRef');
                 const target = flow.getAttribute('targetRef');
+                const name = flow.getAttribute('name') || '';
 
                 this.connections.push({
                     id: id,
                     source: source,
                     target: target,
                     configured: false,
+                    condition: name,
                 });
             });
 
             // 解析BPMN图形布局
             this.parseBpmnLayout(xmlDoc);
 
-            this.calculateConnections();
+            // 确保连接线计算
+            this.$nextTick(() => {
+                this.calculateConnections();
+            });
         },
 
         // 解析BPMN图形布局
@@ -497,6 +568,7 @@ export default {
 
         // 节点选择
         selectNode(node) {
+            if (this.isDragging) return; // 拖动时不触发选择
             this.selectedNode = node;
             const existingConfig = this.configTable.find((item) => item.nodeId === node.id);
             if (existingConfig) {
@@ -557,8 +629,12 @@ export default {
 
             this.isDragging = true;
             this.dragNode = node;
-            this.startX = event.clientX - node.x;
-            this.startY = event.clientY - node.y;
+
+            // 获取画布相对位置
+            const rect = this.$refs.canvas.getBoundingClientRect();
+            this.startX = event.clientX - rect.left - node.x;
+            this.startY = event.clientY - rect.top - node.y;
+
             this.lastDragTime = Date.now();
 
             // 添加拖动样式
@@ -569,25 +645,37 @@ export default {
         handleCanvasDrag(event) {
             if (!this.isDragging || !this.dragNode) return;
 
-            // 节流处理，提高性能
             const now = Date.now();
             if (now - this.lastDragTime < this.dragThrottle) return;
             this.lastDragTime = now;
 
-            // 使用requestAnimationFrame优化动画
             requestAnimationFrame(() => {
-                this.dragNode.x = event.clientX - this.startX;
-                this.dragNode.y = event.clientY - this.startY;
+                if (!this.dragNode) return;
 
-                // 限制在画布范围内
-                this.dragNode.x = Math.max(
-                    0,
-                    Math.min(this.canvasSize.width - 100, this.dragNode.x),
-                );
-                this.dragNode.y = Math.max(
-                    0,
-                    Math.min(this.canvasSize.height - 60, this.dragNode.y),
-                );
+                // 实时获取画布尺寸
+                const canvas = this.$refs.canvas;
+                if (!canvas) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const canvasWidth = rect.width;
+                const canvasHeight = rect.height;
+
+                const canvasX = event.clientX - rect.left;
+                const canvasY = event.clientY - rect.top;
+
+                this.dragNode.x = canvasX - this.startX;
+                this.dragNode.y = canvasY - this.startY;
+
+                // 使用实时计算的边界
+                const margin = 10;
+                const nodeWidth = 100;
+                const nodeHeight = 60;
+
+                const maxX = canvasWidth - nodeWidth - margin;
+                const maxY = canvasHeight - nodeHeight - margin;
+
+                this.dragNode.x = Math.max(margin, Math.min(maxX, this.dragNode.x));
+                this.dragNode.y = Math.max(margin, Math.min(maxY, this.dragNode.y));
 
                 this.calculateConnections();
             });
@@ -611,8 +699,8 @@ export default {
                 const target = this.bpmnNodes.find((n) => n.id === conn.target);
 
                 if (source && target) {
-                    const startX = source.x + 80;
-                    const startY = source.y + 30;
+                    const startX = source.x + 80; // 节点宽度
+                    const startY = source.y + 30; // 节点高度的一半
                     const endX = target.x;
                     const endY = target.y + 30;
 
@@ -669,6 +757,7 @@ export default {
 
             this.gatewayDialogVisible = false;
             this.$message.success('网关分支配置已保存');
+            this.calculateConnections();
         },
 
         updateNodeName() {
@@ -807,16 +896,19 @@ export default {
     gap: 20px;
     margin-bottom: 20px;
     min-height: 600px;
+    height: calc(100vh - 180px); /* 自适应高度 */
 }
 
+/* 平分布局 */
 .canvas-container {
-    flex: 2;
+    flex: 1; /* 平等分配空间 */
     padding: 20px;
     background: white;
     border-radius: 4px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
+    min-width: 0; /* 防止内容溢出 */
 }
 
 .process-canvas {
@@ -825,9 +917,22 @@ export default {
     background: #fafafa;
     border: 1px solid #e4e7ed;
     border-radius: 4px;
-    overflow: hidden;
-    min-height: 500px;
+    overflow: auto; /* 允许滚动 */
+    min-height: 400px;
     cursor: default; /* 默认光标 */
+    width: 100%; /* 确保占满容器 */
+}
+
+.config-container {
+    flex: 1; /* 平等分配空间 */
+    padding: 20px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* 防止内容溢出 */
+    overflow: hidden; /* 防止内容溢出 */
 }
 
 /* 流程节点样式 */
@@ -974,6 +1079,8 @@ export default {
     left: 0;
     pointer-events: none;
     z-index: 1;
+    width: 100%;
+    height: 100%;
 }
 
 .connection-line {
@@ -1000,27 +1107,17 @@ export default {
     border-radius: 2px;
 }
 
-.config-container {
-    flex: 1;
-    padding: 20px;
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-}
-
 .table-wrapper {
     flex: 1;
     overflow-y: auto;
-    max-height: 300px;
+    max-height: none; /* 移除固定高度 */
 }
 
 .config-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
-    min-width: 600px;
+    min-width: 500px; /* 调整最小宽度 */
 }
 
 .config-table th,
@@ -1074,5 +1171,18 @@ export default {
 /* 网关配置样式 */
 .gateway-config {
     padding: 10px 0;
+}
+
+/* 响应式布局 */
+@media (max-width: 1200px) {
+    .content {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .canvas-container,
+    .config-container {
+        min-height: 500px;
+    }
 }
 </style>
