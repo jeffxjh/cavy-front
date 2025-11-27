@@ -384,15 +384,40 @@ export default {
     },
 
     mounted() {
-        // 确保初始连接线计算
-        this.$nextTick(() => {
+        // 使用 setTimeout 确保 DOM 完全渲染
+        setTimeout(() => {
             this.calculateConnections();
-        });
+            this.nodesReady = true;
+        }, 100);
 
         // 监听窗口大小变化
         window.addEventListener('resize', this.handleResize);
     },
+    watch: {
+        // 监视节点就绪状态
+        nodesReady: {
+            handler(newVal) {
+                if (newVal) {
+                    this.$nextTick(() => {
+                        this.calculateConnections();
+                    });
+                }
+            },
+            immediate: true,
+        },
 
+        // 监视节点数组变化
+        bpmnNodes: {
+            handler() {
+                if (this.nodesReady) {
+                    this.$nextTick(() => {
+                        this.calculateConnections();
+                    });
+                }
+            },
+            deep: true,
+        },
+    },
     beforeDestroy() {
         window.removeEventListener('resize', this.handleResize);
     },
@@ -604,7 +629,9 @@ export default {
 
             // 确保连接线计算
             this.$nextTick(() => {
-                this.calculateConnections();
+                setTimeout(() => {
+                    this.calculateConnections();
+                }, 50);
             });
         },
 
@@ -880,14 +907,12 @@ export default {
             this.isDragging = true;
             this.dragNode = node;
 
-            // 获取画布相对位置
             const rect = this.$refs.canvas.getBoundingClientRect();
             this.startX = event.clientX - rect.left - node.x;
             this.startY = event.clientY - rect.top - node.y;
 
             this.lastDragTime = Date.now();
 
-            // 添加拖动样式
             document.body.style.userSelect = 'none';
             document.body.style.cursor = 'grabbing';
         },
@@ -902,31 +927,27 @@ export default {
             requestAnimationFrame(() => {
                 if (!this.dragNode) return;
 
-                // 实时获取画布尺寸
                 const canvas = this.$refs.canvas;
                 if (!canvas) return;
 
                 const rect = canvas.getBoundingClientRect();
-                const canvasWidth = rect.width;
-                const canvasHeight = rect.height;
-
                 const canvasX = event.clientX - rect.left;
                 const canvasY = event.clientY - rect.top;
 
                 this.dragNode.x = canvasX - this.startX;
                 this.dragNode.y = canvasY - this.startY;
 
-                // 使用实时计算的边界
+                // 边界检查
                 const margin = 10;
                 const nodeWidth = 100;
                 const nodeHeight = 60;
-
-                const maxX = canvasWidth - nodeWidth - margin;
-                const maxY = canvasHeight - nodeHeight - margin;
+                const maxX = rect.width - nodeWidth - margin;
+                const maxY = rect.height - nodeHeight - margin;
 
                 this.dragNode.x = Math.max(margin, Math.min(maxX, this.dragNode.x));
                 this.dragNode.y = Math.max(margin, Math.min(maxY, this.dragNode.y));
 
+                // 立即计算连接线
                 this.calculateConnections();
             });
         },
@@ -944,25 +965,54 @@ export default {
 
         // 计算连接线路径
         calculateConnections() {
+            console.log('计算连接线...');
+
+            if (!this.$refs.canvas) {
+                console.warn('画布元素未找到');
+                return;
+            }
+
+            const canvas = this.$refs.canvas;
+            const rect = canvas.getBoundingClientRect();
+            console.log('画布尺寸:', rect.width, rect.height);
+
             this.connections.forEach((conn) => {
                 const source = this.bpmnNodes.find((n) => n.id === conn.source);
                 const target = this.bpmnNodes.find((n) => n.id === conn.target);
 
                 if (source && target) {
-                    const startX = source.x + 80; // 节点宽度
-                    const startY = source.y + 30; // 节点高度的一半
+                    console.log(`计算连接线 ${conn.id}: ${source.id} -> ${target.id}`);
+
+                    // 节点中心点计算
+                    const nodeWidth = 100; // 节点宽度
+                    const nodeHeight = 60; // 节点高度
+
+                    const startX = source.x + nodeWidth;
+                    const startY = source.y + nodeHeight / 2;
                     const endX = target.x;
-                    const endY = target.y + 30;
+                    const endY = target.y + nodeHeight / 2;
+
+                    console.log(`起点: (${startX}, ${startY}), 终点: (${endX}, ${endY})`);
 
                     // 计算控制点，创建平滑曲线
-                    const controlX1 = startX + (endX - startX) * 0.5;
-                    const controlX2 = startX + (endX - startX) * 0.5;
+                    const controlOffset = Math.max(50, (endX - startX) * 0.3); // 动态控制点偏移
+                    const controlX1 = startX + controlOffset;
+                    const controlY1 = startY;
+                    const controlX2 = endX - controlOffset;
+                    const controlY2 = endY;
 
-                    conn.path = `M ${startX} ${startY} C ${controlX1} ${startY} ${controlX2} ${endY} ${endX} ${endY}`;
+                    conn.path = `M ${startX} ${startY} C ${controlX1} ${controlY1} ${controlX2} ${controlY2} ${endX} ${endY}`;
                     conn.textX = (startX + endX) / 2;
-                    conn.textY = (startY + endY) / 2 - 10;
+                    conn.textY = Math.min(startY, endY) - 15;
+
+                    console.log(`路径: ${conn.path}`);
+                } else {
+                    console.warn(`找不到节点: source=${conn.source}, target=${conn.target}`);
                 }
             });
+
+            // 强制更新视图
+            this.$forceUpdate();
         },
 
         // 网关配置
@@ -1167,10 +1217,11 @@ export default {
     background: #fafafa;
     border: 1px solid #e4e7ed;
     border-radius: 4px;
-    overflow: auto; /* 允许滚动 */
+    overflow: auto;
     min-height: 400px;
-    cursor: default; /* 默认光标 */
-    width: 100%; /* 确保占满容器 */
+    cursor: default;
+    width: 100%;
+    min-width: 800px; /* 添加最小宽度 */
 }
 
 .config-container {
@@ -1331,6 +1382,8 @@ export default {
     z-index: 1;
     width: 100%;
     height: 100%;
+    min-width: 800px; /* 确保最小宽度 */
+    min-height: 500px; /* 确保最小高度 */
 }
 
 .connection-line {
