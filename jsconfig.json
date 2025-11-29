@@ -1,5 +1,31 @@
 {
-  "include": [
-      "./src/*"
-  ]
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"],
+            "~/*": ["./*"]
+        },
+        "module": "ESNext",
+        "target": "ES2020",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "jsx": "preserve",
+        "checkJs": false,
+        "strict": false
+    },
+    "include": ["src/**/*", "src/**/*.vue", "public/**/*"],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "build",
+        ".git",
+        ".github",
+        ".vscode",
+        "coverage",
+        "tmp",
+        "temp",
+        "logs",
+        "public", // 如果不需要跳转到 public 目录的文件
+        "*.config.js" // 排除配置文件
+    ]
 }

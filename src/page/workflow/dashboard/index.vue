@@ -196,16 +196,21 @@ export default {
 
         // 卡片点击事件
         handleCardClick(type) {
-            const routes = {
-                pending: '/task/pending',
-                involved: '/task/involved',
-                completed: '/task/completed',
-                today: '/task/today',
-                recent: '/task/recent',
+            const routeType = {
+                pending: 'pending',
+                involved: 'involved',
+                completed: 'completed',
+                today: 'today',
+                recent: 'recent',
             };
 
-            if (routes[type]) {
-                this.$router.push(routes[type]);
+            if (routeType[type]) {
+                this.$router.push({
+                    path: '/workflow/taskList',
+                    query: { routeType: routeType[type] },
+                });
+            } else {
+                console.warn('未知的卡片类型:', type);
             }
         },
 
