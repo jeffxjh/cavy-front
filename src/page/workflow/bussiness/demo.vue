@@ -1,8 +1,8 @@
 <template>
     <div>
         <workflow-process
-            :process-instance-id="'Order'"
-            :business-id="'Order'"
+            :process-instance-id="'ORDER2'"
+            :business-id="'ORDER2'"
             :step-no="'N0000'"
             :operate-type="'load'"
             :business-action="'create'"

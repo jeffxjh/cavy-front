@@ -97,7 +97,7 @@
                     <div class="form-group">
                         <div class="form-item">
                             <label class="form-label">元素ID</label>
-                            <el-input :value="element.id" disabled />
+                            <el-input :value="element.id" />
                         </div>
                         <div class="form-item">
                             <label class="form-label">名称</label>

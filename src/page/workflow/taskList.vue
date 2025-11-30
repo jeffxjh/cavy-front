@@ -36,7 +36,7 @@
             <template #statusTemplate="{ row }">
                 <div class="status-cell">
                     <el-tag :type="getStatusType(row.status)" size="medium">
-                        {{ getStatusText(row.status) }}
+                        {{ safeFmtDic('WORKFLOW_STATUS', row.status) }}
                     </el-tag>
                     <span v-if="row.status === '进行中'" class="progress-text">
                         (进度: {{ row.progress }}%)
@@ -45,7 +45,7 @@
             </template>
 
             <!-- 自定义操作列模板 -->
-            <template #actionTemplate="{ row, index }">
+            <template #actionTemplate="{ row }">
                 <div class="action-buttons">
                     <el-button size="mini" type="primary" @click="handleViewDetail(row)">
                         查看
@@ -56,10 +56,7 @@
                         :disabled="row.status === '已完成'"
                         @click="handleEdit(row)"
                     >
-                        编辑
-                    </el-button>
-                    <el-button size="mini" type="danger" @click="handleDelete(row, index)">
-                        删除
+                        处理
                     </el-button>
                 </div>
             </template>
@@ -80,7 +77,7 @@
 
 <script>
 import QueryList from '@/components/ui/query-list.vue';
-
+import { mapGetters } from 'vuex';
 export default {
     name: 'TaskManagement',
     components: {
@@ -90,8 +87,20 @@ export default {
         return {
             columns: [
                 {
-                    prop: 'taskDefinitionKey',
+                    prop: 'txnCode',
                     label: '流程定义',
+                    sortable: true,
+                    minWidth: 120,
+                },
+                {
+                    prop: 'stepNo',
+                    label: '步骤号',
+                    sortable: true,
+                    minWidth: 120,
+                },
+                {
+                    prop: 'description',
+                    label: '步骤描述',
                     sortable: true,
                     minWidth: 120,
                 },
@@ -101,7 +110,12 @@ export default {
                     template: 'userInfoTemplate', // 使用自定义模板
                 },
                 {
-                    prop: 'originalAssignee',
+                    prop: 'previousAssignee',
+                    label: '上个节点处理人',
+                    minWidth: 100,
+                },
+                {
+                    prop: 'owner',
                     label: '发起人',
                     minWidth: 100,
                 },
@@ -155,11 +169,20 @@ export default {
         };
     },
     computed: {
+        ...mapGetters(['fmtDic']),
         // btnSize() {
         //     return this.$store.state.app.btnSize;
         // },
     },
     methods: {
+        safeFmtDic(code, key) {
+            try {
+                return this.fmtDic(code, key);
+            } catch (error) {
+                console.error('字典转换失败:', error);
+                return key;
+            }
+        },
         handleOperation(operation, row, index) {
             // 处理操作按钮点击
         },
@@ -173,18 +196,7 @@ export default {
         },
 
         handleEdit(row) {
-            console.log('编辑:', row);
-        },
-
-        handleDelete(row, index) {
-            this.$confirm('确认删除该任务?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning',
-            }).then(() => {
-                console.log('删除:', row);
-                this.$refs.queryListRef.refresh();
-            });
+            this.$router.push('/workflow/bussiness/' + row.processPath);
         },
 
         handleCreate() {

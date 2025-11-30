@@ -114,18 +114,18 @@ export default {
             <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="sid-38422fae-e03e-43a3-bef4-bd33b32041b2" targetNamespace="http://bpmn.io/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="5.1.2">
     <process id="Process_1" isExecutable="false">
-    <startEvent id="StartEvent_1y45yut" name="开始">
+    <startEvent id="N0000" name="开始">
         <outgoing>SequenceFlow_0h21x7r</outgoing>
     </startEvent>
-    <sequenceFlow id="SequenceFlow_0h21x7r" sourceRef="StartEvent_1y45yut" targetRef="Activity_0x06wtw" />
-    <userTask id="Activity_0x06wtw">
+    <sequenceFlow id="SequenceFlow_0h21x7r" sourceRef="N0000" targetRef="N0001" />
+    <userTask id="N0001" name="用户任务">
         <incoming>SequenceFlow_0h21x7r</incoming>
         <outgoing>Flow_0qiynkn</outgoing>
     </userTask>
-    <endEvent id="Event_0sevwlp" name="结束">
+    <endEvent id="N9999" name="结束">
         <incoming>Flow_0qiynkn</incoming>
     </endEvent>
-    <sequenceFlow id="Flow_0qiynkn" sourceRef="Activity_0x06wtw" targetRef="Event_0sevwlp" />
+    <sequenceFlow id="Flow_0qiynkn" sourceRef="N0001" targetRef="N9999" />
     </process>
     <bpmndi:BPMNDiagram id="BpmnDiagram_1">
     <bpmndi:BPMNPlane id="BpmnPlane_1" bpmnElement="Process_1">
@@ -137,16 +137,16 @@ export default {
         <omgdi:waypoint x="188" y="120" />
         <omgdi:waypoint x="270" y="120" />
     </bpmndi:BPMNEdge>
-    <bpmndi:BPMNShape id="StartEvent_1y45yut_di" bpmnElement="StartEvent_1y45yut">
+    <bpmndi:BPMNShape id="N0000_di" bpmnElement="N0000">
         <omgdc:Bounds x="152" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
             <omgdc:Bounds x="160" y="145" width="22" height="14" />
         </bpmndi:BPMNLabel>
     </bpmndi:BPMNShape>
-    <bpmndi:BPMNShape id="Activity_0x06wtw_di" bpmnElement="Activity_0x06wtw">
+    <bpmndi:BPMNShape id="N0001_di" bpmnElement="N0001">
         <omgdc:Bounds x="270" y="80" width="100" height="80" />
     </bpmndi:BPMNShape>
-    <bpmndi:BPMNShape id="Event_0sevwlp_di" bpmnElement="Event_0sevwlp">
+    <bpmndi:BPMNShape id="N9999_di" bpmnElement="N9999">
         <omgdc:Bounds x="452" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
             <omgdc:Bounds x="459" y="145" width="22" height="14" />

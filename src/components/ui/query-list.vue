@@ -471,23 +471,23 @@ export default {
         },
 
         // 安全的字典转换方法
-        safeFmtDic(code, key) {
-            try {
-                const text = this.fmtDic(code, key);
-                const color = this.getDictColor(code, key);
+        // safeFmtDic(code, key) {
+        //     try {
+        //         const text = this.fmtDic(code, key);
+        //         const color = this.getDictColor(code, key);
 
-                return {
-                    text,
-                    color,
-                };
-            } catch (error) {
-                console.error('字典转换失败:', error);
-                return {
-                    text: key,
-                    color: '#909399',
-                };
-            }
-        },
+        //         return {
+        //             text,
+        //             color,
+        //         };
+        //     } catch (error) {
+        //         console.error('字典转换失败:', error);
+        //         return {
+        //             text: key,
+        //             color: '#909399',
+        //         };
+        //     }
+        // },
         loadRequiredDicts() {
             // 从列配置中提取需要的字典
             const requiredDicts = this.columns
