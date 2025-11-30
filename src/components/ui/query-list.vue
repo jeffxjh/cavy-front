@@ -183,7 +183,22 @@
                             ></slot>
                             <!-- 字典显示 -->
                             <template v-else-if="column.dictName">
-                                {{ safeFmtDic(column.dictName, scope.row[column.prop]) }}
+                                <el-tag
+                                    :style="{
+                                        backgroundColor:
+                                            safeFmtDic(column.dictName, scope.row[column.prop])
+                                                .color + '20',
+                                        color: safeFmtDic(column.dictName, scope.row[column.prop])
+                                            .color,
+                                        borderColor:
+                                            safeFmtDic(column.dictName, scope.row[column.prop])
+                                                .color + '40',
+                                    }"
+                                    size="small"
+                                    effect="light"
+                                >
+                                    {{ safeFmtDic(column.dictName, scope.row[column.prop]) }}
+                                </el-tag>
                             </template>
                             <!-- 格式化显示 -->
                             <template v-else-if="column.formatter">
@@ -388,6 +403,8 @@ export default {
                 keyword: '',
                 ...this.searchParams,
             },
+            // 字典颜色映射缓存
+            dictColorMap: new Map(),
         };
     },
     computed: {
@@ -423,6 +440,54 @@ export default {
         this.loadRequiredDicts();
     },
     methods: {
+        // 生成HSL颜色（更均匀的分布）
+        generateHSLColor(seed) {
+            const h = this.hashCode(seed) % 360;
+            return `hsl(${h}, 70%, 50%)`;
+        },
+
+        // 获取字典项颜色
+        getDictColor(dictName, value) {
+            const key = `${dictName}_${value}`;
+
+            if (this.dictColorMap.has(key)) {
+                return this.dictColorMap.get(key);
+            }
+
+            const color = this.generateHSLColor(key);
+            this.dictColorMap.set(key, color);
+            return color;
+        },
+
+        // 哈希函数
+        hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash);
+        },
+
+        // 安全的字典转换方法
+        safeFmtDic(code, key) {
+            try {
+                const text = this.fmtDic(code, key);
+                const color = this.getDictColor(code, key);
+
+                return {
+                    text,
+                    color,
+                };
+            } catch (error) {
+                console.error('字典转换失败:', error);
+                return {
+                    text: key,
+                    color: '#909399',
+                };
+            }
+        },
         loadRequiredDicts() {
             // 从列配置中提取需要的字典
             const requiredDicts = this.columns

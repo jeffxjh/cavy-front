@@ -4,7 +4,7 @@
         <!-- 顶部统计卡片 -->
         <div class="stat-cards">
             <el-row :gutter="20">
-                <el-col :xs="12" :sm="6" :lg="3">
+                <el-col :span="6">
                     <stat-card
                         title="待办任务"
                         :value="stats.pendingTasks"
@@ -13,7 +13,7 @@
                         @click="handleCardClick('pending')"
                     />
                 </el-col>
-                <el-col :xs="12" :sm="6" :lg="3">
+                <el-col :span="6">
                     <stat-card
                         title="参与任务"
                         :value="stats.involvedTasks"
@@ -22,7 +22,7 @@
                         @click="handleCardClick('involved')"
                     />
                 </el-col>
-                <el-col :xs="12" :sm="6" :lg="3">
+                <el-col :span="6">
                     <stat-card
                         title="已完成任务"
                         :value="stats.completedTasks"
@@ -31,7 +31,7 @@
                         @click="handleCardClick('completed')"
                     />
                 </el-col>
-                <el-col :xs="12" :sm="6" :lg="3">
+                <el-col :span="6">
                     <stat-card
                         title="今日完成"
                         :value="stats.todayCompleted"
@@ -142,7 +142,7 @@ export default {
         };
     },
     mounted() {
-        this.loadDashboardData();
+        // this.loadDashboardData();
     },
     methods: {
         // 加载工作台数据

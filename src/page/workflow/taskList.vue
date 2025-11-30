@@ -48,7 +48,7 @@
             <template #actionTemplate="{ row, index }">
                 <div class="action-buttons">
                     <el-button size="mini" type="primary" @click="handleViewDetail(row)">
-                        查看详情
+                        查看
                     </el-button>
                     <el-button
                         size="mini"
